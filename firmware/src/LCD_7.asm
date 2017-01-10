@@ -1,7 +1,7 @@
 ;----------------------------------------------------------------------------
 
 ;LCD support module
-;Used LCD - HT44780 + 74HC164
+;Used LCD - MT10T7-7 + 74HC164
 
 ;Connections:
 ;LOAD -> WR2 LCD
