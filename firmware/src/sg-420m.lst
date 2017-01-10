@@ -1,0 +1,2926 @@
+
+AVRASM ver. 2.0.13  C:\Projects\Proj_Spetspribor\Measuring\SG-420M\AVR\Main.asm Wed Sep 27 00:37:32 2006
+
+C:\Projects\Proj_Spetspribor\Measuring\SG-420M\AVR\Main.asm(11): Including file 'C:\Program Files\Atmel\AVR Tools\AvrAssembler\Appnotes\m8def.inc'
+C:\Program Files\Atmel\AVR Tools\AvrAssembler\Appnotes\m8def.inc(41): Including file 'C:\Program Files\Atmel\AVR Tools\AvrAssembler\Appnotes\ATmega8.h'
+C:\Projects\Proj_Spetspribor\Measuring\SG-420M\AVR\Main.asm(12): Including file 'C:\Program Files\Atmel\AVR Tools\AvrAssembler\Appnotes\macros.mac'
+C:\Projects\Proj_Spetspribor\Measuring\SG-420M\AVR\Main.asm(13): Including file 'Header.asm'
+C:\Projects\Proj_Spetspribor\Measuring\SG-420M\AVR\Main.asm(22): Including file 'DDS.asm'
+DDS.asm(364): Including file 'sin256.asm'
+C:\Projects\Proj_Spetspribor\Measuring\SG-420M\AVR\Main.asm(119): Including file 'LCD.asm'
+C:\Projects\Proj_Spetspribor\Measuring\SG-420M\AVR\Main.asm(120): Including file 'Keyboard.asm'
+C:\Projects\Proj_Spetspribor\Measuring\SG-420M\AVR\Main.asm(121): Including file 'Beeper.asm'
+C:\Projects\Proj_Spetspribor\Measuring\SG-420M\AVR\Main.asm(122): Including file 'Menu.asm'
+C:\Projects\Proj_Spetspribor\Measuring\SG-420M\AVR\Main.asm(123): Including file 'EEPROM.asm'
+                 
+                 
+                 
+                 ;* Title	: SG-420M sine wave generator
+                 ;* Version	: 1.00
+                 ;* Target	: ATmega8
+                 ;* Author	: wubblick@yahoo.com
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .include "m8def.inc"
+                 
+                 ;* A P P L I C A T I O N   N O T E   F O R   T H E   A V R   F A M I L Y
+                 ;* 
+                 ;* Number				:AVR000
+                 ;* File Name			:"m8def.inc"
+                 ;* Title				:Register/Bit Definitions for the ATmega8
+                 ;* Date                 :07.09.2001
+                 ;* Version              :1.00
+                 ;* Support telephone	:+47 72 88 43 88 (ATMEL Norway)
+                 ;* Support fax			:+47 72 88 43 99 (ATMEL Norway)
+                 ;* Support E-mail		:avr@atmel.no
+                 ;* Target MCU			:ATmega8
+                 ;*
+                 ;* DESCRIPTION
+                 ;* When including this file in the assembly program file, all I/O register	
+                 ;* names and I/O register bit names appearing in the data book can be used.
+                 ;* In addition, the six registers forming the three data pointers X, Y and
+                 ;* Z have been assigned names XL - ZH. Highest RAM address for Internal 
+                 ;* SRAM is also defined 
+                 ;*
+                 ;* The Register names are represented by their hexadecimal address.
+                 ;* 
+                 ;* The Register Bit names are represented by their bit number (0-7).
+                 ;* 
+                 ;* Please observe the difference in using the bit names with instructions
+                 ;* such as "sbr"/"cbr" (set/clear bit in register) and "sbrs"/"sbrc" 
+                 ;* (skip if bit in register set/cleared). The following example illustrates
+                 ;* this:
+                 ;* 
+                 ;* in	r16,PORTB				;read PORTB latch
+                 ;* sbr	r16,(1<<PB6)+(1<<PB5)	;set PB6 and PB5 (use masks, not bit#)
+                 ;* out  PORTB,r16				;output to PORTB
+                 ;*
+                 ;* in	r16,TIFR				;read the Timer Interrupt Flag Register
+                 ;* sbrc	r16,TOV0				;test the overflow flag (use bit#)
+                 ;* rjmp	TOV0_is_set				;jump if set
+                 ;* ...							;otherwise do something else
+                 ;***************************************************************************
+                 
+                 ;***** Specify Device
+                 
+                 #define _ATmega8_h
+                 
+                 #pragma AVRPART ADMIN PART_NAME ATmega8
+                 #pragma AVRPART CORE CORE_VERSION V2E
+                 #pragma AVRPART MEMORY PROG_FLASH 8192
+                 #pragma AVRPART MEMORY EEPROM 512
+                 #pragma AVRPART MEMORY INT_SRAM START_ADDR 0x60
+                 #pragma AVRPART MEMORY INT_SRAM SIZE  1024
+                 
+                 #endif
+                 .device ATmega8
+                 
+                 ;***** I/O Register Definitions
+                 .equ	SREG	=$3f
+                 .equ	SPH		=$3e
+                 .equ	SPL		=$3d
+                 .equ	GIMSK	=$3b
+                 .equ	GICR	=$3b		; new name for GIMSK
+                 .equ	GIFR	=$3a
+                 .equ	TIMSK	=$39
+                 .equ	TIFR	=$38
+                 .equ	SPMCR	=$37
+                 .equ    I2CR    =$36
+                 .equ    TWCR    =$36
+                 .equ    MCUCR   =$35
+                 .equ    MCUSR   =$34		; For compatibility, 
+                 .equ    MCUCSR  =$34		; keep both names until further
+                 .equ	TCCR0	=$33
+                 .equ	TCNT0	=$32
+                 .equ    OSCCAL  =$31
+                 .equ    SFIOR   =$30
+                 .equ	TCCR1A	=$2f
+                 .equ	TCCR1B	=$2e
+                 .equ	TCNT1H	=$2d
+                 .equ	TCNT1L	=$2c
+                 .equ	OCR1AH	=$2b
+                 .equ	OCR1AL	=$2a
+                 .equ	OCR1BH	=$29
+                 .equ	OCR1BL	=$28
+                 .equ	ICR1H	=$27
+                 .equ	ICR1L	=$26
+                 .equ	TCCR2	=$25
+                 .equ	TCNT2	=$24
+                 .equ	OCR2	=$23
+                 .equ	ASSR	=$22
+                 .equ	WDTCR	=$21
+                 .equ    UBRRH   =$20		;  Note! UCSRC equals UBRRH
+                 .equ	EEARH	=$1f
+                 .equ	EEARL	=$1e
+                 .equ	EEDR	=$1d
+                 .equ	EECR	=$1c
+                 .equ	PORTB	=$18
+                 .equ	DDRB	=$17
+                 .equ	PINB	=$16
+                 .equ	PORTC	=$15
+                 .equ	DDRC	=$14
+                 .equ	PINC	=$13
+                 .equ	PORTD	=$12
+                 .equ	DDRD	=$11
+                 .equ	PIND	=$10
+                 .equ	SPDR	=$0f
+                 .equ	SPSR	=$0e
+                 .equ	SPCR	=$0d
+                 .equ	UDR	=$0c
+                 .equ	UCSRA	=$0b
+                 .equ	UCSRB	=$0a
+                 .equ	UCSRC	=$20		;  Note! UCSRC equals UBRRH
+                 .equ	UBRRL	=$09
+                 .equ	ACSR	=$08
+                 .equ    ADMUX   =$07
+                 .equ    ADCSR   =$06
+                 .equ	ADCSRA	=$06
+                 .equ    ADCH    =$05
+                 .equ    ADCL    =$04
+                 .equ    I2DR    =$03
+                 .equ    I2AR    =$02
+                 .equ    I2SR    =$01
+                 .equ    I2BR    =$00
+                 .equ    TWDR    =$03
+                 .equ    TWAR    =$02
+                 .equ    TWSR    =$01
+                 .equ    TWBR    =$00
+                 
+                 
+                 
+                 ;***** Bit Definitions
+                 ;GICR  (former GIMSK)
+                 .equ	INT1	=7
+                 .equ	INT0	=6
+                 .equ	IVSEL	=1		; interrupt vector select
+                 .equ	IVCE	=0		; interrupt vector change enable
+                 
+                 ;GIFR
+                 .equ	INTF1	=7
+                 .equ	INTF0	=6
+                 
+                 ;TIMSK
+                 .equ    TOIE0   =0
+                 .equ    TOIE1   =2
+                 .equ    OCIE1B  =3
+                 .equ    OCIE1A  =4
+                 .equ    TICIE1  =5
+                 .equ    TOIE2   =6
+                 .equ    OCIE2   =7
+                 
+                 ;TIFR
+                 .equ    TOV0    =0
+                 .equ    TOV1    =2
+                 .equ    OCF1B   =3
+                 .equ    OCF1A   =4
+                 .equ    ICF1    =5
+                 .equ    TOV2    =6
+                 .equ    OCF2    =7
+                 
+                 ;SPMCR
+                 .equ	SPMIE	=7
+                 .equ	RWWSB	=6
+                 .equ	RWWSRE	=4
+                 .equ	BLBSET	=3
+                 .equ	PGWRT	=2
+                 .equ	PGERS	=1
+                 .equ	SPMEN	=0
+                 
+                 ;MCUCR
+                 .equ    SE      =7
+                 .equ    SM2     =6
+                 .equ    SM1     =5
+                 .equ    SM0     =4
+                 .equ    ISC11   =3
+                 .equ    ISC10   =2
+                 .equ    ISC01   =1
+                 .equ    ISC00   =0
+                 
+                 ;MCUCSR
+                 .equ    WDRF    =3
+                 .equ    BORF    =2
+                 .equ    EXTRF   =1
+                 .equ    PORF    =0
+                 
+                 ;TCCR0
+                 .equ	CS02	=2
+                 .equ	CS01	=1
+                 .equ	CS00	=0
+                 
+                 ;TCCR1A
+                 .equ	COM1A1	=7
+                 .equ	COM1A0	=6
+                 .equ	COM1B1	=5
+                 .equ	COM1B0	=4
+                 .equ	FOC1A	=3
+                 .equ	FOC1B	=2
+                 .equ	PWM11	=1	; OBSOLETE! Use WGM11
+                 .equ	PWM10	=0	; OBSOLETE! Use WGM10
+                 .equ	WGM11	=1
+                 .equ	WGM10	=0
+                 ;TCCR1B
+                 .equ	ICNC1	=7
+                 .equ	ICES1	=6
+                 .equ	CTC11	=4	; OBSOLETE! Use WGM13
+                 .equ	CTC10	=3	; OBSOLETE! Use WGM12
+                 .equ	WGM13	=4
+                 .equ	WGM12	=3	
+                 .equ	CTC1	=3		; Obsolete - Included for backward compatibility
+                 .equ	CS12	=2
+                 .equ	CS11	=1
+                 .equ	CS10	=0
+                 
+                 ;TCCR2
+                 .equ	FOC2	=7
+                 .equ    PWM2    =6	; OBSOLETE! Use WGM20
+                 .equ	WGM20	=6	
+                 .equ    COM21   =5
+                 .equ    COM20   =4
+                 .equ    CTC2    =3	; OBSOLETE! Use WGM21
+                 .equ	WGM21	=3	
+                 .equ    CS22    =2
+                 .equ    CS21    =1
+                 .equ    CS20    =0
+                 
+                 ;SFIOR
+                 .equ    ADHSM   =4
+                 .equ    ACME    =3
+                 .equ    PUD     =2
+                 .equ	PSR2	=1
+                 .equ	PSR10	=0
+                 
+                 ;WDTCR
+                 .equ	WDCE	=4
+                 .equ	WDTOE	=4
+                 .equ	WDE	=3
+                 .equ	WDP2	=2
+                 .equ	WDP1	=1
+                 .equ	WDP0	=0
+                 
+                 ;EECR
+                 .equ    EERIE   =3
+                 .equ	EEMWE	=2
+                 .equ	EEWE	=1
+                 .equ	EERE	=0
+                 
+                 ;PORTB
+                 .equ	PB7	=7
+                 .equ	PB6	=6
+                 .equ	PB5	=5
+                 .equ	PB4	=4
+                 .equ	PB3	=3
+                 .equ	PB2	=2
+                 .equ	PB1	=1
+                 .equ	PB0	=0
+                 
+                 ;DDRB
+                 .equ	DDB7	=7
+                 .equ	DDB6	=6
+                 .equ	DDB5	=5
+                 .equ	DDB4	=4
+                 .equ	DDB3	=3
+                 .equ	DDB2	=2
+                 .equ	DDB1	=1
+                 .equ	DDB0	=0
+                 
+                 ;PINB
+                 .equ	PINB7	=7
+                 .equ	PINB6	=6
+                 .equ	PINB5	=5
+                 .equ	PINB4	=4
+                 .equ	PINB3	=3
+                 .equ	PINB2	=2
+                 .equ	PINB1	=1
+                 .equ	PINB0	=0
+                 
+                 ;PORTC
+                 .equ	PC6	=6
+                 .equ	PC5	=5
+                 .equ	PC4	=4
+                 .equ	PC3	=3
+                 .equ	PC2	=2
+                 .equ	PC1	=1
+                 .equ	PC0	=0
+                 
+                 ;DDRC
+                 .equ	DDC6	=6
+                 .equ	DDC5	=5
+                 .equ	DDC4	=4
+                 .equ	DDC3	=3
+                 .equ	DDC2	=2
+                 .equ	DDC1	=1
+                 .equ	DDC0	=0
+                 
+                 ;PINC
+                 .equ	PINC6	=6
+                 .equ	PINC5	=5
+                 .equ	PINC4	=4
+                 .equ	PINC3	=3
+                 .equ	PINC2	=2
+                 .equ	PINC1	=1
+                 .equ	PINC0	=0
+                 
+                 ;PORTD
+                 .equ	PD7	=7
+                 .equ	PD6	=6
+                 .equ	PD5	=5
+                 .equ	PD4	=4
+                 .equ	PD3	=3
+                 .equ	PD2	=2
+                 .equ	PD1	=1
+                 .equ	PD0	=0
+                 
+                 ;DDRD
+                 .equ	DDD7	=7
+                 .equ	DDD6	=6
+                 .equ	DDD5	=5
+                 .equ	DDD4	=4
+                 .equ	DDD3	=3
+                 .equ	DDD2	=2
+                 .equ	DDD1	=1
+                 .equ	DDD0	=0
+                 
+                 ;PIND
+                 .equ	PIND7	=7
+                 .equ	PIND6	=6
+                 .equ	PIND5	=5
+                 .equ	PIND4	=4
+                 .equ	PIND3	=3
+                 .equ	PIND2	=2
+                 .equ	PIND1	=1
+                 .equ	PIND0	=0
+                 
+                 ;UCSRA
+                 .equ	RXC	=7
+                 .equ	TXC	=6
+                 .equ	UDRE	=5
+                 .equ	FE	=4
+C:\Program Files\Atmel\AVR Tools\AvrAssembler\Appnotes\m8def.inc(323): warning: Invalid attempt to use of keyword 'or' as user symbol name, ignored
+C:\Projects\Proj_Spetspribor\Measuring\SG-420M\AVR\Main.asm(11): C:\Program Files\Atmel\AVR Tools\AvrAssembler\Appnotes\m8def.inc included form here
+                 .equ	OR	=3		; old name kept for compatibilty
+                 .equ	DOR	=3
+                 .equ	UPE	=2
+                 .equ	PE	=2
+                 .equ	U2X	=1
+                 .equ	MPCM	=0
+                 
+                 ;UCSRB
+                 .equ	RXCIE	=7
+                 .equ	TXCIE	=6
+                 .equ	UDRIE	=5
+                 .equ	RXEN	=4
+                 .equ	TXEN	=3
+                 .equ	CHR9	=2		; old name kept for compatibilty
+                 .equ	UCSZ2	=2
+                 .equ	RXB8	=1
+                 .equ	TXB8	=0
+                 
+                 ;UCSRC
+                 .equ	URSEL	=7
+                 .equ	UMSEL	=6
+                 .equ	UPM1	=5
+                 .equ	UPM0	=4
+                 .equ	USBS	=3
+                 .equ	UCSZ1	=2
+                 .equ	UCSZ0	=1
+                 .equ	UCPOL	=0
+                 		
+                 ;SPCR
+                 .equ	SPIE	=7
+                 .equ	SPE	=6
+                 .equ	DORD	=5
+                 .equ	MSTR	=4
+                 .equ	CPOL	=3
+                 .equ	CPHA	=2
+                 .equ	SPR1	=1
+                 .equ	SPR0	=0
+                 
+                 ;SPSR
+                 .equ	SPIF	=7
+                 .equ	WCOL	=6
+                 .equ	SPI2X	=0
+                 
+                 ;ACSR
+                 .equ	ACD	=7
+                 .equ    ACBG    =6
+                 .equ	ACO	=5
+                 .equ	ACI	=4
+                 .equ	ACIE	=3
+                 .equ	ACIC	=2
+                 .equ	ACIS1	=1
+                 .equ	ACIS0	=0
+                 
+                 ;ADMUX
+                 .equ    REFS1   =7
+                 .equ    REFS0   =6
+                 .equ    ADLAR   =5
+                 .equ    MUX3    =3
+                 .equ    MUX2    =2
+                 .equ    MUX1    =1
+                 .equ    MUX0    =0
+                 
+                 ;ADCSR
+                 .equ    ADEN    =7
+                 .equ    ADSC    =6
+                 .equ    ADFR    =5
+                 .equ    ADIF    =4
+                 .equ    ADIE    =3
+                 .equ    ADPS2   =2
+                 .equ    ADPS1   =1
+                 .equ    ADPS0   =0
+                 
+                 ; TWCR
+                 .equ    TWINT   =7
+                 .equ    TWEA    =6
+                 .equ    TWSTA   =5
+                 .equ    TWSTO   =4
+                 .equ    TWWC    =3
+                 .equ    TWEN    =2
+                 
+                 .equ    TWIE    =0
+                 
+                 ; TWAR
+                 .equ    TWA6    =7
+                 .equ    TWA5    =6
+                 .equ    TWA4    =5
+                 .equ    TWA3    =4
+                 .equ    TWA2    =3
+                 .equ    TWA1    =2
+                 .equ    TWA0    =1
+                 .equ    TWGCE   =0
+                 
+                 ; TWSR
+                 .equ    TWS7    =7
+                 .equ    TWS6    =6
+                 .equ    TWS5    =5
+                 .equ    TWS4    =4
+                 .equ    TWS3    =3
+                 .equ	TWPS1	=1
+                 .equ	TWPS0	=0
+                 
+                 ;ASSR
+                 .equ    AS2     =3
+                 .equ    TCN2UB  =2
+                 .equ    OCR2UB  =1
+                 .equ    TCR2UB  =0
+                 
+                 .def	XL	=r26
+                 .def	XH	=r27
+                 .def	YL	=r28
+                 .def	YH	=r29
+                 .def	ZL	=r30
+                 .def	ZH	=r31
+                 
+                 .equ 	RAMEND =$45F
+                 .equ	FLASHEND =$FFF
+                 
+                 						;  byte groups
+                 						;  /\/--\/--\/--\ 
+                 .equ 	SMALLBOOTSTART	=0b00111110000000  ;($0F80) smallest boot block is 256
+                 .equ 	SECONDBOOTSTART	=0b00111100000000  ;($0F00) 2'nd boot block size is 512
+                 .equ 	THIRDBOOTSTART	=0b00111000000000  ;($0E00) third boot block size is 1K
+                 .equ 	LARGEBOOTSTART	=0b00110000000000  ;($0C00) largest boot block is 2K
+                 .equ 	BOOTSTART		=THIRDBOOTSTART  ;OBSOLETE!!! kept for compatibility
+                 .equ	PAGESIZE		=32     ;number of WORDS in a page
+                 
+                 .equ	INT0addr=$001	; External Interrupt0 Vector Address
+                 .equ	INT1addr=$002	; External Interrupt1 Vector Address
+                 .equ	OC2addr =$003	; Output Compare2 Interrupt Vector Address
+                 .equ	OVF2addr=$004	; Overflow2 Interrupt Vector Address
+                 .equ	ICP1addr=$005	; Input Capture1 Interrupt Vector Address
+                 .equ	OC1Aaddr=$006	; Output Compare1A Interrupt Vector Address
+                 .equ	OC1Baddr=$007	; Output Compare1B Interrupt Vector Address
+                 .equ	OVF1addr=$008	; Overflow1 Interrupt Vector Address
+                 .equ	OVF0addr=$009	; Overflow0 Interrupt Vector Address
+                 .equ	SPIaddr =$00a	; SPI Interrupt Vector Address
+                 .equ	URXCaddr=$00b	; USART Receive Complete Interrupt Vector Address
+                 .equ	UDREaddr=$00c	; USART Data Register Empty Interrupt Vector Address
+                 .equ	UTXCaddr=$00d	; USART Transmit Complete Interrupt Vector Address
+                 .equ	ADCCaddr=$00e	; ADC Interrupt Vector Address
+                 .equ	ERDYaddr=$00f	; EEPROM Interrupt Vector Address
+                 .equ	ACIaddr =$010	; Analog Comparator Interrupt Vector Address
+                 .equ    TWIaddr =$011   ; Irq. vector address for Two-Wire Interface
+                 .equ	SPMaddr =$012	; SPM complete Interrupt Vector Address
+                 .equ	SPMRaddr =$012	; SPM complete Interrupt Vector Address
+                 .include "macros.mac"
+                 
+                 
+                 .macro	clbr			;clear bit in register
+                 	cbr @0,exp2(@1)
+                 .endm
+                 
+                 .macro	stbr			;set bit in register
+                 	sbr @0,exp2(@1)
+                 .endm
+                 
+                 .macro	bbrc			;branch if bit in register clear
+                 	sbrs @0,@1
+                 	rjmp @2
+                 .endm
+                 
+                 .macro	bbrs			;branch if bit in register set
+                 	sbrc @0,@1
+                 	rjmp @2
+                 .endm
+                 
+                 .macro	bbic			;branch if bit in I/O clear
+                 	sbis @0,@1
+                 	rjmp @2
+                 .endm
+                 
+                 .macro	bbis			;branch if bit in I/O set
+                 	sbic @0,@1
+                 	rjmp @2
+                 .endm
+                 
+                 .macro	addi			;add immediate 
+                 	subi @0,-@1
+                 .endm
+                 
+                 .macro	ldx			;load XL, XH with word
+                 	ldi 	XL,byte1(@0)
+                 	ldi 	XH,byte2(@0)
+                 .endm
+                 
+                 .macro	ldy			;load YL, YH with word
+                 	ldi	YL,byte1(@0)
+                 	ldi	YH,byte2(@0)
+                 .endm
+                 
+                 .macro	ldz			;load ZL, ZH with word
+                 	ldi	ZL,byte1(@0)
+                 	ldi	ZH,byte2(@0)
+                 .endm
+                 
+                 .macro	table			;load Z pointer
+                 	ldi	ZL,low (@0*2)
+                 	ldi	ZH,high(@0*2)
+                 .endm
+                 
+                 .macro	stdi			;store immediate indirect with displacement
+                 	ldi	temp,@1
+                 	std	@0,temp
+                 .endm
+                 
+                 .macro	ldsx			;load XL, XH from memory
+                 	lds 	XL,@0+0
+                 	lds 	XH,@0+1
+                 .endm
+                 
+                 .macro	ldsy			;load YL, YH from memory
+                 	lds 	YL,@0+0
+                 	lds 	YH,@0+1
+                 .endm
+                 
+                 .macro	ldsz			;load ZL, ZH from memory
+                 	lds 	ZL,@0+0
+                 	lds 	ZH,@0+1
+                 .endm
+                 
+                 .macro	stsx			;store XL, XH in memory
+                 	sts 	@0+0,XL
+                 	sts 	@0+1,XH
+                 .endm
+                 
+                 .macro	stsy			;store YL, YH in memory
+                 	sts 	@0+0,YL
+                 	sts 	@0+1,YH
+                 .endm
+                 
+                 .macro	stsz			;store ZL, ZH in memory
+                 	sts 	@0+0,ZL
+                 	sts 	@0+1,ZH
+                 .endm
+                 
+                 .include "Header.asm"
+                 
+                 
+                 ;SG-420M header file
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Constantes:
+                 
+                 .equ	FCLK	= 16000000	;Fclk, Hz
+                 .equ	TSYS	= 10		;system timer, mS
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Derivated constantes:
+                 
+                 .equ MAXBYTE = 0xFF
+                 .equ MAXWORD = 0xFFFF
+                 
+                 .equ T0Val = 256 - ((FCLK/1024)*TSYS/1000)
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Port Definitions:
+                 
+                 ;Port B:
+                 
+                 .equ	DIRB	= 0b11111111	;Port B direction
+                 .equ	PUPB	= 0b00000000	;Port B pull-ups
+                 .equ	I2SWS	= PB0		;I2S word select
+                 .equ	I2SBCK0	= PB1		;I2S frame clock (OC1A)
+                 ;.equ		= PB2		;
+                 .equ	I2SDATA	= PB3		;I2S data (MOSI)
+                 ;.equ		= PB4		;
+                 .equ	I2SBCK	= PB5		;I2S clock (SCK)
+                 
+                 .macro	Port_I2SWS_0		;WS = 0
+                 	cbi	PORTB,I2SWS
+                 .endm
+                 
+                 .macro	Port_I2SWS_1		;WS = 1
+                 	sbi	PORTB,I2SWS
+                 .endm
+                 
+                 ;Port C:
+                 
+                 .equ	DIRC	= 0b11111111	;Port C direction
+                 .equ	PUPC	= 0b00000000	;Port C pull-ups
+                 ;.equ		= PC0		;
+                 ;.equ		= PC1		;
+                 ;.equ		= PC2		;
+                 ;.equ		= PC3		;
+                 ;.equ		= PC4		;
+                 ;.equ		= PC5		;
+                 
+                 ;Port D:
+                 
+                 .equ	DIRD	= 0b11101111	;Port D direction
+                 .equ	PUPD	= 0b11110100	;Port D pull-ups
+                 ;.equ		= PD0		;
+                 ;.equ		= PD1		;
+                 .equ	SND	= PD2		;sound generation
+                 ;.equ		= PD3		;
+                 .equ	RETL	= PD4		;keyboard return line
+                 .equ	LOAD	= PD5		;display load
+                 .equ	DATA	= PD6		;display data
+                 .equ	CLK	= PD7		;display clock
+                 
+                 .macro	Port_SND_0		;SND = 0
+                 	cbi	PORTD,SND
+                 .endm
+                 
+                 .macro	Port_SND_1		;SND = 1
+                 	sbi	PORTD,SND
+                 .endm
+                 
+                 .macro	Skip_if_RETL_1		;skip if RETL = 1
+                 	sbis	PIND,RETL
+                 .endm
+                 
+                 .macro	Port_LOAD_0		;LOAD = 0
+                 	cbi	PORTD,LOAD
+                 .endm
+                 
+                 .macro	Port_LOAD_1		;LOAD = 1
+                 	sbi	PORTD,LOAD
+                 .endm
+                 
+                 .macro	Port_DATA_0		;DATA = 0
+                 	cbi	PORTD,DATA
+                 .endm
+                 
+                 .macro	Port_DATA_1		;DATA = 1
+                 	sbi	PORTD,DATA
+                 .endm
+                 
+                 .macro	Port_CLK_0		;CLK = 0
+                 	cbi	PORTD,CLK
+                 .endm
+                 
+                 .macro	Port_CLK_1		;CLK = 1
+                 	sbi	PORTD,CLK
+                 .endm
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Global Register Variables:
+                 
+                 ;* - used in OC1A interrupt
+                 ;r0, r1 * used with mul instruction
+                 
+                 .def	tsreg	= r2		;* SREG store
+                 
+                 .def	PhaseK	= r3		;* phase code
+                 .def	PhaseL	= r4		;*
+                 .def	PhaseM	= r5		;*
+                 .def	PhaseN	= r6		;*
+                 .def	PhaseP	= r7		;*
+                 
+                 .def	FreqK	= r8		;* frequency code (delta phase)
+                 .def	FreqL	= r9		;*
+                 .def	FreqM	= r10		;*
+                 .def	FreqN	= r11		;*
+                 
+                 .def	SinL	= r12		;* instantaneous amplitude code
+                 .def	SinH	= r13		;*
+                 
+                 .def	tempA	= r14		;temporary register tempA
+                 .def	tempB	= r15		;temporary register tempB
+                 .def	tempC	= r16		;temporary register tempC
+                 .def	tempD	= r17		;temporary register tempD
+                 .def	tempE	= r18		;temporary register tempE
+                 .def	tempF	= r19		;temporary register tempF
+                 .def	tempL	= r20		;temporary register tempL
+                 .def	tempM	= r21		;temporary register tempM
+                 .def	tempH	= r22		;temporary register tempH
+                 .def	temp	= r23		;temporary register temp
+                 .def	Cnt	= r24		;temporary register Cnt
+                 
+                 .def	Flags	= r25
+                 .equ	UPD	= 0		;timer update flag
+                 .equ	UPDD	= 1		;display update flag
+                 .equ	NEWPR	= 2		;keyboard new press flag
+                 .equ	EDT	= 3		;edited flag
+                 .equ	ON	= 4		;on flag
+                 .equ	ONR	= 5		;real on flag
+                 .equ	MF	= 6		;minus flag
+                 
+                 ;r26,r27 * used as X-register
+                 ;r28,r29 used as Y-register
+                 ;r30,r31 used as Z-register
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;------------------------- Interrupt Vectors: -------------------------------
+                 
+                 .CSEG				;code segment
+                 .org	0
+000000 c1cb      	rjmp	Init		;reset vector
+                 
+                 .org	OC1Aaddr
+                 .include "DDS.asm"			;link DDS implementation module
+                 
+                 
+                 ;Software DDS implementation module
+                 ;using I2S audio DAC TDA1543
+                 ;I2S is imulated with hardware SPI
+                 ;plus OC signal
+                 
+                 ;Used ports:
+                 ;I2SWS - any port pin
+                 ;I2SBCK0 - OC1A
+                 ;I2SDATA - SPI MOSI
+                 ;I2SBCK - SPI SCK
+                 
+                 ;Connections:
+                 ;I2SWS -> NOT gate
+                 ;not gate out -> DAC WS (pin2)
+                 ;I2SBCK0 -> NOR gate input 1
+                 ;I2SBCK -> NOR gate input 2
+                 ;NOR gate out -> DAC BCK (pin 1)
+                 ;I2SDATA -> NOT gate
+                 ;not gate out -> DAC DATA (pin 3)
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Constantes:
+                 
+                 .equ	FUPD	= 216000	;update frequency, Hz
+                 
+                 ;Nominal frequency calibration value:
+                 
+                 .equ CAL_0 = (1125899906842624 / FCLK * (FCLK/FUPD) + 50) / 100
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .DSEG	;data segment (internal SRAM)
+                 
+000060           CalB:	.byte 4			;calibration value buffer
+000064           MulB:	.byte 7			;multiply buffer
+                 
+                 FreeMem:
+                 
+                 .org	(FreeMem + 0x100) & 0xFF00 ;align table to page
+                 
+000100           LUT:	.byte 514		;LUT
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .CSEG	;Code segment
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Timer1 output compare A interrupt (DDS implementation)
+                 ;To minimize execution time handle must be located
+                 ;direct at vector address. It eliminates RJMP command.
+                 
+                 ;Input:
+                 ;FreqK,L,M,N - current frequency (register variables)
+                 
+                 ;Internal variables:
+                 ;PhaseK,L,M,N,P - current phase (register variables)
+                 ;SinL,H - instantaneous sin amplitude (register variables)
+                 ;XL,XH - data pointer
+                 ;tsreg - SREG store
+                 ;r0,r1 - used with mul instruction
+                 
+000006 e4a0      DDS:	ldi	XL,(1<<COM1A0)	
+000007 bdaf      	out	TCCR1A,XL	;OC1A toggle
+000008 e4a8      	ldi	XL,(1<<COM1A0) | (1<<FOC1A)
+000009 bdaf      	out	TCCR1A,XL	;set SCK (OC1A force toggle)
+                 	Port_I2SWS_0		;clear WS
+00000b bdaf      	out	TCCR1A,XL	;clear SCK (OC1A force toggle)
+                 
+00000c b8df      	out	SPDR,SinH	;---> load DAC high byte
+                 
+00000d b62f      	in	tsreg,SREG	;save status register
+00000e 2411      	clr	r1
+00000f 0c38      	add	PhaseK,FreqK	;Phase(0..33) = Phase(0..33) + Freq(0..31)
+000010 1c49      	adc	PhaseL,FreqL
+000011 1c5a      	adc	PhaseM,FreqM
+000012 1c6b      	adc	PhaseN,FreqN
+000013 1c71      	adc	PhaseP,r1	;r1 = 0
+                 
+000014 2da6      	mov	XL,PhaseN	;XL = wa (word address)
+000015 2c05      	mov	r0,PhaseM	;r0 = dx
+000016 fc70      	sbrc	PhaseP,0	;if(Phase.32 == 0)
+000017 95a0      	com	XL		;wa = !wa
+000018 fc70      	sbrc	PhaseP,0	;if(Phase.32 == 0)
+000019 9400      	com	r0		;dx = !dx
+                 
+00001a e0b1      	ldi	XH,high(LUT)	;XH = table base (low(LUT) = 0)
+00001b 0faa      	add	XL,XL		;offset * 2 (word offset)
+00001c 1db1      	adc	XH,r1		;r1 = 0
+00001d 0000      	nop
+                 
+00001e b8cf      	out	SPDR,SinL	;---> load DAC low byte
+                 
+00001f 90cd      	ld	SinL,X+		;SinL = lo sin[x]
+000020 90dd      	ld	SinH,X+		;SinH = hi sin[x]
+000021 901c      	ld	r1,X		;r1 = lo sin[x + 1]
+000022 181c      	sub	r1,SinL		;r1 = dA
+000023 9c10      	mul	r1,r0		;r1,r0 = dA * dx
+000024 1c00      	rol	r0		;C = 1 if r0.7 == 1
+000025 2400      	clr	r0
+000026 1cc1      	adc	SinL,r1		;SinH:SinL = sin[x] + round(r1:r0 / 256)
+000027 1cd0      	adc	SinH,r0		;SinH:SinL = A
+                 
+000028 fe71      	sbrs	PhaseP,1	
+000029 c003      	rjmp	ph_cd		;jump if Phase.33 == 0
+                 
+00002a 94c0      ph_ab:	com	SinL		;SIN > 0, data line has NOT gate,
+00002b 94d0      	com	SinH		;SinH:SinL = !SinH:SinL
+00002c c003      	rjmp	ph_all
+                 	
+00002d 9408      ph_cd:	sec
+00002e 08c0      	sbc	SinL,r0		;SIN < 0, data line has NOT gate,
+00002f 08d0      	sbc	SinH,r0		;SinH:SinL = SinH:SinL - 1
+                 
+000030 e4a8      ph_all:	ldi	XL,(1<<COM1A0) | (1<<FOC1A)
+000031 bdaf      	out	TCCR1A,XL	;OC1A force toggle
+000032 b80f      	out	SPDR,r0		;zero data for another DAC channel
+                 	Port_I2SWS_1		;set WS
+000034 e8a0      	ldi	XL,(1<<COM1A1)
+000035 bdaf      	out	TCCR1A,XL	;OC1A clear on compare
+                 
+000036 be2f      	out	SREG,tsreg	;restore status register
+000037 9518      	reti
+                 	
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Init DDS subsystem:
+                 
+                 iDDS:
+                 
+                 ;Periphery setup:
+                 
+000038 e079      	ldi	temp,(1<<WGM12) | (1<<CS10)	
+000039 bd7e      	out	TCCR1B,temp	;clear on compare match, CK/1
+                 
+00003a e870      	ldi	temp,(1<<COM1A1)
+00003b bd7f      	out	TCCR1A,temp	;OC1A clear on compare
+                 
+00003c e070      	ldi	temp,high(FCLK/FUPD-1)
+00003d bd7b      	out	OCR1AH,temp	
+00003e e479      	ldi	temp, low(FCLK/FUPD-1)
+00003f bd7a      	out	OCR1AL,temp
+                 
+000040 e170      	ldi	temp,(1<<OCF1A)	
+000041 bf78      	out	TIFR,temp	;clear pending timer interrupt
+000042 bf79      	out	TIMSK,temp	;enable output compare interrupt
+                 
+000043 e574      	ldi	temp,(1<<SPE) | (1<<MSTR) | (1<<CPHA)
+000044 b97d      	out	SPCR,temp	;SPI enable, MSB first, master
+                 
+000045 e071      	ldi	temp,(1<<SPI2X)	
+000046 b97e      	out	SPSR,temp	;double SPI speed
+                 
+                 ;Build sin LUT in RAM:
+                 
+                 	table	SinTab
+                 	ldy	LUT
+00004b 9175      TCopy:	lpm	temp,Z+
+00004c 9379      	st	Y+,temp
+00004d 30d3      	cpi	YH,high(LUT+514)
+00004e f7e1      	brne	TCopy
+00004f 30c2      	cpi	YL, low(LUT+514)
+000050 f7d1      	brne	TCopy
+                 
+                 ;Build triangle LUT in RAM:
+                 
+                 ;	ldz	0
+                 ;	ldy	LUT
+                 ;RCopy:	st	Y+,ZL
+                 ;	st	Y+,ZH
+                 ;	subi	ZL, low(-127)
+                 ;	sbci	ZH,high(-127)
+                 ;	cpi	YH,high(LUT+514)
+                 ;	brne	RCopy
+                 ;	cpi	YL, low(LUT+514)
+                 ;	brne	RCopy
+                 
+                 ;Build  trapeze LUT in RAM:
+                 
+                 ;	ldz	0
+                 ;	ldy	LUT
+                 ;PCopy:	st	Y+,ZL
+                 ;	st	Y+,ZH
+                 ;	subi	ZL, low(-255)
+                 ;	sbci	ZH,high(-255)
+                 ;	cpi	YH,high(LUT+256)
+                 ;	brne	PCopy
+                 ;	cpi	YL, low(LUT+256)
+                 ;	brne	PCopy
+                 ;ZCopy:	st	Y+,ZL
+                 ;	st	Y+,ZH
+                 ;	cpi	YH,high(LUT+514)
+                 ;	brne	ZCopy
+                 ;	cpi	YL, low(LUT+514)
+                 ;	brne	ZCopy
+                 
+                 ;Variables init
+                 
+000051 24cc      	clr	SinL		;clear instantaneous sin amplitude
+000052 24dd      	clr	SinH
+                 
+000053 2433      	clr	PhaseK		;clear phase
+000054 2444      	clr	PhaseL
+000055 2455      	clr	PhaseM
+000056 2466      	clr	PhaseN
+000057 2477      	clr	PhaseP
+                 
+000058 2488      	clr	FreqK		;clear frequency
+000059 2499      	clr	FreqL
+00005a 24aa      	clr	FreqM
+00005b 24bb      	clr	FreqN
+                 
+                 ;	ldi	temp,0xf5
+                 ;	mov	FreqK,temp
+                 ;	ldi	temp,0x28
+                 ;	mov	FreqL,temp
+                 ;	ldi	temp,0x5c
+                 ;	mov	FreqM,temp
+                 ;	ldi	temp,0x2f	;10 KHz
+                 ;	mov	FreqN,temp
+                 
+00005c 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Process ON bit:
+                 
+00005d 2f79      mOn:	mov	temp,Flags
+00005e 7370      	andi	temp,(1<<ON) | (1<<ONR)
+00005f f0c1      	breq	No_op
+000060 3370      	cpi	temp,(1<<ON) | (1<<ONR)
+000061 f0b1      	breq	No_op
+000062 3170      	cpi	temp,(1<<ON)
+000063 f421      	brne	do_off
+                 	
+000064 7b9f      do_on:	cbr	Flags,(1<<MF)
+000065 6290      	sbr	Flags,(1<<ONR)
+000066 d012      	rcall	MakeF		;restore ValF
+000067 c010      	rjmp	No_op	
+                 
+000068 2d7d      do_off:	mov	temp,SinH
+                 	bbrs	temp,7,dd_off	;jump if minus
+00006b 6490      	sbr	Flags,(1<<MF)	;set minus flag
+00006c 20aa      	tst	FreqM
+00006d f7d1      	brne	do_off		;wait for plus if FreqM > 0	
+00006e c009      	rjmp	No_op
+                 	
+                 dd_off:	bbrc	Flags,MF,No_op	;wait for minus flag
+000071 7d9f      	cbr	Flags,(1<<ONR)
+000072 d006      	rcall	MakeF		;ValF <- 0
+000073 2433      	clr	PhaseK		;Phase <- 0
+000074 2444      	clr	PhaseL
+000075 2455      	clr	PhaseM
+000076 2466      	clr	PhaseN
+000077 2477      	clr	PhaseP
+000078 9508      No_op:	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Calculate Freq
+                 ;Input:	ValF, Calib
+                 ;Out: FreqN:FreqM:FreqL:FreqK
+                 
+                 ;Freq = ValF x C / 65536
+                 
+                 ;C = Calib + (CAL_0 - C_0)
+                 
+                 ;m = mc x mp
+                 ;mc - C -> [CalB+0]..[CalB+3]
+                 ;mp - ValF -> [MulB+0]..[MulB+2]
+                 ;m  - [MulB+0]..[MulB+6]
+                 
+000079 e087      MakeF:	ldi	Cnt,7
+                 	ldy	MulB+7
+00007c 2777      	clr	temp
+00007d 937a      clrm:	st	-Y,temp		;clear m
+00007e 958a      	dec	Cnt
+00007f f7e9      	brne	clrm
+                 
+                 	bbrc	Flags,ONR,m0	;if(ONR == 0) Freq = 0
+                 	
+                 	ldy	Calib		;init mc
+000084 d43f      	rcall	LdLMH
+000085 2711      	clr	tempD
+000086 5a49      	subi	tempL,byte1(C_0 - CAL_0)
+000087 4351      	sbci	tempM,byte2(C_0 - CAL_0)
+000088 4e66      	sbci	tempH,byte3(C_0 - CAL_0)
+000089 4f1c      	sbci	tempD,byte4(C_0 - CAL_0)
+00008a 9310 0063 	sts	CalB+3,tempD
+                 	ldy	CalB
+00008e d441      	rcall	StLMH
+                 
+                 	ldy	MulB
+                 	ldz	ValF+3		;init mp
+000093 9172      	ld	temp,-Z
+000094 9576      	lsr	temp
+000095 837a      	std	Y+2,temp	
+000096 9172      	ld	temp,-Z
+000097 9577      	ror	temp
+000098 8379      	std	Y+1,temp
+000099 9172      	ld	temp,-Z
+00009a 9577      	ror	temp
+00009b 8378      	std	Y+0,temp
+                 
+00009c e188      	ldi	Cnt,24		;load cycle counter
+00009d f490      m24_32:	brcc	noadd
+                 	ldz	CalB
+0000a0 817b      	ldd	temp,Y+3
+0000a1 9111      	ld	tempD,Z+
+0000a2 0f71      	add	temp,tempD
+0000a3 837b      	std	Y+3,temp
+0000a4 817c      	ldd	temp,Y+4
+0000a5 9111      	ld	tempD,Z+
+0000a6 1f71      	adc	temp,tempD
+0000a7 837c      	std	Y+4,temp
+0000a8 817d      	ldd	temp,Y+5
+0000a9 9111      	ld	tempD,Z+
+0000aa 1f71      	adc	temp,tempD
+0000ab 837d      	std	Y+5,temp
+0000ac 817e      	ldd	temp,Y+6
+0000ad 9111      	ld	tempD,Z+
+0000ae 1f71      	adc	temp,tempD
+0000af 837e      	std	Y+6,temp
+                 	
+                 noadd:	ldz	MulB+7
+0000b2 9172      rry:	ld	temp,-Z
+0000b3 9577      	ror	temp
+0000b4 8370      	st	Z,temp
+0000b5 13ec      	cpse	ZL,YL
+0000b6 cffb      	rjmp	rry
+0000b7 13fd      	cpse	ZH,YH
+0000b8 cff9      	rjmp	rry
+                 	
+0000b9 958a      	dec	Cnt
+0000ba f711      	brne	m24_32
+                 
+                 ;FreqK,L,M,N = [MulB+2]..[MulB+5] + 0.5
+                 
+0000bb 9179      m0:	ld	temp,Y+		;skip [MulB+0]
+0000bc e810      	ldi	tempD,0x80
+0000bd 9179      	ld	temp,Y+		;load [MulB+1]
+0000be 0f71      	add	temp,tempD
+0000bf b74f      	in	tempL,SREG
+0000c0 94f8      	cli			;interrupts disable
+0000c1 9089      	ld	FreqK,Y+
+0000c2 1e88      	adc	FreqK,Cnt	;Cnt = 0
+0000c3 9099      	ld	FreqL,Y+
+0000c4 1e98      	adc	FreqL,Cnt
+0000c5 90a9      	ld	FreqM,Y+
+0000c6 1ea8      	adc	FreqM,Cnt
+0000c7 90b9      	ld	FreqN,Y+
+0000c8 1eb8      	adc	FreqN,Cnt
+0000c9 bf4f      	out	SREG,tempL	;interrupts enable
+0000ca 9508      	ret
+                 	
+                 ;----------------------------------------------------------------------------
+                 
+                 SinTab:
+                 
+                 .include "sin256.asm"		;sine wave table
+0000cb 0000
+0000cc 00c9
+0000cd 0192
+0000ce 025b      
+0000cf 0324
+0000d0 03ed
+0000d1 04b6
+0000d2 057f             .DB 0x24,0x03,0xED,0x03,0xB6,0x04,0x7F,0x05
+0000d3 0648
+0000d4 0711
+0000d5 07d9
+0000d6 08a2             .DB 0x48,0x06,0x11,0x07,0xD9,0x07,0xA2,0x08
+0000d7 096a
+0000d8 0a33
+0000d9 0afb
+0000da 0bc4             .DB 0x6A,0x09,0x33,0x0A,0xFB,0x0A,0xC4,0x0B
+0000db 0c8c
+0000dc 0d54
+0000dd 0e1c
+0000de 0ee3             .DB 0x8C,0x0C,0x54,0x0D,0x1C,0x0E,0xE3,0x0E
+0000df 0fab
+0000e0 1072
+0000e1 113a
+0000e2 1201             .DB 0xAB,0x0F,0x72,0x10,0x3A,0x11,0x01,0x12
+0000e3 12c8
+0000e4 138f
+0000e5 1455
+0000e6 151c             .DB 0xC8,0x12,0x8F,0x13,0x55,0x14,0x1C,0x15
+0000e7 15e2
+0000e8 16a8
+0000e9 176e
+0000ea 1833             .DB 0xE2,0x15,0xA8,0x16,0x6E,0x17,0x33,0x18
+0000eb 18f9
+0000ec 19be
+0000ed 1a82
+0000ee 1b47             .DB 0xF9,0x18,0xBE,0x19,0x82,0x1A,0x47,0x1B
+0000ef 1c0b
+0000f0 1ccf
+0000f1 1d93
+0000f2 1e57             .DB 0x0B,0x1C,0xCF,0x1C,0x93,0x1D,0x57,0x1E
+0000f3 1f1a
+0000f4 1fdd
+0000f5 209f
+0000f6 2161             .DB 0x1A,0x1F,0xDD,0x1F,0x9F,0x20,0x61,0x21
+0000f7 2223
+0000f8 22e5
+0000f9 23a6
+0000fa 2467             .DB 0x23,0x22,0xE5,0x22,0xA6,0x23,0x67,0x24
+0000fb 2528
+0000fc 25e8
+0000fd 26a8
+0000fe 2767             .DB 0x28,0x25,0xE8,0x25,0xA8,0x26,0x67,0x27
+0000ff 2826
+000100 28e5
+000101 29a3
+000102 2a61             .DB 0x26,0x28,0xE5,0x28,0xA3,0x29,0x61,0x2A
+000103 2b1f
+000104 2bdc
+000105 2c99
+000106 2d55             .DB 0x1F,0x2B,0xDC,0x2B,0x99,0x2C,0x55,0x2D
+000107 2e11
+000108 2ecc
+000109 2f87
+00010a 3041             .DB 0x11,0x2E,0xCC,0x2E,0x87,0x2F,0x41,0x30
+00010b 30fb
+00010c 31b5
+00010d 326e
+00010e 3326             .DB 0xFB,0x30,0xB5,0x31,0x6E,0x32,0x26,0x33
+00010f 33df
+000110 3496
+000111 354d
+000112 3604             .DB 0xDF,0x33,0x96,0x34,0x4D,0x35,0x04,0x36
+000113 36ba
+000114 376f
+000115 3824
+000116 38d9             .DB 0xBA,0x36,0x6F,0x37,0x24,0x38,0xD9,0x38
+000117 398c
+000118 3a40
+000119 3af2
+00011a 3ba5             .DB 0x8C,0x39,0x40,0x3A,0xF2,0x3A,0xA5,0x3B
+00011b 3c56
+00011c 3d07
+00011d 3db8
+00011e 3e68             .DB 0x56,0x3C,0x07,0x3D,0xB8,0x3D,0x68,0x3E
+00011f 3f17
+000120 3fc5
+000121 4073
+000122 4121             .DB 0x17,0x3F,0xC5,0x3F,0x73,0x40,0x21,0x41
+000123 41ce
+000124 427a
+000125 4325
+000126 43d0             .DB 0xCE,0x41,0x7A,0x42,0x25,0x43,0xD0,0x43
+000127 447a
+000128 4524
+000129 45cd
+00012a 4675             .DB 0x7A,0x44,0x24,0x45,0xCD,0x45,0x75,0x46
+00012b 471c
+00012c 47c3
+00012d 4869
+00012e 490f             .DB 0x1C,0x47,0xC3,0x47,0x69,0x48,0x0F,0x49
+00012f 49b4
+000130 4a58
+000131 4afb
+000132 4b9d             .DB 0xB4,0x49,0x58,0x4A,0xFB,0x4A,0x9D,0x4B
+000133 4c3f
+000134 4ce0
+000135 4d81
+000136 4e20             .DB 0x3F,0x4C,0xE0,0x4C,0x81,0x4D,0x20,0x4E
+000137 4ebf
+000138 4f5d
+000139 4ffb
+00013a 5097             .DB 0xBF,0x4E,0x5D,0x4F,0xFB,0x4F,0x97,0x50
+00013b 5133
+00013c 51ce
+00013d 5268
+00013e 5302             .DB 0x33,0x51,0xCE,0x51,0x68,0x52,0x02,0x53
+00013f 539b
+000140 5432
+000141 54c9
+000142 5560             .DB 0x9B,0x53,0x32,0x54,0xC9,0x54,0x60,0x55
+000143 55f5
+000144 568a
+000145 571d
+000146 57b0             .DB 0xF5,0x55,0x8A,0x56,0x1D,0x57,0xB0,0x57
+000147 5842
+000148 58d3
+000149 5964
+00014a 59f3             .DB 0x42,0x58,0xD3,0x58,0x64,0x59,0xF3,0x59
+00014b 5a82
+00014c 5b0f
+00014d 5b9c
+00014e 5c28             .DB 0x82,0x5A,0x0F,0x5B,0x9C,0x5B,0x28,0x5C
+00014f 5cb3
+000150 5d3e
+000151 5dc7
+000152 5e4f             .DB 0xB3,0x5C,0x3E,0x5D,0xC7,0x5D,0x4F,0x5E
+000153 5ed7
+000154 5f5d
+000155 5fe3
+000156 6068             .DB 0xD7,0x5E,0x5D,0x5F,0xE3,0x5F,0x68,0x60
+000157 60eb
+000158 616e
+000159 61f0
+00015a 6271             .DB 0xEB,0x60,0x6E,0x61,0xF0,0x61,0x71,0x62
+00015b 62f1
+00015c 6370
+00015d 63ee
+00015e 646c             .DB 0xF1,0x62,0x70,0x63,0xEE,0x63,0x6C,0x64
+00015f 64e8
+000160 6563
+000161 65dd
+000162 6656             .DB 0xE8,0x64,0x63,0x65,0xDD,0x65,0x56,0x66
+000163 66cf
+000164 6746
+000165 67bc
+000166 6832             .DB 0xCF,0x66,0x46,0x67,0xBC,0x67,0x32,0x68
+000167 68a6
+000168 6919
+000169 698b
+00016a 69fd             .DB 0xA6,0x68,0x19,0x69,0x8B,0x69,0xFD,0x69
+00016b 6a6d
+00016c 6adc
+00016d 6b4a
+00016e 6bb7             .DB 0x6D,0x6A,0xDC,0x6A,0x4A,0x6B,0xB7,0x6B
+00016f 6c23
+000170 6c8e
+000171 6cf8
+000172 6d61             .DB 0x23,0x6C,0x8E,0x6C,0xF8,0x6C,0x61,0x6D
+000173 6dc9
+000174 6e30
+000175 6e96
+000176 6efb             .DB 0xC9,0x6D,0x30,0x6E,0x96,0x6E,0xFB,0x6E
+000177 6f5e
+000178 6fc1
+000179 7022
+00017a 7083             .DB 0x5E,0x6F,0xC1,0x6F,0x22,0x70,0x83,0x70
+00017b 70e2
+00017c 7140
+00017d 719d
+00017e 71f9             .DB 0xE2,0x70,0x40,0x71,0x9D,0x71,0xF9,0x71
+00017f 7254
+000180 72ae
+000181 7307
+000182 735e             .DB 0x54,0x72,0xAE,0x72,0x07,0x73,0x5E,0x73
+000183 73b5
+000184 740a
+000185 745f
+000186 74b2             .DB 0xB5,0x73,0x0A,0x74,0x5F,0x74,0xB2,0x74
+000187 7504
+000188 7555
+000189 75a5
+00018a 75f3             .DB 0x04,0x75,0x55,0x75,0xA5,0x75,0xF3,0x75
+00018b 7641
+00018c 768d
+00018d 76d8
+00018e 7722             .DB 0x41,0x76,0x8D,0x76,0xD8,0x76,0x22,0x77
+00018f 776b
+000190 77b3
+000191 77fa
+000192 783f             .DB 0x6B,0x77,0xB3,0x77,0xFA,0x77,0x3F,0x78
+000193 7884
+000194 78c7
+000195 7909
+000196 794a             .DB 0x84,0x78,0xC7,0x78,0x09,0x79,0x4A,0x79
+000197 7989
+000198 79c8
+000199 7a05
+00019a 7a41             .DB 0x89,0x79,0xC8,0x79,0x05,0x7A,0x41,0x7A
+00019b 7a7c
+00019c 7ab6
+00019d 7aee
+00019e 7b26             .DB 0x7C,0x7A,0xB6,0x7A,0xEE,0x7A,0x26,0x7B
+00019f 7b5c
+0001a0 7b91
+0001a1 7bc5
+0001a2 7bf8             .DB 0x5C,0x7B,0x91,0x7B,0xC5,0x7B,0xF8,0x7B
+0001a3 7c29
+0001a4 7c59
+0001a5 7c88
+0001a6 7cb6             .DB 0x29,0x7C,0x59,0x7C,0x88,0x7C,0xB6,0x7C
+0001a7 7ce3
+0001a8 7d0e
+0001a9 7d39
+0001aa 7d62             .DB 0xE3,0x7C,0x0E,0x7D,0x39,0x7D,0x62,0x7D
+0001ab 7d89
+0001ac 7db0
+0001ad 7dd5
+0001ae 7dfa             .DB 0x89,0x7D,0xB0,0x7D,0xD5,0x7D,0xFA,0x7D
+0001af 7e1d
+0001b0 7e3e
+0001b1 7e5f
+0001b2 7e7e             .DB 0x1D,0x7E,0x3E,0x7E,0x5F,0x7E,0x7E,0x7E
+0001b3 7e9c
+0001b4 7eb9
+0001b5 7ed5
+0001b6 7eef             .DB 0x9C,0x7E,0xB9,0x7E,0xD5,0x7E,0xEF,0x7E
+0001b7 7f09
+0001b8 7f21
+0001b9 7f37
+0001ba 7f4d             .DB 0x09,0x7F,0x21,0x7F,0x37,0x7F,0x4D,0x7F
+0001bb 7f61
+0001bc 7f74
+0001bd 7f86
+0001be 7f97             .DB 0x61,0x7F,0x74,0x7F,0x86,0x7F,0x97,0x7F
+0001bf 7fa6
+0001c0 7fb4
+0001c1 7fc1
+0001c2 7fcd             .DB 0xA6,0x7F,0xB4,0x7F,0xC1,0x7F,0xCD,0x7F
+0001c3 7fd8
+0001c4 7fe1
+0001c5 7fe9
+0001c6 7ff0             .DB 0xD8,0x7F,0xE1,0x7F,0xE9,0x7F,0xF0,0x7F
+0001c7 7ff5
+0001c8 7ff9
+0001c9 7ffd
+0001ca 7ffe             .DB 0xF5,0x7F,0xF9,0x7F,0xFD,0x7F,0xFE,0x7F
+0001cb 7fff      
+                 ;----------------------------------------------------------------------------
+                 ;DDS implementation is located direct at the OC1A vector address
+                 ;Only one interrupt is used in this project
+                 
+                 ;--------------------------- Main program: ----------------------------------
+                 
+                 Init:	ldy	RAMEND	
+0001ce bfcd      	out	SPL,YL		;locate stack
+0001cf bfde      	out	SPH,YH
+0001d0 d00e      	rcall	iWdog		;start internal watchdog
+0001d1 d022      	rcall	iPorts		;ports init
+0001d2 d02e      	rcall	iVar		;variables init
+0001d3 d013      	rcall	iTimer		;system timer init
+0001d4 d02e      	rcall	iDisp		;LCD init
+0001d5 de62      	rcall	iDDS		;DDS subsystem init
+0001d6 9478      	sei			;enable interrupts
+0001d7 d118      	rcall	iMenu		;menu subsystem init
+                 
+                 ;Main loop:
+                 
+0001d8 d011      Main:	rcall	mTimer		;process system timer
+0001d9 d0b0      	rcall	mKey		;scan keyboard
+0001da d12c      	rcall	mMenu		;process menu
+0001db d02f      	rcall	mDisp		;update display
+0001dc de80      	rcall	mOn		;process ON bit
+0001dd d007      	rcall	mWdog		;watchdog restart
+0001de cff9      	rjmp 	Main		;loop
+                 
+                 ;------------------------- Subroutines area: --------------------------------
+                 
+                 ;Internal watchdog init:
+                 
+0001df 95a8      iWdog:	wdr
+0001e0 e178      	ldi	temp,(1<<WDCE) | (1<<WDE)
+0001e1 bd71      	out	WDTCR,temp	
+0001e2 e07c      	ldi	temp,(1<<WDE) | (1<<WDP2)	
+0001e3 bd71      	out	WDTCR,temp	;watchdog enable, period 260 mS
+0001e4 9508      	ret	
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Internal watchdog restart:
+                 
+0001e5 95a8      mWdog:	wdr			;internal watchdog restart
+0001e6 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;System timer init:
+                 
+0001e7 e075      iTimer:	ldi	temp,(1<<CS02) | (1<<CS00)
+0001e8 bf73      	out	TCCR0,temp	;CK/1024
+0001e9 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Process system timer:
+                 
+                 mTimer:	clbr	Flags,UPD
+0001eb b778      	in	temp,TIFR
+                 	bbrc	temp,TOV0,no_tm	;check for Timer 0 overflow
+                 	stbr	temp,TOV0	;Timer 0 overflow flag clear
+0001ef bf78      	out	TIFR,temp
+0001f0 e674      	ldi	temp,T0Val
+0001f1 bf72      	out	TCNT0,temp	;Timer 0 reload
+                 	stbr	Flags,UPD	;set update flag
+0001f3 9508      no_tm:	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Ports init:
+                 	
+0001f4 e070      iPorts:	ldi	temp,PUPB
+0001f5 bb78      	out	PORTB,temp	;init PORTB and on/off pullup
+0001f6 ef7f      	ldi	temp,DIRB	
+0001f7 bb77      	out	DDRB,temp	;set PORTB direction
+                 	
+0001f8 e070      	ldi	temp,PUPC
+0001f9 bb75      	out	PORTC,temp	;init PORTC and on/off pullup
+0001fa ef7f      	ldi	temp,DIRC
+0001fb bb74      	out	DDRC,temp	;set PORTC direction
+                 
+0001fc ef74      	ldi	temp,PUPD
+0001fd bb72      	out	PORTD,temp	;init PORTD and on/off pullup
+0001fe ee7f      	ldi	temp,DIRD
+0001ff bb71      	out	DDRD,temp	;set PORTD direction
+000200 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Variables init:
+                 
+000201 2799      iVar:	clr	Flags		;clear flags
+000202 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .include "LCD.asm"		;link LCD support module
+                 
+                 
+                 ;LCD support module
+                 ;Used LCD - MT10T7-7 + 74HC164
+                 
+                 ;Connections:
+                 ;LOAD -> WR2 LCD
+                 ;DATA -> pin 2 74HC164
+                 ;CLK -> pin 8 74HC164
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Constantes:
+                 
+                 .equ	Pt	= 0x80		;point in Dig
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .DSEG	;data segment (internal SRAM)
+                 
+000302           Dig:	.byte 10		;display data (string copy)
+                 
+                 ;Font:	.byte 18		;RAM copy of display font table
+                 ;StrT:	.byte 12		;RAM copy of string table
+                 ;ShpT:	.byte 6			;RAM copy of shape menu string table
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .CSEG	;Code segment
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Init display:
+                 
+000203 e07f      iDisp:	ldi	temp,0x0F	;temp <- BLK register address
+000204 d061      	rcall	LCD_WA		;write address
+000205 e07f      	ldi	temp,0x0F	;temp <- 0x0F - enable bus
+000206 d05c      	rcall	LCD_WN		;write nibble
+000207 e170      	ldi	temp,BLANK	;load char
+000208 d007      	rcall	Fill		;fill Dig
+000209 d042      	rcall	Disp		;blank display
+00020a 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Update display:
+                 
+                 mDisp:	bbrc	Flags,UPDD,NoUpd ;check up update flag
+                 	clbr	Flags,UPDD	 ;clear update flag
+00020e d03d      	rcall	Disp		 ;update display
+00020f 9508      NoUpd:	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Fill Dig[0..9] with char from temp:
+                 
+                 Fill:	ldy	Dig
+000212 e08a      	ldi	Cnt,10
+000213 9379      fill1:	st	Y+,temp
+000214 958a      	dec	Cnt
+000215 f7e9      	brne	fill1
+000216 9508      	ret		
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;tempH:tempM:tempL convert to BCD Dig[3..9]
+                 	
+                 DisBCD:	ldy	Dig+3
+000219 2777      	clr	temp
+00021a e087      	ldi	Cnt,7
+00021b 9379      clrout: st	Y+,temp		;output array clear
+00021c 958a      	dec	Cnt
+00021d f7e9      	brne	clrout		
+                 
+00021e e188      	ldi	Cnt,24		;input bits count
+                 	ldz	Dig+3
+000221 0f44      hloop:	lsl	tempL		;input array shift left
+000222 1f55      	rol	tempM
+000223 1f66      	rol	tempH		
+                 	ldy	Dig+10
+000226 917a      sloop:	ld	temp,-Y
+000227 1f77      	rol	temp
+000228 5f7a      	subi	temp,-0x06	;temp+6, C=1
+000229 ff74      	sbrs	temp,4
+00022a 5076      	subi	temp,0x06	;temp-6, C=0
+00022b 707f      	andi	temp,0x0f
+00022c 8378      	st	Y,temp
+00022d 13ce      	cpse	YL,ZL		;ZH:ZL = Dig+3
+00022e cff7      	rjmp	sloop
+00022f 13df      	cpse	YH,ZH
+000230 cff5      	rjmp	sloop
+000231 958a      	dec	Cnt		;YH:YL = Dig+3
+000232 f771      	brne	hloop
+                 
+                 ;Supress zeros:
+                 
+                 	ldz	Dig+7
+000235 e140      	ldi	tempL,BLANK
+000236 8178      zsp:	ld	temp,Y
+000237 2377      	tst	temp
+000238 f429      	brne	notz
+000239 9349      	st	Y+,tempL	;suppress zero
+00023a 17ce      	cp	YL,ZL
+00023b f7d1      	brne	zsp
+00023c 17df      	cp	YH,ZH
+00023d f7c1      	brne	zsp
+00023e 01fe      notz:	movw	ZH:ZL,YH:YL	;ZH:ZL points to first non-zero digit
+                 	
+                 ;Setup point:
+                 
+                 	ldy	Dig+5
+000241 17ec      	cp	ZL,YL
+000242 07fd      	cpc	ZH,YH
+                 	ldy	Dig+4
+000245 f010      	brlo	setpo
+                 	ldy	Dig+7
+000248 8178      setpo:	ld	temp,Y
+000249 6870      	ori	temp,Pt
+00024a 8378      	st	Y,temp		;setup point at Dig+4 or Dig+7
+00024b 9508      	ret	
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Indicate Dig[0..9] on LCD:
+                 	
+00024c e070      Disp:	ldi	temp,0x00	;temp <- 0x00 - SG1 address
+00024d d018      	rcall	LCD_WA		;write address
+                 	ldy	Dig		;pointer to Dig
+000250 e08a      	ldi	Cnt,10
+000251 9179      disp1:	ld	temp,Y+		;temp <- digit
+000252 fb77      	bst	temp,7		;T <- temp.7 (point)
+000253 777f      	andi	temp,0x7F	;temp.7 <- 0
+                 	table	FONT		;pointer to FONT
+000256 0fe7      	add	ZL,temp		;ZH:ZL = ZH:ZL + temp
+000257 1ff7      	adc	ZH,temp
+000258 1bf7      	sub	ZH,temp
+000259 9174      	lpm	temp,Z		;read font table
+00025a 937f      	push	temp		;save byte
+00025b d007      	rcall	LCD_WN		;write nibble from temp to LCD
+00025c 917f      	pop	temp		;restore byte
+00025d f974      	bld	temp,H		;H - point
+00025e 9572      	swap	temp
+00025f d003      	rcall	LCD_WN		;write nibble from temp to LCD
+000260 958a      	dec	Cnt
+000261 f779      	brne	disp1		;repeat for all digits
+000262 9508      	ret	
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Write nibble from temp to LCD:
+                 
+000263 707f      LCD_WN:	andi	temp,0x0F	;mask unused bits
+000264 6170      	ori	temp,0x10	;address = 1
+000265 c001      	rjmp	w5
+                 
+                 ;Write address from temp to LCD:
+                 
+000266 707f      LCD_WA:	andi	temp,0x0F	;mask unused bits
+                 
+000267 938f      w5:	push	Cnt
+000268 e085      	ldi	Cnt,5		;write 5 bits to LCD
+                 w5_cyc:	Port_CLK_0		;CLK <- 0
+                 	Port_Data_0		;DATA <- 0 or..
+                 	bbrc	temp,4,w5_0
+                 	Port_Data_1		;DATA <- 1
+00026e 1f77      w5_0:	rol	temp
+00026f 958a      	dec	Cnt
+                 	Port_CLK_1		;CLK <- 1
+000271 f7b9      	brne	w5_cyc
+                 	Port_LOAD_0		;LOAD <- 0
+                 	Port_DATA_1
+                 	Port_LOAD_1		;LOAD <- 1
+000275 918f      	pop	Cnt
+000276 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Font table:
+                 
+                 FONT:	     ;FCBHADEG    FCBHADEG
+000277 60ee      	.DB 0b11101110, 0b01100000	;0, 1
+000278 6d2f      	.DB 0b00101111, 0b01101101	;2, 3
+000279 cde1      	.DB 0b11100001, 0b11001101	;4, 5
+00027a 68cf      	.DB 0b11001111, 0b01101000	;6, 7
+00027b edef      	.DB 0b11101111, 0b11101101	;8, 9
+00027c c7eb      	.DB 0b11101011, 0b11000111	;A, b
+00027d 678e      	.DB 0b10001110, 0b01100111	;C, d
+00027e 8b8f      	.DB 0b10001111, 0b10001011	;E, F
+00027f 0100      	.DB 0b00000000, 0b00000001	;blank, -
+000280 0804      	.DB 0b00000100, 0b00001000	;_, ~
+000281 07a9      	.DB 0b10101001, 0b00000111	;degree, c
+000282 e3ce      	.DB 0b11001110, 0b11100011	;G, H
+000283 8660      	.DB 0b01100000, 0b10000110	;I, L
+000284 4302      	.DB 0b00000010, 0b01000011	;i, n
+000285 ab47      	.DB 0b01000111, 0b10101011	;o, P
+000286 038a      	.DB 0b10001010, 0b00000011	;R, r
+000287 e687      	.DB 0b10000111, 0b11100110	;t, U
+000288 e546      	.DB 0b01000110, 0b11100101	;u, Y
+000289 8a86      	.DB 0b10000110, 0b10001010	;|_, |~
+                 
+                 .equ	H	= 4			;point
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Characters codes table:
+                 
+                 .equ	BLANK	=0x10		;character "blank" code
+                 .equ	i_	=0x10		;character "blank" code
+                 .equ	iMIN	=0x11		;character "-" code
+                 .equ	iLL	=0x12		;character "lower -" code
+                 .equ	iHH	=0x13		;character "upper -" code
+                 .equ	iHL	=0x24		;character "|_" code
+                 .equ	iLH	=0x25		;character "|~" code
+                 .equ	iDEG	=0x14		;character "degree" code
+                 .equ	iA	=0x0A		;character "A" code
+                 .equ	iB	=0x0B		;character "b" code
+                 .equ	iC	=0x0C		;character "C" code
+                 .equ	iiC	=0x15		;character "c" code
+                 .equ	iD	=0x0D		;character "d" code
+                 .equ	iE	=0x0E		;character "E" code
+                 .equ	iF	=0x0F		;character "F" code
+                 .equ	iG	=0x16		;character "G" code
+                 .equ	iH	=0x17		;character "H" code
+                 .equ	iI	=0x18		;character "I" code
+                 .equ	iL	=0x19		;character "L" code
+                 .equ	iii	=0x1A		;character "i" code
+                 .equ	iiN	=0x1B		;character "n" code
+                 .equ	iO	=0x00		;character "O" code
+                 .equ	iiO	=0x1C		;character "o" code
+                 .equ	iP	=0x1D		;character "P" code
+                 .equ	iR	=0x1E		;character "R" code
+                 .equ	iiR	=0x1F		;character "r" code
+                 .equ	iS	=0x05		;character "S" code
+                 .equ	iT	=0x20		;character "t" code
+                 .equ	iU	=0x21		;character "U" code
+                 .equ	iiU	=0x22		;character "u" code
+                 .equ	iY	=0x23		;character "Y" code
+                 
+                 ;----------------------------------------------------------------------------
+                 .include "Keyboard.asm"		;link keyboard support module
+                 
+                 
+                 ;Keyboard support module
+                 ;Used 74HC164
+                 
+                 ;Connections:
+                 ;DATA -> pin 2 74HC164
+                 ;CLK -> pin 8 74HC164
+                 ;RETL -> keyboard return line
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Constantes:
+                 
+                 .equ	ARCnV	= 16		;slow autorepeat count
+                 .equ	ARDel	= 800		;initial autorepeat delay, mS
+                 .equ	ARSlw	= 180		;slow autorepeat rate, mS
+                 .equ	ARFst	= 60		;fast autorepeat rate, mS
+                 .equ	Debnc	= 30		;debounce delay, mS
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Derivated constantes:
+                 
+                 .equ ARDelV = ARDel/TSYS
+                 .equ ARSlwV = ARSlw/TSYS
+                 .equ ARFstV = ARFst/TSYS
+                 .equ DebncV = Debnc/TSYS
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Keyboard scancodes:
+                 
+                 .equ	K_NO	= 0x00		;no press
+                 .equ	K_EX	= 0x01		;key EXIT code
+                 .equ	K_DN	= 0x02		;key DOWN code
+                 .equ	K_UP	= 0x04		;key UP code
+                 .equ	K_EN	= 0x08		;key ENTER code
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .DSEG	;data segment
+                 
+                 ;----------------------------------------------------------------------------
+                 
+00030c           KBD:	.byte 5			;keyboard data structure
+                 .equ	Lc	= 0		;LastCode offset
+                 .equ	Tc	= 1		;TempCode offset
+                 .equ	ARCnt	= 2		;autorepeat counter offset
+                 .equ	DebTM	= 3		;debounce timer offset
+                 .equ	KeyTM	= 4		;key timer offset
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .CSEG	;Code segment
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Scan keyboard and validate code:
+                 ;KBD+Lc	= true scancode,
+                 ;NEWPR	= 1 if new press
+                 
+00028a d037      mKey:	rcall	Scan		;scan keyboard
+                 	ldy	KBD		;keyboard data structure base
+00028d 8148      	ldd	tempL,Y+Lc	
+00028e 1747      	cp	tempL,temp	;scancode = LastCode ?
+00028f f089      	breq	Hold		;branch if same key
+                 	
+000290 8149      	ldd	tempL,Y+Tc
+000291 1747      	cp	tempL,temp	;scancode = TempCode ?
+000292 f459      	brne	NewP		;branch if new key
+                 	
+000293 814b      	ldd	tempL,Y+DebTM
+000294 2344      	tst	tempL		;check debounce timer
+000295 f459      	brne	Hold
+                 	
+000296 8148      	ldd	tempL,Y+Lc
+000297 3040      	cpi	tempL,K_NO	;check LastCode
+000298 8378      	std	Y+Lc,temp	;LastCode <- scancode
+000299 f4d9      	brne	Proc		;if LastCode == K_NO, then
+                 	stbr	Flags,NEWPR	;set new press flag
+00029b e560      	ldi	tempH,ARDelV	;autorepeat delay value
+00029c e140      	ldi	tempL,ARCnV
+00029d c013      	rjmp	Stac		;go to store ARCnt
+                 	
+00029e 8379      NewP:	std	Y+Tc,temp	;TempCode <- scancode
+00029f e043      	ldi	tempL,DebncV
+0002a0 834b      	std	Y+DebTM,tempL	;debounce timer load
+                 	
+                 Hold:	clbr	Flags,NEWPR	;clear new press flag
+0002a2 814c      	ldd	tempL,Y+KeyTM
+0002a3 2344      	tst	tempL		;check key timer
+0002a4 f481      	brne	Proc
+0002a5 8148      	ldd	tempL,Y+Lc
+0002a6 3044      	cpi	tempL,K_UP	;K_UP, autorepeat enable
+0002a7 f019      	breq	Ar
+0002a8 3042      	cpi	tempL,K_DN	;K_DN, autorepeat enable
+0002a9 f009      	breq	Ar
+0002aa c00a      	rjmp	Proc
+                 Ar:	stbr	Flags,NEWPR	;set new press flag
+0002ac 814a      	ldd	tempL,Y+ARCnt
+0002ad 2344      	tst	tempL
+0002ae f021      	breq	Fast		;fast autorepeat if count is over
+0002af 954a      	dec	tempL		;dec autorepeat counter
+0002b0 e162      	ldi	tempH,ARSlwV	;slow autorepeat rate
+                 	
+0002b1 834a      Stac:	std	Y+ARCnt,tempL	;store autorepeat counter ARCnt
+0002b2 c001      	rjmp	Stkt		;go to store KeyTM
+                 	
+0002b3 e066      Fast:	ldi	tempH,ARFstV	;fast autorepeat rate
+0002b4 836c      Stkt:	std	Y+KeyTM,tempH	;store key timer KeyTM
+                 Proc:
+                 
+                 ;Process timers:
+                 
+                 	bbrc	Flags,UPD,Tmr2
+                 	
+0002b7 817b      	ldd	temp,Y+DebTM
+0002b8 2377      	tst	temp		;check debounce timer		 
+0002b9 f011      	breq	Tmr1
+0002ba 957a      	dec	temp		;advance debounce timer
+0002bb 837b      	std	Y+DebTM,temp
+                 
+0002bc 817c      Tmr1:	ldd	temp,Y+KeyTM
+0002bd 2377      	tst	temp		;check key timer		 
+0002be f011      	breq	Tmr2
+0002bf 957a      	dec	temp		;advance key timer
+0002c0 837c      	std	Y+KeyTM,temp
+0002c1 9508      Tmr2:	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Scan keyboard:
+                 ;Out: temp - scancode
+                 
+0002c2 d001      Scan:	rcall	scyc		;dummy scan (load 0bXXXX1111 in HC164)
+                 	Port_DATA_0		;DATA <- 0 at first
+0002c4 e078      scyc:	ldi	temp,0b00001000	;scan 4 buttons by 5 impulses
+                 sclk:	Port_CLK_0		;CLK <- 0
+0002c6 9488      	clc			;clc inside the loop for longer delay only
+                 	Skip_if_RETL_1		;C <- ~RETL
+0002c8 9408      	sec
+                 	Port_CLK_1		;CLK <- 1
+                 	Port_DATA_1		;DATA <- 1 forever
+0002cb 1f77      	rol	temp		;C <- temp.7..temp.0 <- C
+0002cc f7c0      	brcc	sclk
+0002cd 9508      	ret			;temp = scancode
+                 
+                 ;----------------------------------------------------------------------------
+                 .include "Beeper.asm"		;link beeper support module
+                 
+                 
+                 ;Beeper support module
+                 ;(program generation)
+                 
+                 ;Connection:
+                 ;SND -> beeper driver (LOW active)
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Constantes:
+                 
+                 .equ	TDUR	= 150		;tone duration (in half-periods)
+                 .equ	SDUR	= 25		;sound duration (in half-periods)
+                 .equ	ERRBP	= 55		;error bell period
+                 .equ	MLDP1	= 50		;melody period 1
+                 .equ	MLDP2	= 45		;melody period 2
+                 .equ	MLDP3	= 35		;melody period 3
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Derivated constantes:
+                 
+                 .equ	NSND	= FCLK / 1000000 ;sound generation time step
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .DSEG	;data segment (internal RAM)
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .CSEG	;Code segment
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Error bell:
+                 
+0002ce e327      ErrB:	ldi	tempE,ERRBP	;period
+0002cf d008      	rcall	Tone
+0002d0 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Data save melody:
+                 
+0002d1 e322      Melody:	ldi	tempE,MLDP1	;tone 1	
+0002d2 d005      	rcall	Tone
+0002d3 e22d      	ldi	tempE,MLDP2	;tone 2
+0002d4 d003      	rcall	Tone
+0002d5 e223      	ldi	tempE,MLDP3	;tone 3
+0002d6 d001      	rcall	Tone
+0002d7 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Tone generation:
+                 ;Input: tempE - period
+                 
+0002d8 e916      Tone:	ldi	tempD,TDUR	;tone duration
+0002d9 d008      	rcall	Sgen
+0002da 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Sound generation:
+                 ;Input: temp - frequency
+                 
+0002db 2f27      Sound:	mov	tempE,temp	;temp - frequency
+0002dc 9520      	com	tempE		;temp=~temp
+0002dd 702f      	andi	tempE,0x0F	;mask unused bits
+0002de 5e22      	subi	tempE,-30	;add period offset
+0002df e119      	ldi	tempD,SDUR	;sound duration
+0002e0 d001      	rcall	Sgen
+0002e1 9508      	ret
+                 	
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Sound generation:
+                 ;Input: tempE - period
+                 ;       tempD - duration
+                 	
+0002e2 2f32      Sgen:	mov	tempF,tempE	;3
+0002e3 e180      sndb:	ldi	Cnt,NSND  	;2 outer loop
+0002e4 958a      snda:	dec	Cnt		    ;1 inner loop
+0002e5 f7f1      	brne	snda		    ;1 inner loop
+0002e6 953a      	dec	tempF		  ;2 outer loop
+0002e7 f7d9      	brne	sndb		  ;2 outer loop
+0002e8 95a8      	wdr			;3 watchdog restart
+0002e9 fd10      	sbrc	tempD,0		;3 check tempF.0
+                 	Port_SND_1		;3 set	 SND if tempF.0 = 1
+0002eb ff10      	sbrs	tempD,0		;3 check tempF.0
+                 	Port_SND_0		;3 clear SND if tempF.0 = 0
+0002ed 951a      	dec	tempD		;3
+0002ee f799      	brne	Sgen		;3
+0002ef 9508      	ret			;tempF=1, SND = 1, beeper power off
+                 
+                 ;----------------------------------------------------------------------------
+                 .include "Menu.asm"		;link menu implementation module
+                 
+                 
+                 ;Menu implementation module
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Constantes:
+                 
+                 .equ	MIN_F	= 100		;F min,  x0.01 Hz
+                 .equ	MAX_F	= 5000000	;F max,  x0.01 Hz
+                 .equ	MIN_FS	= 1		;FS min, x0.01 Hz
+                 .equ	MAX_FS	= 1000000	;FS max, x0.01 Hz
+                 .equ	MIN_SH	= 0		;min SH menu index
+                 .equ	MAX_SH	= 1		;max SH menu index
+                 .equ	MIN_PE	= 0		;min P and E menus index
+                 .equ	MAX_PE	= 9		;max P and E menus index
+                 .equ	MIN_C	= 0		;min calibration value
+                 .equ	MAX_C	= 99999		;max calibration value
+                 .equ	STEP_C	= 10		;calibration value edit step
+                 .equ	C_0	= 50000		;nominal calibration value C
+                 
+                 ;Menu structure and codes:
+                 
+                 ;[F  0]	<-> [FS 4]
+                 ;  |
+                 ;[P  1]
+                 ;  |
+                 ;[E  2]
+                 ;  |
+                 ;[SH 3]
+                 ;
+                 ;[C  5]
+                 
+                 .equ	MnuF	=0		;edit Frequency
+                 .equ	MnuP	=1		;read Preset
+                 .equ	MnuE	=2		;preset save in Eeprom
+                 .equ	MnuSH	=3		;set Shape
+                 .equ	MnuFS	=4		;edit Frequency Step
+                 .equ	MnuC	=5		;calibration
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Variables:
+                 
+                 .DSEG	;data segment (internal RAM)
+                 
+000311           Menu:	.byte 1			;menu code
+                 
+000312           Calib:	.byte 3			;calibration
+000315           ValFS:	.byte 3			;frequency step
+000318           ValF:	.byte 3			;frequency
+00031b           ValP:	.byte 3			;preset
+                 
+00031e           Buff:	.byte 3			;edit buffer
+000321           Step:	.byte 3			;plus/minus step
+000324           Max:	.byte 3			;max limit
+000327           Min:	.byte 3			;min limit
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Macros:
+                 
+                 .macro	ldmi			;load tempH,M,L with 24-bit data
+                 	ldi 	tempL,byte1(@0)	
+                 	ldi 	tempM,byte2(@0)	
+                 	ldi 	tempH,byte3(@0)	
+                 .endm
+                 
+                 .macro	ldei			;load tempF,E,D with 24-bit data
+                 	ldi 	tempD,byte1(@0)	
+                 	ldi 	tempE,byte2(@0)	
+                 	ldi 	tempF,byte3(@0)	
+                 .endm
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .CSEG	;Code segment
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Init menu subsystem:
+                 
+0002f0 e392      iMenu:	ldi	Flags,(1<<ON) | (1<<ONR) | (1<<UPDD)
+0002f1 d1ef      	rcall	ReadF		;read from EEPROM Calib, ValFS, ValF
+0002f2 e070      	ldi	temp,MnuF	;menu "Frequency"
+0002f3 9370 0311 	sts	Menu,temp
+0002f5 d0c1      	rcall	SetMd		;set mode, calculate Freq and enable interrupts
+0002f6 d17c      	rcall	Update		;update display data
+                 
+0002f7 dfca      	rcall	Scan
+0002f8 3071      	cpi	temp,K_EX	;EX pressed ?
+0002f9 f431      	brne	norm
+0002fa e075      	ldi	temp,MnuC	;menu "Calibration"
+0002fb 9370 0311 	sts	Menu,temp
+0002fd d0b9      	rcall	SetMd		;set calibration mode
+0002fe d174      	rcall	Update		;update display data
+0002ff df4c      	rcall	Disp		;display
+                 
+000300 e223      norm:	ldi	tempE,35
+000301 dfd6      	rcall	Tone		;initial beep
+                 	
+000302 dfbf      rels:	rcall	Scan
+000303 95a8      	wdr
+000304 3070      	cpi	temp,K_NO
+000305 f7e1      	brne	rels		;wait for keyboard release
+000306 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Process key functions:
+                 	
+                 mMenu:	bbrc	Flags,NEWPR,NoPr
+                 	ldy	KBD
+00030b 8178      	ldd	temp,Y+Lc	;temp <- LastCode
+00030c 3070      	cpi	temp,K_NO
+00030d f081      	breq	NoPr		;skip if no press
+00030e dfcc      	rcall	Sound		;key beep
+00030f 3074      	cpi	temp,K_UP
+000310 f411      	brne	Pro1
+000311 d00d      	rcall	Do_UP		;key UP processing
+000312 c00b      	rjmp	NoPr
+000313 3072      Pro1:	cpi	temp,K_DN
+000314 f411      	brne	Pro2
+000315 d035      	rcall	Do_DN		;key DN processing
+000316 c007      	rjmp	NoPr
+000317 3071      Pro2:	cpi	temp,K_EX
+000318 f411      	brne	Pro3
+000319 d063      	rcall	Do_EX		;key EX processing
+00031a c003      	rjmp	NoPr
+00031b 3078      Pro3:	cpi	temp,K_EN
+00031c f409      	brne	NoPr
+00031d d076      	rcall	Do_EN		;key EN procesing
+00031e 9508      NoPr:	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Key "UP" processing:
+                 
+00031f 9170 0311 Do_UP:	lds	temp,Menu
+000321 3074      	cpi	temp,MnuFS	;---> menu "Frequency Step"?
+000322 f089      	breq	upst
+                 	
+                 ;Buff + Step, align value to step
+                 
+                 	ldy	Buff
+000325 d19e      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+                 	ldy	Step
+000328 d1a3      	rcall	LdDEF		;tempF:tempE:tempD = Step
+000329 d182      	rcall	div24		;tempC:tempB:tempA = Rem(Buff / Step) 
+                 	ldy	Buff
+00032c d197      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+00032d 194e      	sub	tempL,tempA	;tempH:tempM:tempL - Rem(Buff / Step)
+00032e 095f      	sbc	tempM,tempB
+00032f 0b60      	sbc	tempH,tempC
+000330 0f41      	add	tempL,tempD	;tempH:tempM:tempL + Step
+000331 1f52      	adc	tempM,tempE
+000332 1f63      	adc	tempH,tempF
+000333 c012      	rjmp	upv		;validate buffer
+                 
+                 ;Step change (1 -> 2 -> 5 -> 10 -> 20..)
+                 
+                 upst:	ldy	Buff
+000336 d18d      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+000337 0f44      	lsl	tempL
+000338 1f55      	rol	tempM
+000339 1f66      	rol	tempH		;Buff * 2
+00033a d0ec      	rcall	Search
+00033b 3072      	cpi	temp,2
+00033c f449      	brne	upv		;validate buffer
+                 	ldy	Buff
+00033f d188      	rcall	LdABC		;tempC:tempB:tempA = Buff	
+000340 9506      	lsr	tempC
+000341 94f7      	ror	tempB
+000342 94e7      	ror	tempA		;Buff / 2
+000343 0d4e      	add	tempL,tempA
+000344 1d5f      	adc	tempM,tempB
+000345 1f60      	adc	tempH,tempC	;Buff * 2.5
+                 
+000346 d0e8      upv:	rcall	Valid		;validate tempH:tempM:tempL
+000347 d10c      	rcall	Assume		;assume new parameters
+                 	stbr	Flags,EDT	;set edited flag
+000349 d129      	rcall	Update		;update display data
+00034a 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Key "DN" processing:
+                 		
+00034b 9170 0311 Do_DN:	lds	temp,Menu
+00034d 3074      	cpi	temp,MnuFS	;---> menu "Frequency Step"?
+00034e f0b1      	breq	dnst
+                 	
+                 
+                 ;Buff - Step, align value to step
+                 
+                 	ldy	Buff
+000351 d172      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+                 	ldy	Step
+000354 d177      	rcall	LdDEF		;tempF:tempE:tempD = Step
+000355 d156      	rcall	div24		;tempC:tempB:tempA = Rem(Buff / Step) 
+                 	ldy	Buff
+000358 d16b      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+000359 2d7e      	mov	temp,tempA
+00035a 297f      	or	temp,tempB
+00035b 2b70      	or	temp,tempC
+00035c f021      	breq	dn0
+00035d 194e      	sub	tempL,tempA	;Buff - Rem(Buff/Step)
+00035e 095f      	sbc	tempM,tempB
+00035f 0b60      	sbc	tempH,tempC
+000360 c017      	rjmp	dnv		;validate buffer	
+000361 1b41      dn0:	sub	tempL,tempD	;Buff - Step
+000362 0b52      	sbc	tempM,tempE
+000363 0b63      	sbc	tempH,tempF
+000364 c013      dn1:	rjmp	dnv		;validate buffer	
+                 	
+                 ;Step change (..20 -> 10 -> 5 -> 2 -> 1)
+                 
+                 dnst:	ldy	Buff
+000367 d15c      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+000368 9566      	lsr	tempH
+000369 9557      	ror	tempM
+00036a 9547      	ror	tempL		;Buff / 2
+00036b d0bb      	rcall	Search
+00036c 3075      	cpi	temp,5
+00036d f451      	brne	dnv		;validate buffer
+                 	ldy	Buff
+000370 d153      	rcall	LdLMH		;tempH:tempM:tempL = Buff	
+000371 0f44      	lsl	tempL
+000372 1f55      	rol	tempM
+000373 1f66      	rol	tempH		;Buff * 2
+000374 e015      	ldi	tempD,5
+000375 2722      	clr	tempE
+000376 2733      	clr	tempF
+000377 d134      	rcall	Div24		;Buff / 2.5
+                 
+000378 d0b6      dnv:	rcall	Valid		;validate tempH:tempM:tempL
+000379 d0da      	rcall	Assume		;assume new parameters
+                 	stbr	Flags,EDT	;set edited flag
+00037b d0f7      	rcall	Update		;update display data
+00037c 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Key "EX" processing (change menu item):
+                 	
+00037d 9170 0311 Do_EX:	lds	temp,Menu
+00037f 3074      	cpi	temp,MnuFS	;---> menu "Frequency Step":
+000380 f099      	breq	Do_EN		;process enter key
+                 
+000381 3075      	cpi	temp,MnuC	;---> menu "Calibration":
+000382 f411      	brne	ex1
+000383 d15d      	rcall	ReadF		;skip calibration, read Calib from EEPROM
+000384 c009      	rjmp	exf		;return to the frequency menu
+                 
+000385 3070      ex1:	cpi	temp,MnuF	;---> menu "Frequency":
+000386 f029      	breq	exn
+                 
+                 	bbrc	Flags,EDT,ex2	;if (EDT == 1) return to the frequency menu
+000389 c004      	rjmp	exf		;else next menu item
+                 
+00038a 3073      ex2:	cpi	temp,MnuSH	;---> menu "Shape":
+00038b f011      	breq	exf		;return to the frequency menu
+                 
+00038c 9573      exn:	inc	temp		;next menu item
+00038d c001      	rjmp	ex0
+00038e e070      exf:	ldi	temp,MnuF
+00038f 9370 0311 ex0:	sts	Menu,temp
+000391 d025      	rcall	SetMd		;set mode
+000392 d0e0      	rcall	Update		;update display data
+000393 9508      	ret
+                 	
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Key "EN" processing (change menu item):
+                 
+000394 9170 0311 Do_EN:	lds	temp,Menu
+000396 3075      	cpi	temp,MnuC	;---> menu "Calibration":
+000397 f411      	brne	en1
+000398 d172      	rcall	SaveC		;save Calib in EEPROM
+000399 c017      	rjmp	enf		;return to the frequency menu
+                 	
+00039a 3070      en1:	cpi	temp,MnuF	;---> menu "Frequency":
+00039b f411      	brne	en2
+00039c e074      	ldi	temp,MnuFS	;jump to the frequency step menu
+00039d c014      	rjmp	en0
+                 	
+00039e 3071      en2:	cpi	temp,MnuP	;---> menu "Read Preset":
+00039f f439      	brne	en3
+                 	ldy	ValP
+0003a2 d121      	rcall	LdLMH		;tempH:tempM:tempL = ValP
+                 	ldy	ValF
+0003a5 d12a      	rcall	StLMH		;ValF = tempH:tempM:tempL
+0003a6 c008      	rjmp	ens		;beep and return to the frequency menu	
+                 	
+0003a7 3072      en3:	cpi	temp,MnuE	;---> menu "Save Preset":
+0003a8 f411      	brne	en4
+0003a9 d168      	rcall	SaveP		;save preset
+0003aa c006      	rjmp	enf		;return to the frequency menu
+                 
+0003ab 3073      en4:	cpi	temp,MnuSH	;---> menu "Shape":
+0003ac f411      	brne	ens		;beep and return to the frequency menu
+0003ad df20      	rcall	ErrB		;error beep
+0003ae c006      	rjmp	enx
+                 	
+0003af e070      ens:	ldi	temp,0
+0003b0 df2a      	rcall	Sound		;return beep
+0003b1 e070      enf:	ldi	temp,MnuF	;menu "Frequency"
+0003b2 9370 0311 en0:	sts	Menu,temp
+0003b4 d002      	rcall	SetMd		;set mode
+0003b5 d0bd      enx:	rcall	Update		;update display data
+0003b6 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Set current edit mode:
+                 ;Input: Menu
+                 ;Out:   Buff, Step, Min, Max
+                 
+0003b7 9170 0311 SetMd:	lds	temp,Menu
+0003b9 3075      	cpi	temp,MnuC	;---> menu "Calibration":
+0003ba f499      	brne	smd1
+                 	ldy	Calib
+0003bd d106      	rcall	LdLMH
+                 	ldy	Buff
+0003c0 d10f      	rcall	StLMH		;Buff = Calib
+                 	ldmi	STEP_C
+                 	ldy	Step
+0003c6 d109      	rcall	StLMH		;Step = StepC
+                 	ldmi	MIN_C		;Min  = MIN_C
+                 	ldei	MAX_C		;Max  = MAX_C
+0003cd c04c      	rjmp	smm
+                 	
+0003ce 3070      smd1:	cpi	temp,MnuF	;---> menu "Frequency":
+0003cf f499      	brne	smd2
+                 	ldy	ValF
+0003d2 d0f1      	rcall	LdLMH
+                 	ldy	Buff
+0003d5 d0fa      	rcall	StLMH		;Buff = ValF
+                 	ldy	ValFS
+0003d8 d0eb      	rcall	LdLMH
+                 	ldy	Step
+0003db d0f4      	rcall	StLMH		;Step = ValFS
+                 	ldmi	MIN_F		;Min  = MIN_F
+                 	ldei	MAX_F		;Max  = MAX_F
+0003e2 c037      	rjmp	smm
+                 
+0003e3 3074      smd2:	cpi	temp,MnuFS	;---> menu "Frequency Step":
+0003e4 f469      	brne	smd3
+                 	ldy	ValFS
+0003e7 d0dc      	rcall	LdLMH
+                 	ldy	Buff
+0003ea d0e5      	rcall	StLMH		;Buff = ValFS
+                 	ldmi	MIN_FS		;Min  = MIN_FS
+                 	ldei	MAX_FS		;Max  = MAX_FS
+0003f1 c028      	rjmp	smm
+                 
+0003f2 3073      smd3:	cpi	temp,MnuSH	;---> menu "Shape":
+0003f3 f4a1      	brne	smd4
+0003f4 fd94      	sbrc	Flags,ON
+                 	ldmi	1	
+                 	ldy	Buff
+0003fa d0d5      	rcall	StLMH		;Buff = ON
+                 	ldmi	1
+                 	ldy	Step
+000400 d0cf      	rcall	StLMH		;Step = 1
+                 	ldmi	MIN_SH		;Min = MIN_SH
+                 	ldei	MAX_SH		;Max = MAX_SH
+000407 c012      	rjmp	smm
+                 	
+                 smd4:	ldmi	0		;---> menu "Read/Save Preset":
+                 	ldy	Buff
+00040d d0c2      	rcall	StLMH		;Buff = 0
+                 	ldmi	1
+                 	ldy	Step
+000413 d0bc      	rcall	StLMH		;Step = 1
+                 	ldmi	MIN_PE		;Min = MIN_PE
+                 	ldei	MAX_PE		;Max = MAX_PE
+                 		
+                 smm:	ldy	Max
+00041c d0b7      	rcall	StDEF		;save Max
+                 	ldy	Min
+00041f d0b0      	rcall	StLMH		;save Min
+                 	ldy	Buff
+000422 d0a1      	rcall	LdLMH		;tempH:tempM:tempL = Buff	
+000423 d00b      	rcall	Valid		;validate buffer
+000424 d02f      	rcall	Assume		;assume new values
+                 	clbr	Flags,EDT	;set edited flag
+000426 9508      	ret
+                 	
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Search for first non-zero digit:
+                 
+                 Search:	ldy	Dig+3
+000429 9179      srch:	ld	temp,Y+
+00042a 777f      	andi	temp,~Pt
+00042b f3e9      	breq	srch
+00042c 3170      	cpi	temp,BLANK
+00042d f3d9      	breq	srch
+00042e 9508      	ret
+                 	
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Validate value:
+                 ;Input: [Buff] - old value
+                 ;       tempH:tempM:tempL - new value
+                 ;       [Max], [Min] - limits
+                 ;Out:   tempH:tempM:tempL, [Buff] - validated value
+                 
+00042f d013      Valid:	rcall	ChkMin		;check for Min
+000430 f010      	brcs	RstBf
+000431 d01b      	rcall	ChkMax		;check for Max
+000432 f460      	brcc	ValOk	
+                 	
+                 RstBf:	ldy	Buff
+000435 d08e      	rcall	LdLMH		;error, restore buffer	
+000436 de97      	rcall	ErrB		;error bell
+000437 d00b      	rcall	ChkMin		;check for Min
+000438 f010      	brcs	LimBf
+000439 d013      	rcall	ChkMax		;check for Max
+00043a f420      	brcc	ValOk	
+                 	
+00043b 2d4e      LimBf:	mov	tempL,tempA	;limit buffer
+00043c 2d5f      	mov	tempM,tempB
+00043d 2f60      	mov	tempH,tempC
+00043e de8f      	rcall	ErrB		;error bell
+                 
+                 ValOk:	ldy	Buff
+000441 d08e      	rcall	StLMH		;save value to buffer
+000442 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Compare tempH:tempM:tempL and [Min]:
+                 ;Out: C = 1 if limit exceeded
+                 	
+                 ChkMin:	ldy	Min
+000445 d082      	rcall	LdABC		;tempC:tempB:tempA = Min
+000446 ec70      	ldi	temp,0xC0	;0xC00000 is max negative
+000447 1776      	cp	temp,tempH
+000448 f018      	brcs	chmr		
+000449 154e      	cp	tempL,tempA
+00044a 055f      	cpc	tempM,tempB
+00044b 0760      	cpc	tempH,tempC
+00044c 9508      chmr:	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Compare tempH:tempM:tempL and [Max]:
+                 ;Out: C = 1 if limit exceeded
+                 
+                 ChkMax:	ldy	Max
+00044f d078      	rcall	LdABC		;tempC:tempB:tempA = Max
+000450 16e4      	cp	tempA,tempL
+000451 06f5      	cpc	tempB,tempM
+000452 0706      	cpc	tempC,tempH
+000453 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Assume new parameters:
+                 ;Input:	tempH:tempM:tempL - new value
+                 ;	[Menu] - index
+                 	
+000454 9170 0311 Assume:	lds	temp,Menu
+000456 3070      	cpi	temp,MnuF	;---> menu "Frequency":
+000457 f429      	brne	assm1
+                 	ldy	ValF	
+00045a d075      	rcall	StLMH		;save new ValF
+00045b dc1d      	rcall	MakeF		;change frequency
+00045c c015      	rjmp	assmr
+                 
+00045d 3074      assm1:	cpi	temp,MnuFS	;---> menu "Frequency Step":
+00045e f421      	brne	assm2
+                 	ldy	ValFS
+000461 d06e      	rcall	StLMH		;save new ValFS
+000462 c00f      	rjmp	assmr
+                 
+000463 3073      assm2:	cpi	temp,MnuSH	;---> menu "Shape":
+000464 f419      	brne	assm3
+000465 fb40      	bst	tempL,0
+000466 f994      	bld	Flags,ON	;change shape
+000467 c00a      	rjmp	assmr
+                 
+000468 3071      assm3:	cpi	temp,MnuP	;---> menu "Preset":
+000469 f411      	brne	assm4
+00046a d099      	rcall	ReadP		;read preset fom EEPROM
+00046b c006      	rjmp	assmr
+                 
+00046c 3075      assm4:	cpi	temp,MnuC	;---> menu "Calibration":
+00046d f421      	brne	assmr
+                 	ldy	Calib
+000470 d05f      	rcall	StLMH		;save new Calib
+000471 dc07      	rcall	MakeF		;change frequency
+000472 9508      assmr:	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Update display data:
+                 ;Input:	Menu, Buff/ValF/ValP
+                 ;Out:	Dig[0..9]
+                 ;	UPDD = 1
+                 
+000473 e170      Update:	ldi	temp,BLANK	;load char
+000474 dd9b      	rcall	Fill		;clear display data
+                 	ldy	Buff
+000477 d04c      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+                 
+000478 9170 0311 	lds	temp,Menu
+00047a 3073      	cpi	temp,MnuSH	;---> menu "Shape":
+00047b f489      	brne	upd1
+                 
+                 	table	ShpT		;string table base
+00047e 2f74      	mov	temp,tempL
+00047f 0f74      	add	temp,tempL
+000480 0f74      	add	temp,tempL	;temp = Buff[0] * 3
+000481 0fe7      	add	ZL,temp
+000482 1ff7      	adc	ZH,temp
+000483 1bf7      	sub	ZH,temp		;ZH:ZL = ShpT + Buff[0] * 3
+                 	ldy	Dig+4		;display data base + 4
+000486 9175      	lpm	temp,Z+
+000487 9379      	st	Y+,temp		;menu char 1
+000488 9175      	lpm	temp,Z+
+000489 9379      	st	Y+,temp		;menu char 2
+00048a 9175      	lpm	temp,Z+
+00048b 9379      	st	Y+,temp		;menu char 3
+00048c c01d      	rjmp	upd31
+                 
+                 upd1:	table	StrT		;string table base
+00048f 0f77      	add	temp,temp	;temp = Menu * 2
+000490 0fe7      	add	ZL,temp
+000491 1ff7      	adc	ZH,temp
+000492 1bf7      	sub	ZH,temp		;ZH:ZL = StrT + Menu * 2
+                 	ldy	Dig		;display data base
+000495 9175      	lpm	temp,Z+
+000496 9379      	st	Y+,temp		;menu char 1
+000497 9175      	lpm	temp,Z+
+000498 9379      	st	Y+,temp		;menu char 2
+                 
+000499 9170 0311 	lds	temp,Menu
+00049b 3072      	cpi	temp,MnuE	;---> menu "Save Preset":
+00049c f429      	brne	upd2
+00049d 9340 0303 	sts	Dig+1,tempL	;Dig[1] - preset number
+                 	ldy	ValF
+0004a1 c006      	rjmp	upd21
+                 
+0004a2 3071      upd2:	cpi	temp,MnuP	;---> menu "Read Preset":
+0004a3 f429      	brne	upd3
+0004a4 9340 0303 	sts	Dig+1,tempL	;Dig[1] - preset number
+                 	ldy	ValP
+0004a8 d01b      upd21:	rcall	LdLMH		;tempH:tempM:tempL = ValF or ValP
+                 
+0004a9 dd6d      upd3:	rcall	DisBCD		;tempH:tempM:tempL convert to BCD Dig[3..9]
+                 upd31:	stbr	Flags,UPDD	;display update request
+0004ab 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Divide tempH:tempM:tempL / tempF:tempE:tempD =
+                 ; tempH:tempM:tempL.tempC:tempB:tempA
+                 
+0004ac 24ee      div24:	clr	tempA		;clear remainder Low byte
+0004ad 24ff      	clr	tempB
+0004ae 1b00      	sub	tempC,tempC	;clear remainder High byte and carry
+                 	
+0004af e189      	ldi	Cnt,25		;init loop counter
+                 	
+0004b0 1f44      div1:	rol	tempL		;shift left dividend
+0004b1 1f55      	rol	tempM
+0004b2 1f66      	rol	tempH
+0004b3 958a      	dec	Cnt		;decrement counter
+0004b4 f059      	breq	divret
+0004b5 1cee      	rol	tempA		;shift dividend into remainder
+0004b6 1cff      	rol	tempB
+0004b7 1f00      	rol	tempC
+0004b8 1ae1      	sub	tempA,tempD	;remainder = remainder - divisor
+0004b9 0af2      	sbc	tempB,tempE	
+0004ba 0b03      	sbc	tempC,tempF	
+0004bb f7a0      	brcc	div1		;if result negative
+0004bc 0ee1      	add	tempA,tempD	; restore remainder
+0004bd 1ef2      	adc	tempB,tempE
+0004be 1f03      	adc	tempC,tempF
+0004bf cff0      	rjmp	div1
+0004c0 9540      divret:	com	tempL
+0004c1 9550      	com	tempM
+0004c2 9560      	com	tempH		
+0004c3 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Load tempH,M,L from [Y+2],[Y+1],[Y+0]
+                 
+0004c4 9149      LdLMH:	ld	tempL,Y+
+0004c5 9159      	ld	tempM,Y+
+0004c6 9169      	ld	tempH,Y+
+0004c7 9508      	ret
+                 	
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Load tempC,B,A from [Y+2],[Y+1],[Y+0]
+                 
+0004c8 90e9      LdABC:	ld	tempA,Y+
+0004c9 90f9      	ld	tempB,Y+
+0004ca 9109      	ld	tempC,Y+
+0004cb 9508      	ret
+                 	
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Load tempF,E,D from [Y+2],[Y+1],[Y+0]
+                 
+0004cc 9119      LdDEF:	ld	tempD,Y+
+0004cd 9129      	ld	tempE,Y+
+0004ce 9139      	ld	tempF,Y+
+0004cf 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Store tempH,M,L  to [Y+2],[Y+1],[Y+0]
+                 
+0004d0 9349      StLMH:	st	Y+,tempL
+0004d1 9359      	st	Y+,tempM
+0004d2 9369      	st	Y+,tempH
+0004d3 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Store tempF,E,D  to [Y+2],[Y+1],[Y+0]
+                 
+0004d4 9319      StDEF:	st	Y+,tempD
+0004d5 9329      	st	Y+,tempE
+0004d6 9339      	st	Y+,tempF
+0004d7 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;String table:
+                 
+0004d8 100f
+0004d9 101d
+0004da 100e
+0004db 1705      StrT:	.DB iF,i_,iP,i_,iE,i_,iS,iH
+0004dc 050f
+0004dd 100c      	.DB iF,iS,iC,i_
+                 
+                 ;Shape string table:
+                 
+0004de 0f00
+0004df 050f
+0004e0 1b1a      ShpT:	.DB iO,iF,iF,iS,iii,iiN
+                 
+                 ;----------------------------------------------------------------------------
+                 .include "EEPROM.asm"		;link EEPROM support module
+                 
+                 
+                 ;EEPROM support module
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Constantes:
+                 
+                 .equ	SIGN	= 0xDE		;signature value
+                 
+                 .equ	STEP_0	= 10000		;initial step, x 0.01 Hz
+                 
+                 .equ	FREQ_0	= 100000	;preset 0, x 0.01 Hz
+                 .equ	FREQ_1	= 200000	;preset 1, x 0.01 Hz
+                 .equ	FREQ_2	= 300000	;preset 2, x 0.01 Hz
+                 .equ	FREQ_3	= 400000	;preset 3, x 0.01 Hz
+                 .equ	FREQ_4	= 500000	;preset 4, x 0.01 Hz
+                 .equ	FREQ_5	= 600000	;preset 5, x 0.01 Hz
+                 .equ	FREQ_6	= 700000	;preset 6, x 0.01 Hz
+                 .equ	FREQ_7	= 1000000	;preset 7, x 0.01 Hz
+                 .equ	FREQ_8	= 2000000	;preset 8, x 0.01 Hz
+                 .equ	FREQ_9	= 5000000	;preset 9, x 0.01 Hz
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .ESEG	;EEPROM initial values
+                 
+                 ;----------------------------------------------------------------------------
+                 
+000000           Enone:	.byte 1			;address 0 not used
+000001           ECalib:	.byte 3			;calibration value
+000004           EValFS:	.byte 3			;step
+000007           EPres:	.byte 30		;presets
+000025           ESign:	.byte 1			;signature
+                 EEnd:				;end of EEPROM array
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 .CSEG	;Code segment
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Read Calib, ValFS, ValF from EEPROM:
+                 
+                 ReadF:	ldy	ESign
+0004e3 d04f      	rcall	EE_Rd		;read signature
+0004e4 3d7e      	cpi	temp,SIGN	;check signature
+0004e5 f071      	breq	rdpar
+                 
+                 ;Signature fail, EEPROM init:
+                 
+0004e6 dde7      	rcall	ErrB		;error beep
+                 	ldy	ECalib		;load EEPROM array base address
+                 	table	FCalib		;load FLASH array base address
+0004eb d047      eeini:	rcall	EE_Rd		;wait EEPROM ready
+0004ec 9175      	lpm	temp,Z+		;read byte from FLASH
+0004ed d05b      	rcall	EE_Wr		;save byte to EEPROM
+0004ee 9631      	adiw	ZH:ZL,1		;skip high byte of word
+0004ef 9621      	adiw	YH:YL,1		;EEPROM address inc
+0004f0 32c6      	cpi	YL,low(EEnd)
+0004f1 f7c9      	brne	eeini
+0004f2 30d0      	cpi	YH,high(EEnd)
+0004f3 f7b9      	brne	eeini
+                 
+                 rdpar:	ldy	ECalib
+                 	ldz	Calib
+0004f8 d033      	rcall	EE_Rd3		;read Calib
+                 	ldy	EValFS
+                 	ldz	ValFS
+0004fd d02e      	rcall	EE_Rd3		;read ValFS
+                 	ldy	EPres
+                 	ldz	ValF
+000502 d029      	rcall	EE_Rd3		;read ValF
+000503 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Read preset from the EEPROM:	
+                 ;Input: [Buff+0] - preset number
+                 	
+000504 9170 031e ReadP:	lds	temp,Buff+0	;temp = preset number
+000506 d01c      	rcall	EE_PrA		;YH:YL = EEPROM address
+                 	ldz	ValP
+000509 d022      	rcall	EE_Rd3		;read preset
+00050a 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Save calibration to the EEPROM:
+                 	
+                 SaveC:	ldy	ECalib
+                 	ldz	Calib	
+00050f d02e      	rcall	EE_Wr3		;save Calib
+000510 ddc0      	rcall	Melody		;melody
+000511 9508      	ret
+                 	
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Save preset to the EEPROM:
+                 
+000512 9170 031e SaveP:	lds	temp,Buff+0	;temp = preset number
+000514 2377      	tst	temp
+000515 f439      	brne	svp
+                 	
+000516 937f      	push	temp
+                 	ldy	EValFS
+                 	ldz	ValFS	
+00051b d022      	rcall	EE_Wr3		;save ValFS
+00051c 917f      	pop	temp
+                 
+00051d d005      svp:	rcall	EE_PrA		;YH:YL = EEPROM address
+                 	ldz	ValF
+000520 d01d      	rcall	EE_Wr3		;save preset
+000521 ddaf      	rcall	Melody		;melody
+000522 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Make EEPROM preset address:
+                 ;Input: temp - preset number
+                 ;Out:   YH:YL - EEPROM address
+                 
+                 EE_PrA:	ldy	EPres
+000525 2f47      	mov	tempL,temp
+000526 0f74      	add	temp,tempL
+000527 0f74      	add	temp,tempL
+000528 2744      	clr	tempL
+000529 0fc7      	add	YL,temp
+00052a 1fd4      	adc	YH,tempL
+00052b 9508      	ret
+                 	
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Read 3 bytes from the EEPROM:
+                 ;Input: YH:YL = EEPROM address
+                 ;	ZH:ZL = RAM address
+                 
+00052c e083      EE_Rd3:	ldi	Cnt,3
+00052d d005      rdn:	rcall	EE_Rd		;temp = EEPROM data byte
+00052e 9371      	st	Z+,temp		;save data byte
+00052f 9621      	adiw	YH:YL,1		;EEPROM address inc
+000530 958a      	dec	Cnt
+000531 f7d9      	brne	rdn
+000532 9508      	ret	
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Wait for EEPROM ready and read EEPROM:
+                 ;Input: YH:YL - address
+                 ;Out:   temp - data
+                 
+000533 95a8      EE_Rd:	wdr			;watchdog restart
+000534 99e1      	sbic	EECR,EEWE
+000535 cffd      	rjmp	EE_Rd		;wait for EEPROM ready
+000536 bbce      	out	EEARL,YL	;EEPROM address low
+000537 bbdf      	out	EEARH,YH	;EEPROM address high
+000538 9ae0      	sbi	EECR,EERE	;strobe
+000539 b37d      	in	temp,EEDR	;read EEPROM
+00053a 2744      	clr	tempL
+00053b bb4e      	out	EEARL,tempL	;EEPROM address = 0
+00053c bb4f      	out	EEARH,tempL
+00053d 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Write 3 bytes to the EEPROM:
+                 ;Input: YH:YL = EEPROM address
+                 ;	ZH:ZL = RAM address
+                 
+00053e e083      EE_Wr3:	ldi	Cnt,3
+00053f dff3      wrn:	rcall	EE_Rd
+000540 2f47      	mov	tempL,temp	;tempL = EEPROM data byte
+000541 9171      	ld	temp,Z+		;temp = RAM data byte
+000542 1774      	cp	temp,tempL
+000543 f009      	breq	wrs		;skip write if temp == tempL
+000544 d004      	rcall	EE_Wr		;write data byte to the EEPROM
+000545 9621      wrs:	adiw	YH:YL,1		;EEPROM address inc
+000546 958a      	dec	Cnt
+000547 f7b9      	brne	wrn
+000548 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Write EEPROM:
+                 ;Input: YH:YL - address
+                 ;	temp - data
+                 
+000549 bbce      EE_Wr:	out	EEARL,YL	;EEPROM address low
+00054a bbdf      	out	EEARH,YH	;EEPROM address high
+00054b bb7d      	out	EEDR,temp	;load data
+00054c b74f      	in	tempL,SREG
+00054d 94f8      	cli			;interrupts disable
+00054e 9ae2      	sbi 	EECR,EEMWE	;master write enable
+00054f 9ae1      	sbi	EECR,EEWE	;strobe
+000550 bf4f      	out	SREG,tempL	;interrupts enable
+000551 2744      	clr	tempL
+000552 bb4e      	out	EEARL,tempL	;EEPROM address = 0
+000553 bb4f      	out	EEARH,tempL
+000554 9508      	ret
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;Initial EEPROM values:
+                 
+000555 0050      FCalib:	.dw byte1(C_0)
+000556 00c3      	.dw byte2(C_0)
+000557 0000      	.dw byte3(C_0)
+                 
+000558 0010      FValFS:	.dw byte1(STEP_0)
+000559 0027      	.dw byte2(STEP_0)
+00055a 0000      	.dw byte3(STEP_0)
+                 
+00055b 00a0      FPres:	.dw byte1(FREQ_0)
+00055c 0086      	.dw byte2(FREQ_0)
+00055d 0001      	.dw byte3(FREQ_0)
+                 
+00055e 0040      	.dw byte1(FREQ_1)
+00055f 000d      	.dw byte2(FREQ_1)
+000560 0003      	.dw byte3(FREQ_1)
+                 
+000561 00e0      	.dw byte1(FREQ_2)
+000562 0093      	.dw byte2(FREQ_2)
+000563 0004      	.dw byte3(FREQ_2)
+                 
+000564 0080      	.dw byte1(FREQ_3)
+000565 001a      	.dw byte2(FREQ_3)
+000566 0006      	.dw byte3(FREQ_3)
+                 
+000567 0020      	.dw byte1(FREQ_4)
+000568 00a1      	.dw byte2(FREQ_4)
+000569 0007      	.dw byte3(FREQ_4)
+                 
+00056a 00c0      	.dw byte1(FREQ_5)
+00056b 0027      	.dw byte2(FREQ_5)
+00056c 0009      	.dw byte3(FREQ_5)
+                 
+00056d 0060      	.dw byte1(FREQ_6)
+00056e 00ae      	.dw byte2(FREQ_6)
+00056f 000a      	.dw byte3(FREQ_6)
+                 
+000570 0040      	.dw byte1(FREQ_7)
+000571 0042      	.dw byte2(FREQ_7)
+000572 000f      	.dw byte3(FREQ_7)
+                 
+000573 0080      	.dw byte1(FREQ_8)
+000574 0084      	.dw byte2(FREQ_8)
+000575 001e      	.dw byte3(FREQ_8)
+                 
+000576 0040      	.dw byte1(FREQ_9)
+000577 004b      	.dw byte2(FREQ_9)
+000578 004c      	.dw byte3(FREQ_9)
+                 
+000579 00de      FSign:	.dw SIGN
+                 
+                 ;----------------------------------------------------------------------------
+                 
+                 ;----------------------------------------------------------------------------
+
+
+RESOURCE USE INFORMATION
+------------------------
+
+Notice:
+The register and instruction counts are symbol table hit counts,
+and hence implicitly used resources are not counted, eg, the
+'lpm' instruction without operands implicitly uses r0 and z,
+none of which are counted.
+
+x,y,z are separate entities in the symbol table and are
+counted separately from r26..r31 here.
+
+.dseg memory usage only counts static data declared with .byte
+
+ATmega8 register use summary:
+r0 :   9 r1 :   7 r2 :   2 r3 :   3 r4 :   3 r5 :   4 r6 :   4 r7 :   6 
+r8 :   4 r9 :   4 r10:   5 r11:   4 r12:   7 r13:   7 r14:  13 r15:  13 
+r16:  14 r17:  30 r18:  22 r19:  14 r20:  72 r21:  27 r22:  32 r23: 225 
+r24:  28 r25:  25 r26:  13 r27:   2 r28:  78 r29:  78 r30:  26 r31:  29 
+x  :   3 y  :  66 z  :  19 
+Registers used: 35 out of 35 (100.0%)
+
+ATmega8 instruction use summary:
+adc   :  24 add   :  16 adiw  :   4 and   :   0 andi  :   7 asr   :   0 
+bclr  :   0 bld   :   2 brbc  :   0 brbs  :   0 brcc  :   5 brcs  :   3 
+break :   0 breq  :  20 brge  :   0 brhc  :   0 brhs  :   0 brid  :   0 
+brie  :   0 brlo  :   1 brlt  :   0 brmi  :   0 brne  :  52 brpl  :   0 
+brsh  :   0 brtc  :   0 brts  :   0 brvc  :   0 brvs  :   0 bset  :   0 
+bst   :   2 cbi   :   7 cbr   :   6 clc   :   1 clh   :   0 cli   :   2 
+cln   :   0 clr   :  29 cls   :   0 clt   :   0 clv   :   0 clz   :   0 
+com   :   8 cp    :   9 cpc   :   5 cpi   :  43 cpse  :   4 dec   :  16 
+eor   :   0 fmul  :   0 fmuls :   0 fmulsu:   0 icall :   0 ijmp  :   0 
+in    :   5 inc   :   1 ld    :  32 ldd   :  14 ldi   : 269 lds   :  10 
+lpm   :   8 lsl   :   3 lsr   :   3 mov   :  13 movw  :   1 mul   :   1 
+muls  :   0 mulsu :   0 neg   :   0 nop   :   1 or    :   3 ori   :   2 
+out   :  41 pop   :   3 push  :   3 rcall : 135 ret   :  50 reti  :   1 
+rjmp  :  49 rol   :  16 ror   :   7 sbc   :  10 sbci  :   3 sbi   :  11 
+sbic  :   1 sbis  :   1 sbiw  :   0 sbr   :   9 sbrc  :   5 sbrs  :  11 
+sec   :   2 seh   :   0 sei   :   1 sen   :   0 ser   :   0 ses   :   0 
+set   :   0 sev   :   0 sez   :   0 sleep :   0 spm   :   0 st    :  20 
+std   :  14 sts   :   7 sub   :   9 subi  :   4 swap  :   1 tst   :   8 
+wdr   :   5 
+Instructions used: 64 out of 109 (58.7%)
+
+ATmega8 memory use summary [bytes]:
+Segment   Begin    End      Code   Data   Used    Size   Use%
+---------------------------------------------------------------
+[.cseg] 0x000000 0x000af4   2150    644   2794    8192  34.1%
+[.dseg] 0x000060 0x00032a      0    565    565    1024  55.2%
+[.eseg] 0x000000 0x000026      0     38     38     512   7.4%
+
+Assembly complete, 0 errors, 1 warnings
