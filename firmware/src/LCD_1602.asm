@@ -72,12 +72,6 @@ iDisp:	Port_LOAD_0;        ;E <- 0
 		rcall	LCD_CMD
 		ldi		temp,0x01		; clear display byte 2
 		rcall	LCD_CMD
-		ldi		temp, 5
-  		rcall	WaitMiliseconds
-		ldi		temp,0x00		; entry mode byte 1
-		rcall	LCD_CMD
-		ldi		temp,0x60		; entry mode byte 2
-		rcall	LCD_CMD
 		ldi		temp, 15 
   		rcall	WaitMiliseconds
 		ldi		temp,'#'		;load char
@@ -172,25 +166,22 @@ setpo:	ld	temp,Y
 Disp:	ldy		Dig			;pointer to Dig
 		ldi		Cnt,16
 disp1:	ld		temp,Y+		;temp <- digit
-		rcall	LCD_DATA	;write nibble from temp to LCD
+		push	temp
+		rcall	LCD_WN	;write nibble from temp to LCD
+		pop		temp
+		swap	temp
+		rcall	LCD_WN	;write nibble from temp to LCD
 		dec		Cnt
 		brne	disp1		;repeat for all digits
 		ret	
 
 ;----------------------------------------------------------------------------
 LCD_CMD: push temp
-		 rcall	LCD_WA
-		 pop temp
-		 swap temp
-		 rcall	LCD_WA
-		 ret
-
-LCD_DATA: push temp
-		  rcall	LCD_WN
-		  pop temp
-		  swap temp
-		  rcall	LCD_WN
-		  ret
+		swap temp
+		rcall	LCD_WA		; first LOW bits
+		pop temp
+		rcall	LCD_WA		; second HIGH bibts
+		ret
 
 ;Write nibble from temp to LCD:
 
@@ -214,40 +205,14 @@ w5_0:	rol		temp
 		brne	w5_cyc
 		Port_LOAD_1			;E <- 1
 		Port_DATA_1
-		push temp
-		ldi	   temp, 5
+		push	temp
+		ldi	   	temp, 5
   		rcall	WaitMiliseconds
-		pop temp
+		pop 	temp
 		Port_LOAD_0			;E <- 0
 		pop		Cnt
 		ret
 
-;----------------------------------------------------------------------------
-
-;Font table:
-
-FONT:	     ;FCBHADEG    FCBHADEG
-	.DB 0b11101110, 0b01100000	;0, 1
-	.DB 0b00101111, 0b01101101	;2, 3
-	.DB 0b11100001, 0b11001101	;4, 5
-	.DB 0b11001111, 0b01101000	;6, 7
-	.DB 0b11101111, 0b11101101	;8, 9
-	.DB 0b11101011, 0b11000111	;A, b
-	.DB 0b10001110, 0b01100111	;C, d
-	.DB 0b10001111, 0b10001011	;E, F
-	.DB 0b00000000, 0b00000001	;blank, -
-	.DB 0b00000100, 0b00001000	;_, ~
-	.DB 0b10101001, 0b00000111	;degree, c
-	.DB 0b11001110, 0b11100011	;G, H
-	.DB 0b01100000, 0b10000110	;I, L
-	.DB 0b00000010, 0b01000011	;i, n
-	.DB 0b01000111, 0b10101011	;o, P
-	.DB 0b10001010, 0b00000011	;R, r
-	.DB 0b10000111, 0b11100110	;t, U
-	.DB 0b01000110, 0b11100101	;u, Y
-	.DB 0b10000110, 0b10001010	;|_, |~
-
-.equ	H	= 4			;point
 
 ;----------------------------------------------------------------------------
 
@@ -261,7 +226,7 @@ FONT:	     ;FCBHADEG    FCBHADEG
 .equ	iHL	=0x24		;character "|_" code
 .equ	iLH	=0x25		;character "|~" code
 .equ	iDEG	=0x14		;character "degree" code
-.equ	iA	=0x0A		;character "A" code
+.equ	iA	= 'A'		;character "A" code
 .equ	iB	=0x0B		;character "b" code
 .equ	iC	=0x0C		;character "C" code
 .equ	iiC	=0x15		;character "c" code
