@@ -1,5 +1,5 @@
 
-AVRASM ver. 2.1.42  main.asm Wed Jan 11 14:41:38 2017
+AVRASM ver. 2.1.42  main.asm Wed Jan 11 16:17:12 2017
 
 main.asm(10): Including file 'c:\progra~2\atmel\avrtoo~1\avrass~1\appnotes\m8def.inc'
 main.asm(11): Including file 'macros.mac'
@@ -1850,23 +1850,23 @@ main.asm(121): Including file 'EEPROM.asm'
 00021c dfe6        		rcall	 WaitMiliseconds 
 00021d e270      		ldi	temp,0x20		;LCD_WrCmd(0x20);     //FUNCTION SET (8 bit)
 00021e d05d      		rcall	LCD_CMD
-00021f e00f      		ldi	   r16, 15
-000220 dfe2        		rcall	 WaitMiliseconds
-000221 e278      		ldi	temp,0x28		;LCD_WrCmd(0x28);     //FUNCTION SET (4 bit)
+00021f e001      		ldi	   r16, 1 		;delay >4.1 ms 	
+000220 dfe2        		rcall	 WaitMiliseconds 
+000221 e270      		ldi	temp,0x20		;LCD_WrCmd(0x20);     //FUNCTION SET (8 bit)
 000222 d059      		rcall	LCD_CMD
-000223 e00f      		ldi	   	r16, 15
+000223 e00f      		ldi	   r16, 15
 000224 dfde        		rcall	 WaitMiliseconds
-000225 e076      		ldi	temp,0x06		;LCD_WrCmd(0x06);     //ENTRY MODE SET
+000225 e070      		ldi	temp,0x00		;LCD_WrCmd(0x80);     //FUNCTION SET (4 bit)
 000226 d055      		rcall	LCD_CMD
-000227 e00f      		ldi	   r16, 15
+000227 e00f      		ldi	   	r16, 15
 000228 dfda        		rcall	 WaitMiliseconds
-000229 e273      		ldi	temp,0x23		;load char
-00022a d00d      		rcall	Fill		;fill Dig
-00022b d048      		rcall	Disp		;blank display LCD_Clear();         //CLEAR 
-00022c e00f      		ldi	   r16, 15
-00022d dfd5        		rcall	 WaitMiliseconds
-00022e e07c      		ldi	temp,0x0C		;LCD_WrCmd(0x0C);     //DISPLAY ON
-00022f d04c      		rcall	LCD_CMD
+000229 ec70      		ldi	temp,0xC0		    
+00022a d051      		rcall	LCD_CMD
+00022b e00f      		ldi	   r16, 15
+00022c dfd6        		rcall	 WaitMiliseconds
+00022d e273      		ldi	temp,0x23		;load char
+00022e d009      		rcall	Fill		;fill Dig
+00022f d044      		rcall	Disp		;blank display LCD_Clear();         //CLEAR 
 000230 e00f      		ldi	   r16, 15
 000231 dfd1        		rcall	 WaitMiliseconds
 000232 9508      		ret

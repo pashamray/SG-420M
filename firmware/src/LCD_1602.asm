@@ -60,23 +60,23 @@ iDisp:	Port_LOAD_0;        ;E <- 0
   		rcall	 WaitMiliseconds 
 		ldi	temp,0x20		;LCD_WrCmd(0x20);     //FUNCTION SET (8 bit)
 		rcall	LCD_CMD
+		ldi	   r16, 1 		;delay >4.1 ms 	
+  		rcall	 WaitMiliseconds 
+		ldi	temp,0x20		;LCD_WrCmd(0x20);     //FUNCTION SET (8 bit)
+		rcall	LCD_CMD
 		ldi	   r16, 15
   		rcall	 WaitMiliseconds
-		ldi	temp,0x28		;LCD_WrCmd(0x28);     //FUNCTION SET (4 bit)
+		ldi	temp,0x00		;LCD_WrCmd(0x80);     //FUNCTION SET (4 bit)
 		rcall	LCD_CMD
 		ldi	   	r16, 15
   		rcall	 WaitMiliseconds
-		ldi	temp,0x06		;LCD_WrCmd(0x06);     //ENTRY MODE SET
+		ldi	temp,0xC0		    
 		rcall	LCD_CMD
 		ldi	   r16, 15
   		rcall	 WaitMiliseconds
 		ldi	temp,0x23		;load char
 		rcall	Fill		;fill Dig
 		rcall	Disp		;blank display LCD_Clear();         //CLEAR 
-		ldi	   r16, 15
-  		rcall	 WaitMiliseconds
-		ldi	temp,0x0C		;LCD_WrCmd(0x0C);     //DISPLAY ON
-		rcall	LCD_CMD
 		ldi	   r16, 15
   		rcall	 WaitMiliseconds
 		ret
