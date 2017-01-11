@@ -18,7 +18,7 @@
 	rjmp	Init		;reset vector
 
 .org	OC1Aaddr
-.include "DDS.asm"			;link DDS implementation module
+;.include "DDS.asm"			;link DDS implementation module
 ;DDS implementation is located direct at the OC1A vector address
 ;Only one interrupt is used in this project
 
@@ -32,7 +32,7 @@ Init:	ldy	RAMEND
 	rcall	iVar		;variables init
 	rcall	iTimer		;system timer init
 	rcall	iDisp		;LCD init
-	rcall	iDDS		;DDS subsystem init
+	;rcall	iDDS		;DDS subsystem init
 	sei			;enable interrupts
 	rcall	iMenu		;menu subsystem init
 
@@ -42,7 +42,7 @@ Main:	rcall	mTimer		;process system timer
 	rcall	mKey		;scan keyboard
 	rcall	mMenu		;process menu
 	rcall	mDisp		;update display
-	rcall	mOn		;process ON bit
+	;rcall	mOn		;process ON bit
 	rcall	mWdog		;watchdog restart
 	rjmp 	Main		;loop
 
@@ -114,8 +114,7 @@ iVar:	clr	Flags		;clear flags
 	ret
 
 ;----------------------------------------------------------------------------
-
-.include "LCD.asm"		;link LCD support module
+.include "LCD_1602.asm"		;link LCD 1602 support module
 .include "Keyboard.asm"		;link keyboard support module
 .include "Beeper.asm"		;link beeper support module
 .include "Menu.asm"		;link menu implementation module

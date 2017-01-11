@@ -1,12 +1,12 @@
 ;----------------------------------------------------------------------------
 
 ;LCD support module
-;Used LCD - HT44780 + 74HC164
+;Used LCD - WH1602S + 74HC164
 
 ;Connections:
-;LOAD -> WR2 LCD
+;LOAD -> E LCD
 ;DATA -> pin 2 74HC164
-;CLK -> pin 8 74HC164
+;CLK  -> pin 8 74HC164
 
 ;----------------------------------------------------------------------------
 
@@ -18,7 +18,7 @@
 
 .DSEG	;data segment (internal SRAM)
 
-Dig:	.byte 10		;display data (string copy)
+Dig:	.byte 16		;display data (string copy)
 
 ;Font:	.byte 18		;RAM copy of display font table
 ;StrT:	.byte 12		;RAM copy of string table

@@ -467,7 +467,7 @@ Assume:	lds	temp,Menu
 	brne	assm1
 	ldy	ValF	
 	rcall	StLMH		;save new ValF
-	rcall	MakeF		;change frequency
+	;rcall	MakeF		;change frequency
 	rjmp	assmr
 
 assm1:	cpi	temp,MnuFS	;---> menu "Frequency Step":
@@ -491,7 +491,7 @@ assm4:	cpi	temp,MnuC	;---> menu "Calibration":
 	brne	assmr
 	ldy	Calib
 	rcall	StLMH		;save new Calib
-	rcall	MakeF		;change frequency
+	;rcall	MakeF		;change frequency
 assmr:	ret
 
 ;----------------------------------------------------------------------------
