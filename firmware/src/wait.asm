@@ -21,10 +21,10 @@ Wait4xCycles:
   brne	  Wait4xCycles
   ret
 ;------------------------------------------------------------------------------
-; Input : r16 - number of miliseconds to wait
+; Input : temp - number of miliseconds to wait
 ;------------------------------------------------------------------------------
 WaitMiliseconds:
-  push	r16
+  push	temp
 WaitMsLoop: 
   ldi	   XH,HIGH(DVUS(500))
   ldi	   XL,LOW(DVUS(500))
@@ -32,9 +32,9 @@ WaitMsLoop:
   ldi	   XH,HIGH(DVUS(500))
   ldi	   XL,LOW(DVUS(500))
   rcall	 Wait4xCycles
-  dec	   r16
+  dec	   temp
   brne	  WaitMsLoop
-  pop	   r16
+  pop	   temp
   ret
 ;------------------------------------------------------------------------------
 ; End of file

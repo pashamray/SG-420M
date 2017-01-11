@@ -6,7 +6,7 @@
 
 ;Constantes:
 
-.equ	FCLK	= 8000000	;Fclk, Hz
+.equ	FCLK	= 16000000	;Fclk, Hz
 .equ	TSYS	= 10		;system timer, mS
 
 ;----------------------------------------------------------------------------

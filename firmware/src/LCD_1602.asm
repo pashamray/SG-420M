@@ -22,10 +22,6 @@
 
 Dig:	.byte 16		;display data (string copy)
 
-;Font:	.byte 18		;RAM copy of display font table
-;StrT:	.byte 12		;RAM copy of string table
-;ShpT:	.byte 6			;RAM copy of shape menu string table
-
 ;----------------------------------------------------------------------------
 
 .CSEG	;Code segment
@@ -44,41 +40,51 @@ Dig:	.byte 16		;display data (string copy)
 ;	ret
 
 iDisp:	Port_LOAD_0;        ;E <- 0
-		ldi	   r16, 15
-  		rcall	 WaitMiliseconds
-		ldi	temp,0x30		;LCD_WrCmd(0x30);
-		rcall LCD_CMD
-		ldi	   r16, 5 		;delay >4.1 ms 	
-  		rcall	 WaitMiliseconds 
-		ldi	temp,0x30		;LCD_WrCmd(0x30);
+		ldi		temp, 15
+  		rcall	WaitMiliseconds
+		ldi		temp,0x30		; FUNCTION SET (8 bit)
 		rcall	LCD_CMD
-		ldi	   r16, 150
-  		rcall	 WaitMiliseconds	;delay >100 us
-		ldi	temp,0x30		;LCD_WrCmd(0x30);
+		ldi		temp, 5 		;delay >4.1 ms 	
+  		rcall	WaitMiliseconds 
+		ldi		temp,0x30		; FUNCTION SET (8 bit)
 		rcall	LCD_CMD
-		ldi	   r16, 5 		;delay >4.1 ms 	
-  		rcall	 WaitMiliseconds 
-		ldi	temp,0x20		;LCD_WrCmd(0x20);     //FUNCTION SET (8 bit)
+		ldi		temp, 5
+  		rcall	WaitMiliseconds	;delay >100 us
+		ldi		temp,0x30		; FUNCTION SET (8 bit)
 		rcall	LCD_CMD
-		ldi	   r16, 1 		;delay >4.1 ms 	
-  		rcall	 WaitMiliseconds 
-		ldi	temp,0x20		;LCD_WrCmd(0x20);     //FUNCTION SET (8 bit)
+		ldi		temp, 5 		;delay >4.1 ms 	
+  		rcall	WaitMiliseconds 
+		ldi		temp,0x20		; FUNCTION SET (4 bit)
 		rcall	LCD_CMD
-		ldi	   r16, 15
-  		rcall	 WaitMiliseconds
-		ldi	temp,0x00		;LCD_WrCmd(0x80);     //FUNCTION SET (4 bit)
+		ldi		temp, 5 		;delay >4.1 ms 	
+  		rcall	WaitMiliseconds 
+		ldi		temp,0x20		;FUNCTION SET (4 bit)
 		rcall	LCD_CMD
-		ldi	   	r16, 15
-  		rcall	 WaitMiliseconds
-		ldi	temp,0xC0		    
+		ldi		temp, 5
+  		rcall	WaitMiliseconds
+		ldi		temp,0x00		; display on byte 1
 		rcall	LCD_CMD
-		ldi	   r16, 15
-  		rcall	 WaitMiliseconds
-		ldi	temp,0x23		;load char
-		rcall	Fill		;fill Dig
-		rcall	Disp		;blank display LCD_Clear();         //CLEAR 
-		ldi	   r16, 15
-  		rcall	 WaitMiliseconds
+		ldi		temp,0xC0		; display on byte 2
+		rcall	LCD_CMD
+		ldi		temp, 5
+  		rcall	WaitMiliseconds
+		ldi		temp,0x00		; clear display byte 1
+		rcall	LCD_CMD
+		ldi		temp,0x01		; clear display byte 2
+		rcall	LCD_CMD
+		ldi		temp, 5
+  		rcall	WaitMiliseconds
+		ldi		temp,0x00		; entry mode byte 1
+		rcall	LCD_CMD
+		ldi		temp,0x60		; entry mode byte 2
+		rcall	LCD_CMD
+		ldi		temp, 15 
+  		rcall	WaitMiliseconds
+		ldi		temp,'#'		;load char
+		rcall	Fill			;fill Dig
+		rcall	Disp			;
+		ldi		temp, 15
+  		rcall	WaitMiliseconds
 		ret
 
 ;----------------------------------------------------------------------------
@@ -92,14 +98,14 @@ NoUpd:	ret
 
 ;----------------------------------------------------------------------------
 
-;Fill Dig[0..9] with char from temp:
+;Fill display with char from temp:
 
 Fill:	ldy	Dig
-	ldi	Cnt,10
+		ldi	Cnt,16
 fill1:	st	Y+,temp
-	dec	Cnt
-	brne	fill1
-	ret		
+		dec	Cnt
+		brne	fill1
+		ret		
 
 ;----------------------------------------------------------------------------
 
@@ -166,23 +172,23 @@ setpo:	ld	temp,Y
 Disp:	ldy		Dig			;pointer to Dig
 		ldi		Cnt,16
 disp1:	ld		temp,Y+		;temp <- digit
-		rcall	LCD_DATA		;write nibble from temp to LCD
+		rcall	LCD_DATA	;write nibble from temp to LCD
 		dec		Cnt
 		brne	disp1		;repeat for all digits
 		ret	
 
 ;----------------------------------------------------------------------------
 LCD_CMD: push temp
-		 swap temp
 		 rcall	LCD_WA
 		 pop temp
+		 swap temp
 		 rcall	LCD_WA
 		 ret
 
 LCD_DATA: push temp
-		  swap temp
 		  rcall	LCD_WN
 		  pop temp
+		  swap temp
 		  rcall	LCD_WN
 		  ret
 
@@ -209,7 +215,7 @@ w5_0:	rol		temp
 		Port_LOAD_1			;E <- 1
 		Port_DATA_1
 		push temp
-		ldi	   r16, 5
+		ldi	   temp, 5
   		rcall	WaitMiliseconds
 		pop temp
 		Port_LOAD_0			;E <- 0
