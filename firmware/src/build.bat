@@ -8,6 +8,6 @@ SET source=main.asm
 del %target%.map
 del %target%.lst
 
-%avrasmdir%\avrasm2.exe -fI -o %target%.hex -d %target%.obj -e %target%.eep -I "." -I "%avrincdir%" -l %target%.lst -D lcdtype="1602" %source%
+%avrasmdir%\avrasm2.exe -fI -o %target%.hex -d %target%.obj -e %target%.eep -I "." -I "%avrincdir%" -l %target%.lst %source%
 
 PAUSE

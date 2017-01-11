@@ -18,7 +18,7 @@
 	rjmp	Init		;reset vector
 
 .org	OC1Aaddr
-;.include "DDS.asm"			;link DDS implementation module
+.include "DDS.asm"			;link DDS implementation module
 ;DDS implementation is located direct at the OC1A vector address
 ;Only one interrupt is used in this project
 
@@ -27,7 +27,7 @@
 Init:	ldy	RAMEND	
 	out	SPL,YL		;locate stack
 	out	SPH,YH
-	rcall	iWdog		;start internal watchdog
+	;rcall	iWdog		;start internal watchdog
 	rcall	iPorts		;ports init
 	rcall	iVar		;variables init
 	rcall	iTimer		;system timer init

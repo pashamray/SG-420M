@@ -8,6 +8,8 @@
 ;DATA -> pin 2 74HC164
 ;CLK  -> pin 8 74HC164
 
+.include "wait.asm"
+
 ;----------------------------------------------------------------------------
 
 ;Constantes:
@@ -32,14 +34,52 @@ Dig:	.byte 16		;display data (string copy)
 
 ;Init display:
 
-iDisp:	ldi	temp,0x0F	;temp <- BLK register address
-	rcall	LCD_WA		;write address
-	ldi	temp,0x0F	;temp <- 0x0F - enable bus
-	rcall	LCD_WN		;write nibble
-	ldi	temp,BLANK	;load char
-	rcall	Fill		;fill Dig
-	rcall	Disp		;blank display
-	ret
+;iDisp:	ldi	temp,0x0F	;temp <- BLK register address
+;	rcall	LCD_WA		;write address
+;	ldi	temp,0x0F	;temp <- 0x0F - enable bus
+;	rcall	LCD_WN		;write nibble
+;	ldi	temp,BLANK	;load char
+;	rcall	Fill		;fill Dig
+;	rcall	Disp		;blank display
+;	ret
+
+iDisp:	Port_LOAD_0;        ;E <- 0
+		ldi	   r16, 15
+  		rcall	 WaitMiliseconds
+		ldi	temp,0x30		;LCD_WrCmd(0x30);
+		rcall LCD_CMD
+		ldi	   r16, 5 		;delay >4.1 ms 	
+  		rcall	 WaitMiliseconds 
+		ldi	temp,0x30		;LCD_WrCmd(0x30);
+		rcall	LCD_CMD
+		ldi	   r16, 150
+  		rcall	 WaitMiliseconds	;delay >100 us
+		ldi	temp,0x30		;LCD_WrCmd(0x30);
+		rcall	LCD_CMD
+		ldi	   r16, 5 		;delay >4.1 ms 	
+  		rcall	 WaitMiliseconds 
+		ldi	temp,0x20		;LCD_WrCmd(0x20);     //FUNCTION SET (8 bit)
+		rcall	LCD_CMD
+		ldi	   r16, 15
+  		rcall	 WaitMiliseconds
+		ldi	temp,0x28		;LCD_WrCmd(0x28);     //FUNCTION SET (4 bit)
+		rcall	LCD_CMD
+		ldi	   	r16, 15
+  		rcall	 WaitMiliseconds
+		ldi	temp,0x06		;LCD_WrCmd(0x06);     //ENTRY MODE SET
+		rcall	LCD_CMD
+		ldi	   r16, 15
+  		rcall	 WaitMiliseconds
+		ldi	temp,0x23		;load char
+		rcall	Fill		;fill Dig
+		rcall	Disp		;blank display LCD_Clear();         //CLEAR 
+		ldi	   r16, 15
+  		rcall	 WaitMiliseconds
+		ldi	temp,0x0C		;LCD_WrCmd(0x0C);     //DISPLAY ON
+		rcall	LCD_CMD
+		ldi	   r16, 15
+  		rcall	 WaitMiliseconds
+		ret
 
 ;----------------------------------------------------------------------------
 
@@ -123,55 +163,58 @@ setpo:	ld	temp,Y
 
 ;Indicate Dig[0..9] on LCD:
 	
-Disp:	ldi	temp,0x00	;temp <- 0x00 - SG1 address
-	rcall	LCD_WA		;write address
-	ldy	Dig		;pointer to Dig
-	ldi	Cnt,10
-disp1:	ld	temp,Y+		;temp <- digit
-	bst	temp,7		;T <- temp.7 (point)
-	andi	temp,0x7F	;temp.7 <- 0
-	table	FONT		;pointer to FONT
-	add	ZL,temp		;ZH:ZL = ZH:ZL + temp
-	adc	ZH,temp
-	sub	ZH,temp
-	lpm	temp,Z		;read font table
-	push	temp		;save byte
-	rcall	LCD_WN		;write nibble from temp to LCD
-	pop	temp		;restore byte
-	bld	temp,H		;H - point
-	swap	temp
-	rcall	LCD_WN		;write nibble from temp to LCD
-	dec	Cnt
-	brne	disp1		;repeat for all digits
-	ret	
+Disp:	ldy		Dig			;pointer to Dig
+		ldi		Cnt,16
+disp1:	ld		temp,Y+		;temp <- digit
+		rcall	LCD_DATA		;write nibble from temp to LCD
+		dec		Cnt
+		brne	disp1		;repeat for all digits
+		ret	
 
 ;----------------------------------------------------------------------------
+LCD_CMD: push temp
+		 swap temp
+		 rcall	LCD_WA
+		 pop temp
+		 rcall	LCD_WA
+		 ret
+
+LCD_DATA: push temp
+		  swap temp
+		  rcall	LCD_WN
+		  pop temp
+		  rcall	LCD_WN
+		  ret
 
 ;Write nibble from temp to LCD:
 
 LCD_WN:	andi	temp,0x0F	;mask unused bits
-	ori	temp,0x10	;address = 1
-	rjmp	w5
+		ori		temp,0x10	;address = 1
+		rjmp	w5
 
 ;Write address from temp to LCD:
 
 LCD_WA:	andi	temp,0x0F	;mask unused bits
 
-w5:	push	Cnt
-	ldi	Cnt,5		;write 5 bits to LCD
-w5_cyc:	Port_CLK_0		;CLK <- 0
-	Port_Data_0		;DATA <- 0 or..
-	bbrc	temp,4,w5_0
-	Port_Data_1		;DATA <- 1
-w5_0:	rol	temp
-	dec	Cnt
-	Port_CLK_1		;CLK <- 1
-	brne	w5_cyc
-	Port_LOAD_0		;LOAD <- 0
-	Port_DATA_1
-	Port_LOAD_1		;LOAD <- 1
-	pop	Cnt
-	ret
+w5:		push	Cnt
+		ldi		Cnt,5		;write 5 bits to LCD
+w5_cyc:	Port_CLK_0			;CLK <- 0
+		Port_DATA_0			;DATA <- 0 or..
+		bbrc	temp,4,w5_0
+		Port_DATA_1			;DATA <- 1
+w5_0:	rol		temp
+		dec		Cnt
+		Port_CLK_1			;CLK <- 1
+		brne	w5_cyc
+		Port_LOAD_1			;E <- 1
+		Port_DATA_1
+		push temp
+		ldi	   r16, 5
+  		rcall	WaitMiliseconds
+		pop temp
+		Port_LOAD_0			;E <- 0
+		pop		Cnt
+		ret
 
 ;----------------------------------------------------------------------------
 
