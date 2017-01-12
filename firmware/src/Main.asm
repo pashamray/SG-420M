@@ -24,27 +24,27 @@
 
 ;--------------------------- Main program: ----------------------------------
 
-Init:	ldy	RAMEND	
-	out	SPL,YL		;locate stack
-	out	SPH,YH
-	;rcall	iWdog		;start internal watchdog
-	rcall	iPorts		;ports init
-	rcall	iVar		;variables init
-	rcall	iTimer		;system timer init
-	rcall	iDisp		;LCD init
-	;rcall	iDDS		;DDS subsystem init
-	sei			;enable interrupts
-	rcall	iMenu		;menu subsystem init
+Init:	ldy		RAMEND	
+		out		SPL,YL		;locate stack
+		out		SPH,YH
+		rcall	iWdog		;start internal watchdog
+		rcall	iPorts		;ports init
+		rcall	iVar		;variables init
+		rcall	iTimer		;system timer init
+		rcall	iDisp		;LCD init
+		rcall	iDDS		;DDS subsystem init
+		sei					;enable interrupts
+		rcall	iMenu		;menu subsystem init
 
 ;Main loop:
 
 Main:	rcall	mTimer		;process system timer
-	rcall	mKey		;scan keyboard
-	rcall	mMenu		;process menu
-	rcall	mDisp		;update display
-	;rcall	mOn		;process ON bit
-	rcall	mWdog		;watchdog restart
-	rjmp 	Main		;loop
+		rcall	mKey		;scan keyboard
+		rcall	mMenu		;process menu
+		rcall	mDisp		;update display
+		rcall	mOn			;process ON bit
+		rcall	mWdog		;watchdog restart
+		rjmp 	Main		;loop
 
 ;------------------------- Subroutines area: --------------------------------
 
@@ -114,10 +114,12 @@ iVar:	clr	Flags		;clear flags
 	ret
 
 ;----------------------------------------------------------------------------
+.include "wait.asm"
+;.include "LCD_7.asm"		;link LCD support module
 .include "LCD_1602.asm"		;link LCD 1602 support module
 .include "Keyboard.asm"		;link keyboard support module
 .include "Beeper.asm"		;link beeper support module
-.include "Menu.asm"		;link menu implementation module
+.include "Menu.asm"			;link menu implementation module
 .include "EEPROM.asm"		;link EEPROM support module
 
 ;----------------------------------------------------------------------------

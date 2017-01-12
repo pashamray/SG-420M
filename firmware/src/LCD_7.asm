@@ -204,14 +204,14 @@ FONT:	     ;FCBHADEG    FCBHADEG
 
 ;Characters codes table:
 
-.equ	BLANK	=0x10		;character "blank" code
+.equ	BLANK=0x10		;character "blank" code
 .equ	i_	=0x10		;character "blank" code
-.equ	iMIN	=0x11		;character "-" code
+.equ	iMIN=0x11		;character "-" code
 .equ	iLL	=0x12		;character "lower -" code
 .equ	iHH	=0x13		;character "upper -" code
 .equ	iHL	=0x24		;character "|_" code
 .equ	iLH	=0x25		;character "|~" code
-.equ	iDEG	=0x14		;character "degree" code
+.equ	iDEG=0x14		;character "degree" code
 .equ	iA	=0x0A		;character "A" code
 .equ	iB	=0x0B		;character "b" code
 .equ	iC	=0x0C		;character "C" code

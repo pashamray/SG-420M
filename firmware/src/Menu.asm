@@ -636,7 +636,7 @@ StDEF:	st	Y+,tempD
 ;String table:
 
 StrT:	.DB iF,i_,iP,i_,iE,i_,iS,iH
-	.DB iF,iS,iC,i_
+		.DB iF,iS,iC,i_
 
 ;Shape string table:
 
