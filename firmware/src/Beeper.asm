@@ -65,7 +65,8 @@ Tone:	ldi	tempD,TDUR	;tone duration
 ;Sound generation:
 ;Input: temp - frequency
 
-Sound:	mov	tempE,temp	;temp - frequency
+Sound:
+	mov	tempE,temp	;temp - frequency
 	com	tempE		;temp=~temp
 	andi	tempE,0x0F	;mask unused bits
 	subi	tempE,-30	;add period offset
