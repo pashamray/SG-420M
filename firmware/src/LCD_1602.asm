@@ -45,41 +45,41 @@ iDisp:		Port_LOAD_0;        ;E <- 0
 			ldi		temp, 15
   			rcall	WaitMiliseconds
 			ldi		temp,0x30		; FUNCTION SET (8 bit)
-			rcall	LCD_CMD
-			ldi		temp, 5 		;delay >4.1 ms 	
+			rcall	LCD_WA
+			ldi		temp, 15 		;delay >4.1 ms 	
   			rcall	WaitMiliseconds 
 			ldi		temp,0x30		; FUNCTION SET (8 bit)
-			rcall	LCD_CMD
-			ldi		temp, 1
+			rcall	LCD_WA
+			ldi		temp, 15
   			rcall	WaitMiliseconds	;delay >100 us
 			ldi		temp,0x30		; FUNCTION SET (8 bit)
-			rcall	LCD_CMD
-			ldi		temp, 5 		;delay >4.1 ms 	
+			rcall	LCD_WA
+			ldi		temp, 15 		;delay >4.1 ms 	
   			rcall	WaitMiliseconds 
 			ldi		temp,0x20		; FUNCTION SET (4 bit)
-			rcall	LCD_CMD
-			ldi		temp, 5 		;delay >4.1 ms 	
+			rcall	LCD_WA
+			ldi		temp, 15 		;delay >4.1 ms 	
   			rcall	WaitMiliseconds 
 			ldi		temp,0x28		;FUNCTION SET (4 bit)
 			rcall	LCD_CMD
-			ldi		temp, 1
+			ldi		temp, 20
   			rcall	WaitMiliseconds
 			ldi		temp,0x06		; entry mode
 			rcall	LCD_CMD
-			ldi		temp, 1
+			ldi		temp, 25
   			rcall	WaitMiliseconds
 			ldi		temp,0x01		; clear display
 			rcall	LCD_CMD
-			ldi		temp, 1
+			ldi		temp, 25
   			rcall	WaitMiliseconds
 			ldi		temp,0x0C		; display on
 			rcall	LCD_CMD
-			ldi		temp, 1 
+			ldi		temp, 25 
   			rcall	WaitMiliseconds
 			ldi		temp,BLANK		;load char
 			rcall	Fill			;fill Dig
 			rcall	Disp			;
-			ldi		temp, 1
+			ldi		temp, 25
   			rcall	WaitMiliseconds
 			ret
 
@@ -182,6 +182,16 @@ disp1:	ld	temp,Y+		;temp <- digit
 		rcall	LCD_WN		;write nibble from temp to LCD
 		pop	temp		;restore byte
 		bld	temp,H		;H - point
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
+		nop
 		rcall	LCD_WN		;write nibble from temp to LCD
 		dec	Cnt
 		brne	disp1		;repeat for all digits
@@ -189,16 +199,36 @@ disp1:	ld	temp,Y+		;temp <- digit
 
 ;----------------------------------------------------------------------------
 LCD_CMD:	push	temp
-			swap	temp
 			rcall	LCD_WA		; first HIGH bits
 			pop		temp
-			rcall	LCD_WA		; second LOW bits
+			swap	temp 		; second LOW bits
+			nop
+			nop
+			nop
+			nop
+			nop
+			nop
+			nop
+			nop
+			nop
+			nop
+			rcall	LCD_WA		
 			ret
 
 LCD_DATA:	push	temp
 			swap	temp
 			rcall	LCD_WN		; first HIGH bits
 			pop		temp
+			nop
+			nop
+			nop
+			nop
+			nop
+			nop
+			nop
+			nop
+			nop
+			nop
 			rcall	LCD_WN		; second LOW bits
 			ret
 
@@ -210,7 +240,8 @@ LCD_WN:		andi	temp,0x0F	;mask unused bits
 
 ;Write address from temp to LCD:
 
-LCD_WA:		andi	temp,0x0F	;mask unused bits
+LCD_WA:		swap	temp 		; first HIGH bits
+			andi	temp,0x0F	;mask unused bits
 
 w5:			push	Cnt
 			ldi		Cnt,5		;write 5 bits to LCD
@@ -224,7 +255,16 @@ w5_0:		rol		temp
 			brne	w5_cyc
 			Port_LOAD_1			;E <- 1
 			Port_DATA_1
-			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
 			Port_LOAD_0			;E <- 0
 			pop		Cnt
 			ret

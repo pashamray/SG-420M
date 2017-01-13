@@ -74,7 +74,8 @@
   <WaitMiliseconds><FILE>C:\project\sg-420m\firmware\src\wait.asm</FILE><LINE>26</LINE></WaitMiliseconds>
   <WaitMsLoop><FILE>C:\project\sg-420m\firmware\src\wait.asm</FILE><LINE>28</LINE></WaitMsLoop>
   <Dig><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>25</LINE></Dig>
-  <LCD_CMD><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>191</LINE></LCD_CMD>
+  <LCD_WA><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>243</LINE></LCD_WA>
+  <LCD_CMD><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>201</LINE></LCD_CMD>
   <Fill><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>99</LINE></Fill>
   <Disp><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>168</LINE></Disp>
   <NoUpd><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>93</LINE></NoUpd>
@@ -87,13 +88,12 @@
   <notz><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>149</LINE></notz>
   <setpo><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>159</LINE></setpo>
   <disp1><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>172</LINE></disp1>
-  <FONT><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>236</LINE></FONT>
-  <LCD_WN><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>207</LINE></LCD_WN>
-  <LCD_WA><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>213</LINE></LCD_WA>
-  <LCD_DATA><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>198</LINE></LCD_DATA>
-  <w5><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>215</LINE></w5>
-  <w5_cyc><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>217</LINE></w5_cyc>
-  <w5_0><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>221</LINE></w5_0>
+  <FONT><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>276</LINE></FONT>
+  <LCD_WN><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>237</LINE></LCD_WN>
+  <LCD_DATA><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>218</LINE></LCD_DATA>
+  <w5><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>246</LINE></w5>
+  <w5_cyc><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>248</LINE></w5_cyc>
+  <w5_0><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>252</LINE></w5_0>
   <KBD><FILE>C:\project\sg-420m\firmware\src\Keyboard.asm</FILE><LINE>46</LINE></KBD>
   <Scan><FILE>C:\project\sg-420m\firmware\src\Keyboard.asm</FILE><LINE>136</LINE></Scan>
   <Hold><FILE>C:\project\sg-420m\firmware\src\Keyboard.asm</FILE><LINE>90</LINE></Hold>
