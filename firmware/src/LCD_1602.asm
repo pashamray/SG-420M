@@ -17,12 +17,14 @@
 ;Constantes:
 
 .equ	Pt	= 0x80		;point in Dig
-
+.equ	Lcd_cols = 16	;
+.equ	Lcd_rows = 2	;
+.equ	Lcd_bytes = (Lcd_cols * Lcd_rows)
 ;----------------------------------------------------------------------------
 
 .DSEG	;data segment (internal SRAM)
 
-Dig:	.byte 10	;display data (string copy)
+Dig:	.byte Lcd_bytes	;display data (string copy)
 
 ;----------------------------------------------------------------------------
 
@@ -76,11 +78,6 @@ iDisp:		Port_LOAD_0;        ;E <- 0
 			rcall	LCD_CMD
 			ldi		temp, 25 
   			rcall	WaitMiliseconds
-			ldi		temp,BLANK		;load char
-			rcall	Fill			;fill Dig
-			rcall	Disp			;
-			ldi		temp, 25
-  			rcall	WaitMiliseconds
 			ret
 
 ;----------------------------------------------------------------------------
@@ -97,7 +94,7 @@ NoUpd:		ret
 ;Fill display with char from temp:
 
 Fill:		ldy		Dig
-			ldi		Cnt,10
+			ldi		Cnt,Lcd_bytes
 fill1:		st		Y+,temp
 			dec		Cnt
 			brne	fill1
@@ -165,23 +162,23 @@ setpo:		ld		temp,Y
 
 ;Indicate Dig[0..9] on LCD:
 	
-Disp:	ldi	temp,0x02	;temp <- 0x02-  address
-		rcall	LCD_CMD		;write address
-		ldy	Dig		;pointer to Dig
-		ldi	Cnt,10
-disp1:	ld	temp,Y+		;temp <- digit
-		bst	temp,7		;T <- temp.7 (point)
-		andi	temp,0x7F	;temp.7 <- 0
-		table	FONT		;pointer to FONT
-		add	ZL,temp		;ZH:ZL = ZH:ZL + temp
-		adc	ZH,temp
-		sub	ZH,temp
-		lpm	temp,Z		;read font table
-		push	temp		;save byte
+Disp:	ldi		temp,0x02		;temp <- 0x02-  address
+		rcall	LCD_CMD			;write address
+		ldy		Dig				;pointer to Dig
+		ldi		Cnt,Lcd_bytes
+disp1:	ld		temp,Y+			;temp <- digit
+		bst		temp,7			;T <- temp.7 (point)
+		andi	temp,0x7F		;temp.7 <- 0
+		table	FONT			;pointer to FONT
+		add		ZL,temp			;ZH:ZL = ZH:ZL + temp
+		adc		ZH,temp
+		sub		ZH,temp
+		lpm		temp,Z			;read font table
+		push	temp			;save byte
 		swap	temp
-		rcall	LCD_WN		;write nibble from temp to LCD
-		pop	temp		;restore byte
-		bld	temp,H		;H - point
+		rcall	LCD_WN			;write nibble from temp to LCD
+		pop		temp			;restore byte
+		bld		temp,H			;H - point
 		nop
 		nop
 		nop
@@ -192,9 +189,9 @@ disp1:	ld	temp,Y+		;temp <- digit
 		nop
 		nop
 		nop
-		rcall	LCD_WN		;write nibble from temp to LCD
-		dec	Cnt
-		brne	disp1		;repeat for all digits
+		rcall	LCD_WN			;write nibble from temp to LCD
+		dec		Cnt
+		brne	disp1			;repeat for all digits
 		ret	
 
 ;----------------------------------------------------------------------------
@@ -290,6 +287,7 @@ FONT:	     ;FCBHADEG    FCBHADEG
 	.DB 'i', 'n'	;i, n
 	.DB 'o', 'P'	;o, P
 	.DB 'R', 'r'	;R, r
+	.DB 'S', 's'	;S, s
 	.DB 't', 'U'	;t, U
 	.DB 'u', 'Y'	;u, Y
 	.DB '|', '/'	;|_, |~
@@ -305,8 +303,8 @@ FONT:	     ;FCBHADEG    FCBHADEG
 .equ	iMIN=0x11		;character "-" code
 .equ	iLL	=0x12		;character "lower -" code
 .equ	iHH	=0x13		;character "upper -" code
-.equ	iHL	=0x24		;character "|_" code
-.equ	iLH	=0x25		;character "|~" code
+.equ	iHL	=0x26		;character "|_" code
+.equ	iLH	=0x27		;character "|~" code
 .equ	iDEG=0x14		;character "degree" code
 .equ	iA	=0x0A		;character "A" code
 .equ	iB	=0x0B		;character "b" code
@@ -326,10 +324,11 @@ FONT:	     ;FCBHADEG    FCBHADEG
 .equ	iP	=0x1D		;character "P" code
 .equ	iR	=0x1E		;character "R" code
 .equ	iiR	=0x1F		;character "r" code
-.equ	iS	=0x05		;character "S" code
-.equ	iT	=0x20		;character "t" code
-.equ	iU	=0x21		;character "U" code
-.equ	iiU	=0x22		;character "u" code
-.equ	iY	=0x23		;character "Y" code
+.equ	iS	=0x20		;character "S" code
+.equ	iiS	=0x21		;character "s" code
+.equ	iT	=0x22		;character "t" code
+.equ	iU	=0x23		;character "U" code
+.equ	iiU	=0x24		;character "u" code
+.equ	iY	=0x25		;character "Y" code
 
 ;----------------------------------------------------------------------------

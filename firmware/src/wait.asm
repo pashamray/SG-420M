@@ -5,10 +5,6 @@
 ; (c) Radoslaw Kwiecien, 2008
 ;------------------------------------------------------------------------------
 
-.if FCLK < 4000000
-  #warning "FCLK too low, possible wrong delay"
-.endif
-
 #define CYCLES_PER_US (FCLK/1000000)
 #define C4PUS (CYCLES_PER_US/4)
 #define DVUS(x) (C4PUS*x)

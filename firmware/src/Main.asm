@@ -118,7 +118,7 @@ iVar:	clr	Flags		;clear flags
 .include "LCD_1602.asm"		;link LCD support module
 .include "Keyboard.asm"		;link keyboard support module
 .include "Beeper.asm"		;link beeper support module
-.include "Menu.asm"		;link menu implementation module
+.include "Menu_1602.asm"	;link menu implementation module
 .include "EEPROM.asm"		;link EEPROM support module
 
 ;----------------------------------------------------------------------------
