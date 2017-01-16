@@ -80,7 +80,8 @@ Min:	.byte 3			;min limit
 
 ;Init menu subsystem:
 
-iMenu:	ldi	Flags,(1<<ON) | (1<<ONR) | (1<<UPDD)
+iMenu:
+	ldi		Flags,(1<<ON) | (1<<ONR) | (1<<UPDD)
 	rcall	ReadF		;read from EEPROM Calib, ValFS, ValF
 	ldi		temp,MnuF	;menu "Frequency"
 	sts		Menu,temp
@@ -96,12 +97,14 @@ iMenu:	ldi	Flags,(1<<ON) | (1<<ONR) | (1<<UPDD)
 	rcall	Update		;update display data
 	rcall	Disp		;display
 
-norm:	ldi	tempE,35
+norm:
+	ldi		tempE,35
 	rcall	Tone		;initial beep
 	
-rels:	rcall	Scan
+rels:	
+	rcall	Scan
 	wdr
-	cpi	temp,K_NO
+	cpi		temp,K_NO
 	brne	rels		;wait for keyboard release
 	ret
 
@@ -316,71 +319,77 @@ enx:	rcall	Update		;update display data
 ;Input: Menu
 ;Out:   Buff, Step, Min, Max
 
-SetMd:	lds	temp,Menu
-	cpi	temp,MnuC	;---> menu "Calibration":
+SetMd:	
+	lds		temp,Menu
+	cpi		temp,MnuC	;---> menu "Calibration":
 	brne	smd1
-	ldy	Calib
+	ldy		Calib
 	rcall	LdLMH
-	ldy	Buff
+	ldy		Buff
 	rcall	StLMH		;Buff = Calib
 	ldmi	STEP_C
-	ldy	Step
+	ldy		Step
 	rcall	StLMH		;Step = StepC
 	ldmi	MIN_C		;Min  = MIN_C
 	ldei	MAX_C		;Max  = MAX_C
 	rjmp	smm
 	
-smd1:	cpi	temp,MnuF	;---> menu "Frequency":
+smd1:	
+	cpi		temp,MnuF	;---> menu "Frequency":
 	brne	smd2
-	ldy	ValF
+	ldy		ValF
 	rcall	LdLMH
-	ldy	Buff
+	ldy		Buff
 	rcall	StLMH		;Buff = ValF
-	ldy	ValFS
+	ldy		ValFS
 	rcall	LdLMH
-	ldy	Step
+	ldy		Step
 	rcall	StLMH		;Step = ValFS
 	ldmi	MIN_F		;Min  = MIN_F
 	ldei	MAX_F		;Max  = MAX_F
 	rjmp	smm
 
-smd2:	cpi	temp,MnuFS	;---> menu "Frequency Step":
+smd2:	
+	cpi		temp,MnuFS	;---> menu "Frequency Step":
 	brne	smd3
-	ldy	ValFS
+	ldy		ValFS
 	rcall	LdLMH
-	ldy	Buff
+	ldy		Buff
 	rcall	StLMH		;Buff = ValFS
 	ldmi	MIN_FS		;Min  = MIN_FS
 	ldei	MAX_FS		;Max  = MAX_FS
 	rjmp	smm
 
-smd3:	cpi	temp,MnuSH	;---> menu "Shape":
+smd3:	
+	cpi		temp,MnuSH	;---> menu "Shape":
 	brne	smd4
 	sbrc	Flags,ON
 	ldmi	1	
-	ldy	Buff
+	ldy		Buff
 	rcall	StLMH		;Buff = ON
 	ldmi	1
-	ldy	Step
+	ldy		Step
 	rcall	StLMH		;Step = 1
 	ldmi	MIN_SH		;Min = MIN_SH
 	ldei	MAX_SH		;Max = MAX_SH
 	rjmp	smm
 	
-smd4:	ldmi	0		;---> menu "Read/Save Preset":
-	ldy	Buff
+smd4:	
+	ldmi	0		;---> menu "Read/Save Preset":
+	ldy		Buff
 	rcall	StLMH		;Buff = 0
 	ldmi	1
-	ldy	Step
+	ldy		Step
 	rcall	StLMH		;Step = 1
 	ldmi	MIN_PE		;Min = MIN_PE
 	ldei	MAX_PE		;Max = MAX_PE
 		
-smm:	ldy	Max
+smm:	
+	ldy		Max
 	rcall	StDEF		;save Max
-	ldy	Min
+	ldy		Min
 	rcall	StLMH		;save Min
-	ldy	Buff
+	ldy		Buff
 	rcall	LdLMH		;tempH:tempM:tempL = Buff	
 	rcall	Valid		;validate buffer
 	rcall	Assume		;assume new values
@@ -391,11 +400,13 @@ smm:	ldy	Max
 
 ;Search for first non-zero digit:
 
-Search:	ldy	Dig+3
-srch:	ld	temp,Y+
+Search:	
+	ldy		Dig+3
+srch:	
+	ld		temp,Y+
 	andi	temp,~Pt
 	breq	srch
-	cpi	temp,BLANK
+	cpi		temp,BLANK
 	breq	srch
 	ret
 	
@@ -434,26 +445,29 @@ ValOk:	ldy	Buff
 ;Compare tempH:tempM:tempL and [Min]:
 ;Out: C = 1 if limit exceeded
 	
-ChkMin:	ldy	Min
+ChkMin:	
+	ldy		Min
 	rcall	LdABC		;tempC:tempB:tempA = Min
-	ldi	temp,0xC0	;0xC00000 is max negative
-	cp	temp,tempH
-	brcs	chmr		
-	cp	tempL,tempA
-	cpc	tempM,tempB
-	cpc	tempH,tempC
-chmr:	ret
+	ldi		temp,0xC0	;0xC00000 is max negative
+	cp		temp,tempH
+	brcs	chmr
+	cp		tempL,tempA
+	cpc		tempM,tempB
+	cpc		tempH,tempC
+chmr:	
+	ret
 
 ;----------------------------------------------------------------------------
 
 ;Compare tempH:tempM:tempL and [Max]:
 ;Out: C = 1 if limit exceeded
 
-ChkMax:	ldy	Max
+ChkMax:	
+	ldy		Max
 	rcall	LdABC		;tempC:tempB:tempA = Max
-	cp	tempA,tempL
-	cpc	tempB,tempM
-	cpc	tempC,tempH
+	cp		tempA,tempL
+	cpc		tempB,tempM
+	cpc		tempC,tempH
 	ret
 
 ;----------------------------------------------------------------------------
@@ -462,37 +476,43 @@ ChkMax:	ldy	Max
 ;Input:	tempH:tempM:tempL - new value
 ;	[Menu] - index
 	
-Assume:	lds	temp,Menu
-	cpi	temp,MnuF	;---> menu "Frequency":
+Assume:	
+	lds		temp,Menu
+	cpi		temp,MnuF	;---> menu "Frequency":
 	brne	assm1
-	ldy	ValF	
+	ldy		ValF	
 	rcall	StLMH		;save new ValF
 	rcall	MakeF		;change frequency
 	rjmp	assmr
 
-assm1:	cpi	temp,MnuFS	;---> menu "Frequency Step":
+assm1:	
+	cpi		temp,MnuFS	;---> menu "Frequency Step":
 	brne	assm2
-	ldy	ValFS
+	ldy		ValFS
 	rcall	StLMH		;save new ValFS
 	rjmp	assmr
 
-assm2:	cpi	temp,MnuSH	;---> menu "Shape":
+assm2:	
+	cpi		temp,MnuSH	;---> menu "Shape":
 	brne	assm3
-	bst	tempL,0
-	bld	Flags,ON	;change shape
+	bst		tempL,0
+	bld		Flags,ON	;change shape
 	rjmp	assmr
 
-assm3:	cpi	temp,MnuP	;---> menu "Preset":
+assm3:	
+	cpi		temp,MnuP	;---> menu "Preset":
 	brne	assm4
 	rcall	ReadP		;read preset fom EEPROM
 	rjmp	assmr
 
-assm4:	cpi	temp,MnuC	;---> menu "Calibration":
+assm4:	
+	cpi		temp,MnuC	;---> menu "Calibration":
 	brne	assmr
-	ldy	Calib
+	ldy		Calib
 	rcall	StLMH		;save new Calib
 	rcall	MakeF		;change frequency
-assmr:	ret
+assmr:
+	ret
 
 ;----------------------------------------------------------------------------
 
@@ -501,57 +521,62 @@ assmr:	ret
 ;Out:	Dig[0..9]
 ;	UPDD = 1
 
-Update:	ldi	temp,BLANK	;load char
+Update:	
+	ldi		temp,BLANK	;load char
 	rcall	Fill		;clear display data
-	ldy	Buff
+	ldy		Buff
 	rcall	LdLMH		;tempH:tempM:tempL = Buff
 
-	lds	temp,Menu
-	cpi	temp,MnuSH	;---> menu "Shape":
+	lds		temp,Menu
+	cpi		temp,MnuSH	;---> menu "Shape":
 	brne	upd1
 
 	table	ShpT		;string table base
-	mov	temp,tempL
-	add	temp,tempL
-	add	temp,tempL	;temp = Buff[0] * 3
-	add	ZL,temp
-	adc	ZH,temp
-	sub	ZH,temp		;ZH:ZL = ShpT + Buff[0] * 3
-	ldy	Dig+4		;display data base + 4
-	lpm	temp,Z+
-	st	Y+,temp		;menu char 1
-	lpm	temp,Z+
-	st	Y+,temp		;menu char 2
-	lpm	temp,Z+
-	st	Y+,temp		;menu char 3
+	mov		temp,tempL
+	add		temp,tempL
+	add		temp,tempL	;temp = Buff[0] * 3
+	add		ZL,temp
+	adc		ZH,temp
+	sub		ZH,temp		;ZH:ZL = ShpT + Buff[0] * 3
+	ldy		Dig+4		;display data base + 4
+	lpm		temp,Z+
+	st		Y+,temp		;menu char 1
+	lpm		temp,Z+
+	st		Y+,temp		;menu char 2
+	lpm		temp,Z+
+	st		Y+,temp		;menu char 3
 	rjmp	upd31
 
-upd1:	table	StrT		;string table base
-	add	temp,temp	;temp = Menu * 2
-	add	ZL,temp
-	adc	ZH,temp
-	sub	ZH,temp		;ZH:ZL = StrT + Menu * 2
-	ldy	Dig		;display data base
-	lpm	temp,Z+
-	st	Y+,temp		;menu char 1
-	lpm	temp,Z+
-	st	Y+,temp		;menu char 2
+upd1:	
+	table	StrT		;string table base
+	add		temp,temp	;temp = Menu * 2
+	add		ZL,temp
+	adc		ZH,temp
+	sub		ZH,temp		;ZH:ZL = StrT + Menu * 2
+	ldy		Dig		;display data base
+	lpm		temp,Z+
+	st		Y+,temp		;menu char 1
+	lpm		temp,Z+
+	st		Y+,temp		;menu char 2
 
-	lds	temp,Menu
-	cpi	temp,MnuE	;---> menu "Save Preset":
+	lds		temp,Menu
+	cpi		temp,MnuE	;---> menu "Save Preset":
 	brne	upd2
-	sts	Dig+1,tempL	;Dig[1] - preset number
-	ldy	ValF
+	sts		Dig+1,tempL	;Dig[1] - preset number
+	ldy		ValF
 	rjmp	upd21
 
-upd2:	cpi	temp,MnuP	;---> menu "Read Preset":
+upd2:	
+	cpi		temp,MnuP	;---> menu "Read Preset":
 	brne	upd3
-	sts	Dig+1,tempL	;Dig[1] - preset number
-	ldy	ValP
-upd21:	rcall	LdLMH		;tempH:tempM:tempL = ValF or ValP
-
-upd3:	rcall	DisBCD		;tempH:tempM:tempL convert to BCD Dig[3..9]
-upd31:	stbr	Flags,UPDD	;display update request
+	sts		Dig+1,tempL	;Dig[1] - preset number
+	ldy		ValP
+upd21:	
+	rcall	LdLMH		;tempH:tempM:tempL = ValF or ValP
+upd3:	
+	rcall	DisBCD		;tempH:tempM:tempL convert to BCD Dig[3..9]
+upd31:	
+	stbr	Flags,UPDD	;display update request
 	ret
 
 ;----------------------------------------------------------------------------
@@ -559,40 +584,44 @@ upd31:	stbr	Flags,UPDD	;display update request
 ;Divide tempH:tempM:tempL / tempF:tempE:tempD =
 ; tempH:tempM:tempL.tempC:tempB:tempA
 
-div24:	clr	tempA		;clear remainder Low byte
-	clr	tempB
-	sub	tempC,tempC	;clear remainder High byte and carry
+div24:	
+	clr		tempA		;clear remainder Low byte
+	clr		tempB
+	sub		tempC,tempC	;clear remainder High byte and carry
 	
-	ldi	Cnt,25		;init loop counter
+	ldi		Cnt,25		;init loop counter
 	
-div1:	rol	tempL		;shift left dividend
-	rol	tempM
-	rol	tempH
-	dec	Cnt		;decrement counter
+div1:	
+	rol		tempL		;shift left dividend
+	rol		tempM
+	rol		tempH
+	dec		Cnt		;decrement counter
 	breq	divret
-	rol	tempA		;shift dividend into remainder
-	rol	tempB
-	rol	tempC
-	sub	tempA,tempD	;remainder = remainder - divisor
-	sbc	tempB,tempE	
-	sbc	tempC,tempF	
+	rol		tempA		;shift dividend into remainder
+	rol		tempB
+	rol		tempC
+	sub		tempA,tempD	;remainder = remainder - divisor
+	sbc		tempB,tempE	
+	sbc		tempC,tempF	
 	brcc	div1		;if result negative
-	add	tempA,tempD	; restore remainder
-	adc	tempB,tempE
-	adc	tempC,tempF
+	add		tempA,tempD	; restore remainder
+	adc		tempB,tempE
+	adc		tempC,tempF
 	rjmp	div1
-divret:	com	tempL
-	com	tempM
-	com	tempH		
+divret:	
+	com		tempL
+	com		tempM
+	com		tempH
 	ret
 
 ;----------------------------------------------------------------------------
 
 ;Load tempH,M,L from [Y+2],[Y+1],[Y+0]
 
-LdLMH:	ld	tempL,Y+
-	ld	tempM,Y+
-	ld	tempH,Y+
+LdLMH:	
+	ld		tempL,Y+
+	ld		tempM,Y+
+	ld		tempH,Y+
 	ret
 	
 ;----------------------------------------------------------------------------
@@ -635,11 +664,13 @@ StDEF:	st	Y+,tempD
 
 ;String table:
 
-StrT:	.DB iF,i_,iP,i_,iE,i_,iS,iH
+StrT:
+	.DB iF,i_,iP,i_,iE,i_,iS,iH
 	.DB iF,iS,iC,i_
 
 ;Shape string table:
 
-ShpT:	.DB iO,iF,iF,iS,iii,iiN
+ShpT:
+	.DB iO,iF,iF,iS,iii,iiN
 
 ;----------------------------------------------------------------------------

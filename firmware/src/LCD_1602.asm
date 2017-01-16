@@ -167,7 +167,7 @@ Disp:	ldi		temp,0x02		;temp <- 0x02-  address
 		ldy		Dig				;pointer to Dig
 		ldi		Cnt,Lcd_bytes
 disp1:	ld		temp,Y+			;temp <- digit
-		bst		temp,7			;T <- temp.7 (point)
+		;bst		temp,7			;T <- temp.7 (point)
 		andi	temp,0x7F		;temp.7 <- 0
 		table	FONT			;pointer to FONT
 		add		ZL,temp			;ZH:ZL = ZH:ZL + temp
@@ -178,7 +178,7 @@ disp1:	ld		temp,Y+			;temp <- digit
 		swap	temp
 		rcall	LCD_WN			;write nibble from temp to LCD
 		pop		temp			;restore byte
-		bld		temp,H			;H - point
+		;bld		temp,H			;H - point
 		nop
 		nop
 		nop
@@ -271,28 +271,38 @@ w5_0:		rol		temp
 ;Font table:
 
 FONT:	     ;FCBHADEG    FCBHADEG
-	.DB '0', '1'	;0, 1
-	.DB '2', '3'	;2, 3
-	.DB '4', '5'	;4, 5
-	.DB '6', '7'	;6, 7
-	.DB '8', '9'	;8, 9
-	.DB 'A', 'b'	;A, b
-	.DB 'C', 'd'	;C, d
-	.DB 'E', 'F'	;E, F
-	.DB ' ', '-'	;blank, -
-	.DB '_', '~'	;_, ~
-	.DB 'o', 'c'	;degree, c
-	.DB 'G', 'H'	;G, H
-	.DB 'I', 'L'	;I, L
-	.DB 'i', 'n'	;i, n
-	.DB 'o', 'P'	;o, P
-	.DB 'R', 'r'	;R, r
-	.DB 'S', 's'	;S, s
-	.DB 't', 'U'	;t, U
-	.DB 'u', 'Y'	;u, Y
-	.DB '|', '/'	;|_, |~
+	.db '0', '1'	;0, 1
+	.db '2', '3'	;2, 3
+	.db '4', '5'	;4, 5
+	.db '6', '7'	;6, 7
+	.db '8', '9'	;8, 9
+	.db 'A', 'b'	;A, b
+	.db 'C', 'd'	;C, d
+	.db 'E', 'F'	;E, F
+	.db ' ', '-'	;blank, -
+	.db '_', '~'	;_, ~
+	.db 'o', 'c'	;degree, c
+	.db 'G', 'H'	;G, H
+	.db 'I', 'L'	;I, L
+	.db 'i', 'n'	;i, n
+	.db 'o', 'P'	;o, P
+	.db 'R', 'r'	;R, r
+	.db 'S', 's'	;S, s
+	.db 't', 'U'	;t, U
+	.db 'u', 'Y'	;u, Y
+	.db '|', '/'	;|_, |~
 
 .equ	H	= 4			;point
+
+;----------------------------------------------------------------------------
+
+; Strings table
+
+StrFreq:
+	.db "Frequency", '\0'
+
+StrkHz:
+	.db "kHz", '\0'	
 
 ;----------------------------------------------------------------------------
 
