@@ -19,7 +19,7 @@
 .equ	Pt	= 0x80		;point in Dig
 .equ	Lcd_cols = 16	;
 .equ	Lcd_rows = 2	;
-.equ	Lcd_bytes = (Lcd_cols * Lcd_rows)
+.equ	Lcd_bytes = 32
 ;----------------------------------------------------------------------------
 
 .DSEG	;data segment (internal SRAM)
@@ -104,13 +104,15 @@ fill1:		st		Y+,temp
 
 ;tempH:tempM:tempL convert to BCD Dig[3..9]
 	
-DisBCD:		ldy		Dig+3
+DisBCD:
+			ldy		Dig+Lcd_cols
 			clr		temp
-			ldi		Cnt,7
+			ldi		Cnt,Lcd_cols
 clrout: 	st		Y+,temp		;output array clear
 			dec		Cnt
 			brne	clrout		
-
+			ret
+			
 			ldi		Cnt,24		;input bits count
 			ldz		Dig+3
 hloop:		lsl		tempL		;input array shift left
@@ -166,29 +168,12 @@ Disp:	ldi		temp,0x02		;temp <- 0x02-  address
 		rcall	LCD_CMD			;write address
 		ldy		Dig				;pointer to Dig
 		ldi		Cnt,Lcd_bytes
-disp1:	ld		temp,Y+			;temp <- digit
-		;bst		temp,7			;T <- temp.7 (point)
-		andi	temp,0x7F		;temp.7 <- 0
-		table	FONT			;pointer to FONT
-		add		ZL,temp			;ZH:ZL = ZH:ZL + temp
-		adc		ZH,temp
-		sub		ZH,temp
-		lpm		temp,Z			;read font table
+disp1:	
+		ld		temp,Y+			;temp <- digit
 		push	temp			;save byte
 		swap	temp
 		rcall	LCD_WN			;write nibble from temp to LCD
 		pop		temp			;restore byte
-		;bld		temp,H			;H - point
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
-		nop
 		rcall	LCD_WN			;write nibble from temp to LCD
 		dec		Cnt
 		brne	disp1			;repeat for all digits

@@ -553,11 +553,25 @@ upd1:
 	add		ZL,temp
 	adc		ZH,temp
 	sub		ZH,temp		;ZH:ZL = StrT + Menu * 2
-	ldy		Dig		;display data base
+	ldy		Dig			;display data base
 	lpm		temp,Z+
-	st		Y+,temp		;menu char 1
+	st		Y+,temp		;F
 	lpm		temp,Z+
-	st		Y+,temp		;menu char 2
+	st		Y+,temp		;r
+	lpm		temp,Z+
+	st		Y+,temp		;e
+	lpm		temp,Z+
+	st		Y+,temp		;q
+	lpm		temp,Z+
+	st		Y+,temp		;u
+	lpm		temp,Z+
+	st		Y+,temp		;e
+	lpm		temp,Z+
+	st		Y+,temp		;n
+	lpm		temp,Z+
+	st		Y+,temp		;c
+	lpm		temp,Z+
+	st		Y+,temp		;y
 
 	lds		temp,Menu
 	cpi		temp,MnuE	;---> menu "Save Preset":
@@ -665,7 +679,7 @@ StDEF:	st	Y+,tempD
 ;String table:
 
 StrT:
-	.DB iF,i_,iP,i_,iE,i_,iS,iH
+	.DB "Frequency",' ',iP,i_,iE,i_,iS,iH
 	.DB iF,iS,iC,i_
 
 ;Shape string table:
