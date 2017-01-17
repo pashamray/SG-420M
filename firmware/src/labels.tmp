@@ -1,7 +1,7 @@
 <ASSEMBLER_INFO>
  <VERSION>2.1.42</VERSION>
  <DEVICE>ATmega8</DEVICE>
- <WORKING_DIR>c:\project\sg-420m\firmware\src</WORKING_DIR>
+ <WORKING_DIR>C:\project\sg-420m\firmware\src</WORKING_DIR>
  <INCLUDE_PATH>
   <DIR>C:\Program Files (x86)\Atmel\AVR Tools\AvrAssembler2\Appnotes</DIR>
  </INCLUDE_PATH>
@@ -16,7 +16,7 @@
   <FILE>C:\project\sg-420m\firmware\src\wait.asm</FILE>
   <FILE>C:\project\sg-420m\firmware\src\Keyboard.asm</FILE>
   <FILE>C:\project\sg-420m\firmware\src\Beeper.asm</FILE>
-  <FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE>
+  <FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE>
   <FILE>C:\project\sg-420m\firmware\src\EEPROM.asm</FILE>
  </INCLUDED_FILES>
  <OBJECT_FILES>
@@ -24,7 +24,7 @@
  </OBJECT_FILES>
  <HEX_FILES>
   <FILE>C:\project\sg-420m\firmware\src\SG-420M.hex</FILE>
-  <FILE>C:\project\sg-420m\firmware\src\sg-420m.eep</FILE>
+  <FILE>C:\project\sg-420m\firmware\src\SG-420M.eep</FILE>
  </HEX_FILES>
  <OUTPUT_FILES>
   <FILE>C:\project\sg-420m\firmware\src\SG-420M.map</FILE>
@@ -40,60 +40,65 @@
   <ph_ab><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>114</LINE></ph_ab>
   <ph_all><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>122</LINE></ph_all>
   <iDDS><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>136</LINE></iDDS>
-  <SinTab><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>365</LINE></SinTab>
+  <SinTab><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>376</LINE></SinTab>
   <TCopy><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>165</LINE></TCopy>
   <mOn><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>235</LINE></mOn>
-  <No_op><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>263</LINE></No_op>
-  <do_off><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>248</LINE></do_off>
-  <do_on><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>243</LINE></do_on>
-  <MakeF><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>280</LINE></MakeF>
-  <dd_off><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>255</LINE></dd_off>
-  <clrm><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>283</LINE></clrm>
-  <m0><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>346</LINE></m0>
-  <Calib><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>49</LINE></Calib>
-  <LdLMH><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>593</LINE></LdLMH>
-  <StLMH><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>620</LINE></StLMH>
-  <ValF><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>51</LINE></ValF>
-  <m24_32><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>313</LINE></m24_32>
-  <noadd><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>332</LINE></noadd>
-  <rry><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>333</LINE></rry>
-  <iWdog><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>53</LINE></iWdog>
-  <iPorts><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>93</LINE></iPorts>
-  <iVar><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>113</LINE></iVar>
-  <iTimer><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>71</LINE></iTimer>
+  <No_op><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>267</LINE></No_op>
+  <do_off><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>250</LINE></do_off>
+  <do_on><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>244</LINE></do_on>
+  <MakeF><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>285</LINE></MakeF>
+  <dd_off><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>258</LINE></dd_off>
+  <clrm><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>289</LINE></clrm>
+  <m0><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>356</LINE></m0>
+  <Calib><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>49</LINE></Calib>
+  <LdLMH><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>648</LINE></LdLMH>
+  <StLMH><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>676</LINE></StLMH>
+  <ValF><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>51</LINE></ValF>
+  <m24_32><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>320</LINE></m24_32>
+  <noadd><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>340</LINE></noadd>
+  <rry><FILE>C:\project\sg-420m\firmware\src\DDS.asm</FILE><LINE>342</LINE></rry>
+  <iWdog><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>55</LINE></iWdog>
+  <iPorts><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>100</LINE></iPorts>
+  <iVar><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>121</LINE></iVar>
+  <iTimer><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>75</LINE></iTimer>
   <iDisp><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>46</LINE></iDisp>
-  <iMenu><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>83</LINE></iMenu>
-  <Main><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>41</LINE></Main>
-  <mTimer><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>79</LINE></mTimer>
+  <iMenu><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>83</LINE></iMenu>
+  <Main><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>42</LINE></Main>
+  <mTimer><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>84</LINE></mTimer>
   <mKey><FILE>C:\project\sg-420m\firmware\src\Keyboard.asm</FILE><LINE>63</LINE></mKey>
-  <mMenu><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>112</LINE></mMenu>
+  <mMenu><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>115</LINE></mMenu>
   <mDisp><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>87</LINE></mDisp>
-  <mWdog><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>64</LINE></mWdog>
-  <no_tm><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>87</LINE></no_tm>
-  <Wait4xCycles><FILE>C:\project\sg-420m\firmware\src\wait.asm</FILE><LINE>19</LINE></Wait4xCycles>
-  <WaitMiliseconds><FILE>C:\project\sg-420m\firmware\src\wait.asm</FILE><LINE>26</LINE></WaitMiliseconds>
-  <WaitMsLoop><FILE>C:\project\sg-420m\firmware\src\wait.asm</FILE><LINE>28</LINE></WaitMsLoop>
+  <mWdog><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>67</LINE></mWdog>
+  <no_tm><FILE>C:\project\sg-420m\firmware\src\Main.asm</FILE><LINE>93</LINE></no_tm>
+  <Wait4xCycles><FILE>C:\project\sg-420m\firmware\src\wait.asm</FILE><LINE>15</LINE></Wait4xCycles>
+  <WaitMiliseconds><FILE>C:\project\sg-420m\firmware\src\wait.asm</FILE><LINE>22</LINE></WaitMiliseconds>
+  <WaitMsLoop><FILE>C:\project\sg-420m\firmware\src\wait.asm</FILE><LINE>24</LINE></WaitMsLoop>
   <Dig><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>27</LINE></Dig>
-  <LCD_WA><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>240</LINE></LCD_WA>
-  <LCD_CMD><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>198</LINE></LCD_CMD>
+  <LCD_WA><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>233</LINE></LCD_WA>
+  <LCD_CMD><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>191</LINE></LCD_CMD>
   <NoUpd><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>90</LINE></NoUpd>
-  <Disp><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>165</LINE></Disp>
+  <Disp><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>167</LINE></Disp>
   <Fill><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>96</LINE></Fill>
   <fill1><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>98</LINE></fill1>
   <DisBCD><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>107</LINE></DisBCD>
-  <clrout><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>110</LINE></clrout>
-  <hloop><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>116</LINE></hloop>
-  <sloop><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>120</LINE></sloop>
-  <zsp><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>138</LINE></zsp>
-  <notz><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>146</LINE></notz>
-  <setpo><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>156</LINE></setpo>
-  <disp1><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>169</LINE></disp1>
-  <FONT><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>273</LINE></FONT>
-  <LCD_WN><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>234</LINE></LCD_WN>
-  <LCD_DATA><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>215</LINE></LCD_DATA>
-  <w5><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>243</LINE></w5>
-  <w5_cyc><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>245</LINE></w5_cyc>
-  <w5_0><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>249</LINE></w5_0>
+  <clrout><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>111</LINE></clrout>
+  <hloop><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>118</LINE></hloop>
+  <sloop><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>122</LINE></sloop>
+  <zsp><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>140</LINE></zsp>
+  <notz><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>148</LINE></notz>
+  <setpo><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>158</LINE></setpo>
+  <disp_loop><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>172</LINE></disp_loop>
+  <LCD_WN><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>227</LINE></LCD_WN>
+  <disp_ret><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>187</LINE></disp_ret>
+  <LCD_DATA><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>208</LINE></LCD_DATA>
+  <w5><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>236</LINE></w5>
+  <w5_cyc><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>238</LINE></w5_cyc>
+  <w5_0><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>242</LINE></w5_0>
+  <StrName><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>265</LINE></StrName>
+  <StrVer><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>267</LINE></StrVer>
+  <StrFreq><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>269</LINE></StrFreq>
+  <StrStep><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>271</LINE></StrStep>
+  <StrkHz><FILE>C:\project\sg-420m\firmware\src\LCD_1602.asm</FILE><LINE>273</LINE></StrkHz>
   <KBD><FILE>C:\project\sg-420m\firmware\src\Keyboard.asm</FILE><LINE>46</LINE></KBD>
   <Scan><FILE>C:\project\sg-420m\firmware\src\Keyboard.asm</FILE><LINE>136</LINE></Scan>
   <Hold><FILE>C:\project\sg-420m\firmware\src\Keyboard.asm</FILE><LINE>90</LINE></Hold>
@@ -114,81 +119,81 @@
   <Sound><FILE>C:\project\sg-420m\firmware\src\Beeper.asm</FILE><LINE>68</LINE></Sound>
   <sndb><FILE>C:\project\sg-420m\firmware\src\Beeper.asm</FILE><LINE>84</LINE></sndb>
   <snda><FILE>C:\project\sg-420m\firmware\src\Beeper.asm</FILE><LINE>85</LINE></snda>
-  <Menu><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>47</LINE></Menu>
-  <ValFS><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>50</LINE></ValFS>
-  <ValP><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>52</LINE></ValP>
-  <Buff><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>54</LINE></Buff>
-  <Step><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>55</LINE></Step>
-  <Max><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>56</LINE></Max>
-  <Min><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>57</LINE></Min>
+  <Menu><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>47</LINE></Menu>
+  <ValFS><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>50</LINE></ValFS>
+  <ValP><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>52</LINE></ValP>
+  <Buff><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>54</LINE></Buff>
+  <Step><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>55</LINE></Step>
+  <Max><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>56</LINE></Max>
+  <Min><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>57</LINE></Min>
   <ReadF><FILE>C:\project\sg-420m\firmware\src\EEPROM.asm</FILE><LINE>45</LINE></ReadF>
-  <SetMd><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>319</LINE></SetMd>
-  <Update><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>504</LINE></Update>
-  <norm><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>99</LINE></norm>
-  <rels><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>102</LINE></rels>
-  <NoPr><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>133</LINE></NoPr>
-  <Pro1><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>122</LINE></Pro1>
-  <Do_UP><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>139</LINE></Do_UP>
-  <Pro2><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>126</LINE></Pro2>
-  <Do_DN><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>189</LINE></Do_DN>
-  <Pro3><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>130</LINE></Pro3>
-  <Do_EX><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>246</LINE></Do_EX>
-  <Do_EN><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>276</LINE></Do_EN>
-  <upst><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>162</LINE></upst>
-  <LdDEF><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>611</LINE></LdDEF>
-  <div24><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>562</LINE></div24>
-  <upv><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>179</LINE></upv>
-  <Search><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>394</LINE></Search>
-  <LdABC><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>602</LINE></LdABC>
-  <Valid><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>410</LINE></Valid>
-  <Assume><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>465</LINE></Assume>
-  <dnst><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>218</LINE></dnst>
-  <dn0><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>211</LINE></dn0>
-  <dnv><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>236</LINE></dnv>
-  <dn1><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>214</LINE></dn1>
-  <ex1><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>255</LINE></ex1>
-  <exf><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>266</LINE></exf>
-  <exn><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>264</LINE></exn>
-  <ex2><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>261</LINE></ex2>
-  <ex0><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>267</LINE></ex0>
-  <en1><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>282</LINE></en1>
+  <SetMd><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>331</LINE></SetMd>
+  <Update><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>537</LINE></Update>
+  <norm><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>100</LINE></norm>
+  <rels><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>104</LINE></rels>
+  <NoPr><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>136</LINE></NoPr>
+  <Pro1><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>125</LINE></Pro1>
+  <Do_UP><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>142</LINE></Do_UP>
+  <Pro2><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>129</LINE></Pro2>
+  <Do_DN><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>192</LINE></Do_DN>
+  <Pro3><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>133</LINE></Pro3>
+  <Do_EX><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>249</LINE></Do_EX>
+  <Do_EN><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>279</LINE></Do_EN>
+  <upst><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>165</LINE></upst>
+  <LdDEF><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>667</LINE></LdDEF>
+  <div24><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>614</LINE></div24>
+  <upv><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>182</LINE></upv>
+  <Search><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>412</LINE></Search>
+  <LdABC><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>658</LINE></LdABC>
+  <Valid><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>430</LINE></Valid>
+  <Assume><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>492</LINE></Assume>
+  <dnst><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>221</LINE></dnst>
+  <dn0><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>214</LINE></dn0>
+  <dnv><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>239</LINE></dnv>
+  <dn1><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>217</LINE></dn1>
+  <ex1><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>258</LINE></ex1>
+  <exf><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>269</LINE></exf>
+  <exn><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>267</LINE></exn>
+  <ex2><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>264</LINE></ex2>
+  <ex0><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>270</LINE></ex0>
+  <en1><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>286</LINE></en1>
   <SaveC><FILE>C:\project\sg-420m\firmware\src\EEPROM.asm</FILE><LINE>91</LINE></SaveC>
-  <enf><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>307</LINE></enf>
-  <en2><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>287</LINE></en2>
-  <en0><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>308</LINE></en0>
-  <en3><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>295</LINE></en3>
-  <ens><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>305</LINE></ens>
-  <en4><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>300</LINE></en4>
+  <enf><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>316</LINE></enf>
+  <en2><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>292</LINE></en2>
+  <en0><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>318</LINE></en0>
+  <en3><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>301</LINE></en3>
+  <ens><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>313</LINE></ens>
+  <en4><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>307</LINE></en4>
   <SaveP><FILE>C:\project\sg-420m\firmware\src\EEPROM.asm</FILE><LINE>101</LINE></SaveP>
-  <enx><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>310</LINE></enx>
-  <smd1><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>333</LINE></smd1>
-  <smm><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>379</LINE></smm>
-  <smd2><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>347</LINE></smd2>
-  <smd3><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>357</LINE></smd3>
-  <smd4><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>370</LINE></smd4>
-  <StDEF><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>629</LINE></StDEF>
-  <srch><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>395</LINE></srch>
-  <ChkMin><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>437</LINE></ChkMin>
-  <RstBf><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>415</LINE></RstBf>
-  <ChkMax><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>452</LINE></ChkMax>
-  <ValOk><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>428</LINE></ValOk>
-  <LimBf><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>423</LINE></LimBf>
-  <chmr><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>445</LINE></chmr>
-  <assm1><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>473</LINE></assm1>
-  <assmr><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>495</LINE></assmr>
-  <assm2><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>479</LINE></assm2>
-  <assm3><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>485</LINE></assm3>
-  <assm4><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>490</LINE></assm4>
+  <enx><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>321</LINE></enx>
+  <smd1><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>346</LINE></smd1>
+  <smm><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>396</LINE></smm>
+  <smd2><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>361</LINE></smd2>
+  <smd3><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>372</LINE></smd3>
+  <smd4><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>386</LINE></smd4>
+  <StDEF><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>686</LINE></StDEF>
+  <srch><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>414</LINE></srch>
+  <ChkMin><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>461</LINE></ChkMin>
+  <RstBf><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>436</LINE></RstBf>
+  <ChkMax><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>478</LINE></ChkMax>
+  <ValOk><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>451</LINE></ValOk>
+  <LimBf><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>445</LINE></LimBf>
+  <chmr><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>470</LINE></chmr>
+  <assm1><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>501</LINE></assm1>
+  <assmr><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>527</LINE></assmr>
+  <assm2><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>508</LINE></assm2>
+  <assm3><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>515</LINE></assm3>
+  <assm4><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>521</LINE></assm4>
   <ReadP><FILE>C:\project\sg-420m\firmware\src\EEPROM.asm</FILE><LINE>81</LINE></ReadP>
-  <upd1><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>529</LINE></upd1>
-  <ShpT><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>643</LINE></ShpT>
-  <upd31><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>554</LINE></upd31>
-  <StrT><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>638</LINE></StrT>
-  <upd2><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>547</LINE></upd2>
-  <upd21><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>551</LINE></upd21>
-  <upd3><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>553</LINE></upd3>
-  <div1><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>568</LINE></div1>
-  <divret><FILE>C:\project\sg-420m\firmware\src\Menu.asm</FILE><LINE>584</LINE></divret>
+  <upd1><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>563</LINE></upd1>
+  <ShpT><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>701</LINE></ShpT>
+  <upd31><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>605</LINE></upd31>
+  <upd2><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>596</LINE></upd2>
+  <upd21><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>601</LINE></upd21>
+  <upd3><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>603</LINE></upd3>
+  <div1><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>621</LINE></div1>
+  <divret><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>638</LINE></divret>
+  <StrT><FILE>C:\project\sg-420m\firmware\src\Menu_1602.asm</FILE><LINE>695</LINE></StrT>
   <Enone><FILE>C:\project\sg-420m\firmware\src\EEPROM.asm</FILE><LINE>30</LINE></Enone>
   <ECalib><FILE>C:\project\sg-420m\firmware\src\EEPROM.asm</FILE><LINE>31</LINE></ECalib>
   <EValFS><FILE>C:\project\sg-420m\firmware\src\EEPROM.asm</FILE><LINE>32</LINE></EValFS>

@@ -114,11 +114,11 @@ clrout: 	st		Y+,temp		;output array clear
 			ret
 			
 			ldi		Cnt,24		;input bits count
-			ldz		Dig+3
+			ldz		Dig
 hloop:		lsl		tempL		;input array shift left
 			rol		tempM
 			rol		tempH		
-			ldy		Dig+10
+			ldy		Dig+Lcd_cols
 sloop:		ld		temp,-Y
 			rol		temp
 			subi	temp,-0x06	;temp+6, C=1
@@ -131,7 +131,7 @@ sloop:		ld		temp,-Y
 			cpse	YH,ZH
 			rjmp	sloop
 			dec		Cnt		;YH:YL = Dig+3
-			brne	hloop
+			brne	hloop 
 
 ;Supress zeros:
 
@@ -164,11 +164,12 @@ setpo:		ld		temp,Y
 
 ;Indicate Dig[0..9] on LCD:
 	
-Disp:	ldi		temp,0x02		;temp <- 0x02-  address
+Disp:	
+		ldi		temp,0x02		;temp home  address
 		rcall	LCD_CMD			;write address
 		ldy		Dig				;pointer to Dig
 		ldi		Cnt,Lcd_bytes
-disp1:	
+disp_loop:	
 		ld		temp,Y+			;temp <- digit
 		push	temp			;save byte
 		swap	temp
@@ -176,7 +177,14 @@ disp1:
 		pop		temp			;restore byte
 		rcall	LCD_WN			;write nibble from temp to LCD
 		dec		Cnt
-		brne	disp1			;repeat for all digits
+		cpi		Cnt,0
+		breq	disp_ret
+		cpi		Cnt,Lcd_cols
+		brne	disp_loop
+		ldi		temp,0x8F		;temp home  address
+		rcall	LCD_CMD			;write address
+		rjmp	disp_loop
+disp_ret:
 		ret	
 
 ;----------------------------------------------------------------------------
@@ -261,7 +269,7 @@ StrVer:
 StrFreq:
 	.db "Frequency",'\0'
 StrStep:
-	.db "step",'\0'
+	.db "step ",'\0'
 StrkHz:
 	.db "kHz",'\0'
 
