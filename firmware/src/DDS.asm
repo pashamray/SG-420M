@@ -232,35 +232,40 @@ TCopy:	lpm	temp,Z+
 
 ;Process ON bit:
 
-mOn:	mov	temp,Flags
+mOn:	
+	mov		temp,Flags
 	andi	temp,(1<<ON) | (1<<ONR)
 	breq	No_op
-	cpi	temp,(1<<ON) | (1<<ONR)
+	cpi		temp,(1<<ON) | (1<<ONR)
 	breq	No_op
-	cpi	temp,(1<<ON)
+	cpi		temp,(1<<ON)
 	brne	do_off
 	
-do_on:	cbr	Flags,(1<<MF)
-	sbr	Flags,(1<<ONR)
+do_on:	
+	cbr		Flags,(1<<MF)
+	sbr		Flags,(1<<ONR)
 	rcall	MakeF		;restore ValF
 	rjmp	No_op	
 
-do_off:	mov	temp,SinH
+do_off:	
+	mov		temp,SinH
 	bbrs	temp,7,dd_off	;jump if minus
-	sbr	Flags,(1<<MF)	;set minus flag
-	tst	FreqM
+	sbr		Flags,(1<<MF)	;set minus flag
+	tst		FreqM
 	brne	do_off		;wait for plus if FreqM > 0	
 	rjmp	No_op
 	
-dd_off:	bbrc	Flags,MF,No_op	;wait for minus flag
-	cbr	Flags,(1<<ONR)
+dd_off:	
+	bbrc	Flags,MF,No_op	;wait for minus flag
+	cbr		Flags,(1<<ONR)
 	rcall	MakeF		;ValF <- 0
-	clr	PhaseK		;Phase <- 0
-	clr	PhaseL
-	clr	PhaseM
-	clr	PhaseN
-	clr	PhaseP
-No_op:	ret
+	clr		PhaseK		;Phase <- 0
+	clr		PhaseL
+	clr		PhaseM
+	clr		PhaseN
+	clr		PhaseP
+No_op:	
+	ret
 
 ;----------------------------------------------------------------------------
 
@@ -277,87 +282,93 @@ No_op:	ret
 ;mp - ValF -> [MulB+0]..[MulB+2]
 ;m  - [MulB+0]..[MulB+6]
 
-MakeF:	ldi	Cnt,7
-	ldy	MulB+7
-	clr	temp
-clrm:	st	-Y,temp		;clear m
-	dec	Cnt
+MakeF:	
+	ldi		Cnt,7
+	ldy		MulB+7
+	clr		temp
+clrm:	
+	st	    -Y,temp		;clear m
+	dec		Cnt
 	brne	clrm
 
 	bbrc	Flags,ONR,m0	;if(ONR == 0) Freq = 0
 	
-	ldy	Calib		;init mc
+	ldy		Calib		;init mc
 	rcall	LdLMH
-	clr	tempD
+	clr		tempD
 	subi	tempL,byte1(C_0 - CAL_0)
 	sbci	tempM,byte2(C_0 - CAL_0)
 	sbci	tempH,byte3(C_0 - CAL_0)
 	sbci	tempD,byte4(C_0 - CAL_0)
-	sts	CalB+3,tempD
-	ldy	CalB
+	sts		CalB+3,tempD
+	ldy		CalB
 	rcall	StLMH
 
-	ldy	MulB
-	ldz	ValF+3		;init mp
-	ld	temp,-Z
-	lsr	temp
-	std	Y+2,temp	
-	ld	temp,-Z
-	ror	temp
-	std	Y+1,temp
-	ld	temp,-Z
-	ror	temp
-	std	Y+0,temp
+	ldy		MulB
+	ldz		ValF+3		;init mp
+	ld		temp,-Z
+	lsr		temp
+	std		Y+2,temp	
+	ld		temp,-Z
+	ror		temp
+	std		Y+1,temp
+	ld		temp,-Z
+	ror		temp
+	std		Y+0,temp
 
-	ldi	Cnt,24		;load cycle counter
-m24_32:	brcc	noadd
-	ldz	CalB
-	ldd	temp,Y+3
-	ld	tempD,Z+
-	add	temp,tempD
-	std	Y+3,temp
-	ldd	temp,Y+4
-	ld	tempD,Z+
-	adc	temp,tempD
-	std	Y+4,temp
-	ldd	temp,Y+5
-	ld	tempD,Z+
-	adc	temp,tempD
-	std	Y+5,temp
-	ldd	temp,Y+6
-	ld	tempD,Z+
-	adc	temp,tempD
-	std	Y+6,temp
+	ldi		Cnt,24		;load cycle counter
+m24_32:		
+	brcc	noadd
+	ldz		CalB
+	ldd		temp,Y+3
+	ld		tempD,Z+
+	add		temp,tempD
+	std		Y+3,temp
+	ldd		temp,Y+4
+	ld		tempD,Z+
+	adc		temp,tempD
+	std		Y+4,temp
+	ldd		temp,Y+5
+	ld		tempD,Z+
+	adc		temp,tempD
+	std		Y+5,temp
+	ldd		temp,Y+6
+	ld		tempD,Z+
+	adc		temp,tempD
+	std		Y+6,temp
 	
-noadd:	ldz	MulB+7
-rry:	ld	temp,-Z
-	ror	temp
-	st	Z,temp
+noadd:	
+	ldz		MulB+7
+rry:	
+	ld		temp,-Z
+	ror		temp
+	st		Z,temp
 	cpse	ZL,YL
 	rjmp	rry
 	cpse	ZH,YH
 	rjmp	rry
 	
-	dec	Cnt
+	dec		Cnt
 	brne	m24_32
 
 ;FreqK,L,M,N = [MulB+2]..[MulB+5] + 0.5
 
-m0:	ld	temp,Y+		;skip [MulB+0]
-	ldi	tempD,0x80
-	ld	temp,Y+		;load [MulB+1]
-	add	temp,tempD
-	in	tempL,SREG
-	cli			;interrupts disable
-	ld	FreqK,Y+
-	adc	FreqK,Cnt	;Cnt = 0
-	ld	FreqL,Y+
-	adc	FreqL,Cnt
-	ld	FreqM,Y+
-	adc	FreqM,Cnt
-	ld	FreqN,Y+
-	adc	FreqN,Cnt
-	out	SREG,tempL	;interrupts enable
+m0:	
+	ld		temp,Y+		;skip [MulB+0]
+	ldi		tempD,0x80
+	ld		temp,Y+		;load [MulB+1]
+	add		temp,tempD
+	in		tempL,SREG
+	cli					;interrupts disable
+	ld		FreqK,Y+
+	adc		FreqK,Cnt	;Cnt = 0
+	ld		FreqL,Y+
+	adc		FreqL,Cnt
+	ld		FreqM,Y+
+	adc		FreqM,Cnt
+	ld		FreqN,Y+
+	adc		FreqN,Cnt
+	out		SREG,tempL	;interrupts enable
 	ret
 	
 ;----------------------------------------------------------------------------

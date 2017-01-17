@@ -276,41 +276,50 @@ ex0:	sts	Menu,temp
 
 ;Key "EN" processing (change menu item):
 
-Do_EN:	lds	temp,Menu
-	cpi	temp,MnuC	;---> menu "Calibration":
+Do_EN:	
+	lds		temp,Menu
+	cpi		temp,MnuC	;---> menu "Calibration":
 	brne	en1
 	rcall	SaveC		;save Calib in EEPROM
-	rjmp	enf		;return to the frequency menu
+	rjmp	enf			;return to the frequency menu
 	
-en1:	cpi	temp,MnuF	;---> menu "Frequency":
+en1:	
+	cpi		temp,MnuF	;---> menu "Frequency":
 	brne	en2
-	ldi	temp,MnuFS	;jump to the frequency step menu
+	ldi		temp,MnuFS	;jump to the frequency step menu
 	rjmp	en0
 	
-en2:	cpi	temp,MnuP	;---> menu "Read Preset":
+en2:	
+	cpi		temp,MnuP	;---> menu "Read Preset":
 	brne	en3
-	ldy	ValP
+	ldy		ValP
 	rcall	LdLMH		;tempH:tempM:tempL = ValP
-	ldy	ValF
+	ldy		ValF
 	rcall	StLMH		;ValF = tempH:tempM:tempL
-	rjmp	ens		;beep and return to the frequency menu	
+	rjmp	ens			;beep and return to the frequency menu	
 	
-en3:	cpi	temp,MnuE	;---> menu "Save Preset":
+en3:	
+	cpi		temp,MnuE	;---> menu "Save Preset":
 	brne	en4
 	rcall	SaveP		;save preset
-	rjmp	enf		;return to the frequency menu
+	rjmp	enf			;return to the frequency menu
 
-en4:	cpi	temp,MnuSH	;---> menu "Shape":
-	brne	ens		;beep and return to the frequency menu
+en4:	
+	cpi		temp,MnuSH	;---> menu "Shape":
+	brne	ens			;beep and return to the frequency menu
 	rcall	ErrB		;error beep
 	rjmp	enx
 	
-ens:	ldi	temp,0
+ens:	
+	ldi		temp,0
 	rcall	Sound		;return beep
-enf:	ldi	temp,MnuF	;menu "Frequency"
-en0:	sts	Menu,temp
+enf:	
+	ldi		temp,MnuF	;menu "Frequency"
+en0:	
+	sts		Menu,temp
 	rcall	SetMd		;set mode
-enx:	rcall	Update		;update display data
+enx:	
+	rcall	Update		;update display data
 	ret
 
 ;----------------------------------------------------------------------------
@@ -418,12 +427,14 @@ srch:
 ;       [Max], [Min] - limits
 ;Out:   tempH:tempM:tempL, [Buff] - validated value
 
-Valid:	rcall	ChkMin		;check for Min
+Valid:	
+	rcall	ChkMin		;check for Min
 	brcs	RstBf
 	rcall	ChkMax		;check for Max
 	brcc	ValOk	
 	
-RstBf:	ldy	Buff
+RstBf:	
+	ldy		Buff
 	rcall	LdLMH		;error, restore buffer	
 	rcall	ErrB		;error bell
 	rcall	ChkMin		;check for Min
@@ -431,12 +442,14 @@ RstBf:	ldy	Buff
 	rcall	ChkMax		;check for Max
 	brcc	ValOk	
 	
-LimBf:	mov	tempL,tempA	;limit buffer
-	mov	tempM,tempB
-	mov	tempH,tempC
+LimBf:	
+	mov		tempL,tempA	;limit buffer
+	mov		tempM,tempB
+	mov		tempH,tempC
 	rcall	ErrB		;error bell
 
-ValOk:	ldy	Buff
+ValOk:	
+	ldy		Buff
 	rcall	StLMH		;save value to buffer
 	ret
 
@@ -548,7 +561,7 @@ Update:
 	rjmp	upd31
 
 upd1:	
-	table	StrT		;string table base
+	table	StrFreq		;string table base
 	add		temp,temp	;temp = Menu * 2
 	add		ZL,temp
 	adc		ZH,temp
@@ -660,7 +673,8 @@ LdDEF:	ld	tempD,Y+
 
 ;Store tempH,M,L  to [Y+2],[Y+1],[Y+0]
 
-StLMH:	st	Y+,tempL
+StLMH:	
+	st	Y+,tempL
 	st	Y+,tempM
 	st	Y+,tempH
 	ret

@@ -1,11 +1,11 @@
 
-AVRASM ver. 2.1.42  main.asm Mon Jan 16 21:49:23 2017
+AVRASM ver. 2.1.42  main.asm Tue Jan 17 16:26:16 2017
 
 main.asm(10): Including file 'c:\progra~2\atmel\avrtoo~1\avrass~1\appnotes\m8def.inc'
 main.asm(11): Including file 'macros.mac'
 main.asm(12): Including file 'Header.asm'
 main.asm(21): Including file 'DDS.asm'
-DDS.asm(367): Including file 'sin256.asm'
+DDS.asm(378): Including file 'sin256.asm'
 main.asm(118): Including file 'LCD_1602.asm'
 LCD_1602.asm(13): Including file 'wait.asm'
 main.asm(119): Including file 'Keyboard.asm'
@@ -1246,37 +1246,42 @@ main.asm(122): Including file 'EEPROM.asm'
                  
                  ;Process ON bit:
                  
-00005d 2f79      mOn:	mov	temp,Flags
+                 mOn:	
+00005d 2f79      	mov		temp,Flags
 00005e 7370      	andi	temp,(1<<ON) | (1<<ONR)
 00005f f0c1      	breq	No_op
-000060 3370      	cpi	temp,(1<<ON) | (1<<ONR)
+000060 3370      	cpi		temp,(1<<ON) | (1<<ONR)
 000061 f0b1      	breq	No_op
-000062 3170      	cpi	temp,(1<<ON)
+000062 3170      	cpi		temp,(1<<ON)
 000063 f421      	brne	do_off
                  	
-000064 7b9f      do_on:	cbr	Flags,(1<<MF)
-000065 6290      	sbr	Flags,(1<<ONR)
+                 do_on:	
+000064 7b9f      	cbr		Flags,(1<<MF)
+000065 6290      	sbr		Flags,(1<<ONR)
 000066 d012      	rcall	MakeF		;restore ValF
 000067 c010      	rjmp	No_op	
                  
-000068 2d7d      do_off:	mov	temp,SinH
+                 do_off:	
+000068 2d7d      	mov		temp,SinH
 000069 fd77
 00006a c004      	bbrs	temp,7,dd_off	;jump if minus
-00006b 6490      	sbr	Flags,(1<<MF)	;set minus flag
-00006c 20aa      	tst	FreqM
+00006b 6490      	sbr		Flags,(1<<MF)	;set minus flag
+00006c 20aa      	tst		FreqM
 00006d f7d1      	brne	do_off		;wait for plus if FreqM > 0	
 00006e c009      	rjmp	No_op
                  	
+                 dd_off:	
 00006f ff96
-000070 c007      dd_off:	bbrc	Flags,MF,No_op	;wait for minus flag
-000071 7d9f      	cbr	Flags,(1<<ONR)
+000070 c007      	bbrc	Flags,MF,No_op	;wait for minus flag
+000071 7d9f      	cbr		Flags,(1<<ONR)
 000072 d006      	rcall	MakeF		;ValF <- 0
-000073 2433      	clr	PhaseK		;Phase <- 0
-000074 2444      	clr	PhaseL
-000075 2455      	clr	PhaseM
-000076 2466      	clr	PhaseN
-000077 2477      	clr	PhaseP
-000078 9508      No_op:	ret
+000073 2433      	clr		PhaseK		;Phase <- 0
+000074 2444      	clr		PhaseL
+000075 2455      	clr		PhaseM
+000076 2466      	clr		PhaseN
+000077 2477      	clr		PhaseP
+                 No_op:	
+000078 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
@@ -1293,95 +1298,101 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;mp - ValF -> [MulB+0]..[MulB+2]
                  ;m  - [MulB+0]..[MulB+6]
                  
-000079 e087      MakeF:	ldi	Cnt,7
+                 MakeF:	
+000079 e087      	ldi		Cnt,7
 00007a e6cb
-00007b e0d0      	ldy	MulB+7
-00007c 2777      	clr	temp
-00007d 937a      clrm:	st	-Y,temp		;clear m
-00007e 958a      	dec	Cnt
+00007b e0d0      	ldy		MulB+7
+00007c 2777      	clr		temp
+                 clrm:	
+00007d 937a      	st	    -Y,temp		;clear m
+00007e 958a      	dec		Cnt
 00007f f7e9      	brne	clrm
                  
 000080 ff95
 000081 c039      	bbrc	Flags,ONR,m0	;if(ONR == 0) Freq = 0
                  	
 000082 e2c8
-000083 e0d3      	ldy	Calib		;init mc
-000084 d4a2      	rcall	LdLMH
-000085 2711      	clr	tempD
+000083 e0d3      	ldy		Calib		;init mc
+000084 d49c      	rcall	LdLMH
+000085 2711      	clr		tempD
 000086 5a49      	subi	tempL,byte1(C_0 - CAL_0)
 000087 4351      	sbci	tempM,byte2(C_0 - CAL_0)
 000088 4e66      	sbci	tempH,byte3(C_0 - CAL_0)
 000089 4f1c      	sbci	tempD,byte4(C_0 - CAL_0)
-00008a 9310 0063 	sts	CalB+3,tempD
+00008a 9310 0063 	sts		CalB+3,tempD
 00008c e6c0
-00008d e0d0      	ldy	CalB
-00008e d4a4      	rcall	StLMH
+00008d e0d0      	ldy		CalB
+00008e d49e      	rcall	StLMH
                  
 00008f e6c4
-000090 e0d0      	ldy	MulB
+000090 e0d0      	ldy		MulB
 000091 e3e1
-000092 e0f3      	ldz	ValF+3		;init mp
-000093 9172      	ld	temp,-Z
-000094 9576      	lsr	temp
-000095 837a      	std	Y+2,temp	
-000096 9172      	ld	temp,-Z
-000097 9577      	ror	temp
-000098 8379      	std	Y+1,temp
-000099 9172      	ld	temp,-Z
-00009a 9577      	ror	temp
-00009b 8378      	std	Y+0,temp
+000092 e0f3      	ldz		ValF+3		;init mp
+000093 9172      	ld		temp,-Z
+000094 9576      	lsr		temp
+000095 837a      	std		Y+2,temp	
+000096 9172      	ld		temp,-Z
+000097 9577      	ror		temp
+000098 8379      	std		Y+1,temp
+000099 9172      	ld		temp,-Z
+00009a 9577      	ror		temp
+00009b 8378      	std		Y+0,temp
                  
-00009c e188      	ldi	Cnt,24		;load cycle counter
-00009d f490      m24_32:	brcc	noadd
+00009c e188      	ldi		Cnt,24		;load cycle counter
+                 m24_32:		
+00009d f490      	brcc	noadd
 00009e e6e0
-00009f e0f0      	ldz	CalB
-0000a0 817b      	ldd	temp,Y+3
-0000a1 9111      	ld	tempD,Z+
-0000a2 0f71      	add	temp,tempD
-0000a3 837b      	std	Y+3,temp
-0000a4 817c      	ldd	temp,Y+4
-0000a5 9111      	ld	tempD,Z+
-0000a6 1f71      	adc	temp,tempD
-0000a7 837c      	std	Y+4,temp
-0000a8 817d      	ldd	temp,Y+5
-0000a9 9111      	ld	tempD,Z+
-0000aa 1f71      	adc	temp,tempD
-0000ab 837d      	std	Y+5,temp
-0000ac 817e      	ldd	temp,Y+6
-0000ad 9111      	ld	tempD,Z+
-0000ae 1f71      	adc	temp,tempD
-0000af 837e      	std	Y+6,temp
+00009f e0f0      	ldz		CalB
+0000a0 817b      	ldd		temp,Y+3
+0000a1 9111      	ld		tempD,Z+
+0000a2 0f71      	add		temp,tempD
+0000a3 837b      	std		Y+3,temp
+0000a4 817c      	ldd		temp,Y+4
+0000a5 9111      	ld		tempD,Z+
+0000a6 1f71      	adc		temp,tempD
+0000a7 837c      	std		Y+4,temp
+0000a8 817d      	ldd		temp,Y+5
+0000a9 9111      	ld		tempD,Z+
+0000aa 1f71      	adc		temp,tempD
+0000ab 837d      	std		Y+5,temp
+0000ac 817e      	ldd		temp,Y+6
+0000ad 9111      	ld		tempD,Z+
+0000ae 1f71      	adc		temp,tempD
+0000af 837e      	std		Y+6,temp
                  	
+                 noadd:	
 0000b0 e6eb
-0000b1 e0f0      noadd:	ldz	MulB+7
-0000b2 9172      rry:	ld	temp,-Z
-0000b3 9577      	ror	temp
-0000b4 8370      	st	Z,temp
+0000b1 e0f0      	ldz		MulB+7
+                 rry:	
+0000b2 9172      	ld		temp,-Z
+0000b3 9577      	ror		temp
+0000b4 8370      	st		Z,temp
 0000b5 13ec      	cpse	ZL,YL
 0000b6 cffb      	rjmp	rry
 0000b7 13fd      	cpse	ZH,YH
 0000b8 cff9      	rjmp	rry
                  	
-0000b9 958a      	dec	Cnt
+0000b9 958a      	dec		Cnt
 0000ba f711      	brne	m24_32
                  
                  ;FreqK,L,M,N = [MulB+2]..[MulB+5] + 0.5
                  
-0000bb 9179      m0:	ld	temp,Y+		;skip [MulB+0]
-0000bc e810      	ldi	tempD,0x80
-0000bd 9179      	ld	temp,Y+		;load [MulB+1]
-0000be 0f71      	add	temp,tempD
-0000bf b74f      	in	tempL,SREG
-0000c0 94f8      	cli			;interrupts disable
-0000c1 9089      	ld	FreqK,Y+
-0000c2 1e88      	adc	FreqK,Cnt	;Cnt = 0
-0000c3 9099      	ld	FreqL,Y+
-0000c4 1e98      	adc	FreqL,Cnt
-0000c5 90a9      	ld	FreqM,Y+
-0000c6 1ea8      	adc	FreqM,Cnt
-0000c7 90b9      	ld	FreqN,Y+
-0000c8 1eb8      	adc	FreqN,Cnt
-0000c9 bf4f      	out	SREG,tempL	;interrupts enable
+                 m0:	
+0000bb 9179      	ld		temp,Y+		;skip [MulB+0]
+0000bc e810      	ldi		tempD,0x80
+0000bd 9179      	ld		temp,Y+		;load [MulB+1]
+0000be 0f71      	add		temp,tempD
+0000bf b74f      	in		tempL,SREG
+0000c0 94f8      	cli					;interrupts disable
+0000c1 9089      	ld		FreqK,Y+
+0000c2 1e88      	adc		FreqK,Cnt	;Cnt = 0
+0000c3 9099      	ld		FreqL,Y+
+0000c4 1e98      	adc		FreqL,Cnt
+0000c5 90a9      	ld		FreqM,Y+
+0000c6 1ea8      	adc		FreqM,Cnt
+0000c7 90b9      	ld		FreqN,Y+
+0000c8 1eb8      	adc		FreqN,Cnt
+0000c9 bf4f      	out		SREG,tempL	;interrupts enable
 0000ca 9508      	ret
                  	
                  ;----------------------------------------------------------------------------
@@ -1663,13 +1674,13 @@ main.asm(122): Including file 'EEPROM.asm'
 0001d4 d03c      	rcall	iDisp		;LCD init
 0001d5 de62      	rcall	iDDS		;DDS subsystem init
 0001d6 9478      	sei			;enable interrupts
-0001d7 d16d      	rcall	iMenu		;menu subsystem init
+0001d7 d167      	rcall	iMenu		;menu subsystem init
                  
                  ;Main loop:
                  
 0001d8 d011      Main:	rcall	mTimer		;process system timer
-0001d9 d105      	rcall	mKey		;scan keyboard
-0001da d181      	rcall	mMenu		;process menu
+0001d9 d0ff      	rcall	mKey		;scan keyboard
+0001da d17b      	rcall	mMenu		;process menu
 0001db d059      	rcall	mDisp		;update display
 0001dc de80      	rcall	mOn		;process ON bit
 0001dd d007      	rcall	mWdog		;watchdog restart
@@ -2048,46 +2059,35 @@ main.asm(122): Including file 'EEPROM.asm'
                  
                  ;----------------------------------------------------------------------------
                  
-                 ;Font table:
-                 
-                 FONT:	     ;FCBHADEG    FCBHADEG
-0002c4 3130      	.db '0', '1'	;0, 1
-0002c5 3332      	.db '2', '3'	;2, 3
-0002c6 3534      	.db '4', '5'	;4, 5
-0002c7 3736      	.db '6', '7'	;6, 7
-0002c8 3938      	.db '8', '9'	;8, 9
-0002c9 6241      	.db 'A', 'b'	;A, b
-0002ca 6443      	.db 'C', 'd'	;C, d
-0002cb 4645      	.db 'E', 'F'	;E, F
-0002cc 2d20      	.db ' ', '-'	;blank, -
-0002cd 7e5f      	.db '_', '~'	;_, ~
-0002ce 636f      	.db 'o', 'c'	;degree, c
-0002cf 4847      	.db 'G', 'H'	;G, H
-0002d0 4c49      	.db 'I', 'L'	;I, L
-0002d1 6e69      	.db 'i', 'n'	;i, n
-0002d2 506f      	.db 'o', 'P'	;o, P
-0002d3 7252      	.db 'R', 'r'	;R, r
-0002d4 7353      	.db 'S', 's'	;S, s
-0002d5 5574      	.db 't', 'U'	;t, U
-0002d6 5975      	.db 'u', 'Y'	;u, Y
-0002d7 2f7c      	.db '|', '/'	;|_, |~
-                 
-                 .equ	H	= 4			;point
-                 
-                 ;----------------------------------------------------------------------------
-                 
                  ; Strings table
-                 
+                 StrName:
+0002c4 4753
+0002c5 342d
+0002c6 3032
+0002c7 004d      	.db "SG-420M",'\0'
+                 StrVer:
+0002c8 6556
+0002c9 7372
+0002ca 6f69
+0002cb 3a6e
+0002cc 3120
+0002cd 302e
+0002ce 0031      	.db "Version: 1.01",'\0'
                  StrFreq:
-0002d8 7246
-0002d9 7165
-0002da 6575
-0002db 636e
-0002dc 0079      	.db "Frequency", '\0'
-                 
+0002cf 7246
+0002d0 7165
+0002d1 6575
+0002d2 636e
+0002d3 0079      	.db "Frequency",'\0'
+                 StrStep:
+0002d4 7473
+0002d5 7065
+LCD_1602.asm(264): warning: .cseg .db misalignment - padding zero byte
+main.asm(118): 'LCD_1602.asm' included form here
+0002d6 0000      	.db "step",'\0'
                  StrkHz:
-0002dd 486b
-0002de 007a      	.db "kHz", '\0'	
+0002d7 486b
+0002d8 007a      	.db "kHz",'\0'
                  
                  ;----------------------------------------------------------------------------
                  
@@ -2190,93 +2190,93 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;KBD+Lc	= true scancode,
                  ;NEWPR	= 1 if new press
                  
-0002df d037      mKey:	rcall	Scan		;scan keyboard
-0002e0 e2c2
-0002e1 e0d3      	ldy	KBD		;keyboard data structure base
-0002e2 8148      	ldd	tempL,Y+Lc	
-0002e3 1747      	cp	tempL,temp	;scancode = LastCode ?
-0002e4 f089      	breq	Hold		;branch if same key
+0002d9 d037      mKey:	rcall	Scan		;scan keyboard
+0002da e2c2
+0002db e0d3      	ldy	KBD		;keyboard data structure base
+0002dc 8148      	ldd	tempL,Y+Lc	
+0002dd 1747      	cp	tempL,temp	;scancode = LastCode ?
+0002de f089      	breq	Hold		;branch if same key
                  	
-0002e5 8149      	ldd	tempL,Y+Tc
-0002e6 1747      	cp	tempL,temp	;scancode = TempCode ?
-0002e7 f459      	brne	NewP		;branch if new key
+0002df 8149      	ldd	tempL,Y+Tc
+0002e0 1747      	cp	tempL,temp	;scancode = TempCode ?
+0002e1 f459      	brne	NewP		;branch if new key
                  	
-0002e8 814b      	ldd	tempL,Y+DebTM
-0002e9 2344      	tst	tempL		;check debounce timer
-0002ea f459      	brne	Hold
+0002e2 814b      	ldd	tempL,Y+DebTM
+0002e3 2344      	tst	tempL		;check debounce timer
+0002e4 f459      	brne	Hold
                  	
-0002eb 8148      	ldd	tempL,Y+Lc
-0002ec 3040      	cpi	tempL,K_NO	;check LastCode
-0002ed 8378      	std	Y+Lc,temp	;LastCode <- scancode
-0002ee f4d9      	brne	Proc		;if LastCode == K_NO, then
-0002ef 6094      	stbr	Flags,NEWPR	;set new press flag
-0002f0 e560      	ldi	tempH,ARDelV	;autorepeat delay value
-0002f1 e140      	ldi	tempL,ARCnV
-0002f2 c013      	rjmp	Stac		;go to store ARCnt
+0002e5 8148      	ldd	tempL,Y+Lc
+0002e6 3040      	cpi	tempL,K_NO	;check LastCode
+0002e7 8378      	std	Y+Lc,temp	;LastCode <- scancode
+0002e8 f4d9      	brne	Proc		;if LastCode == K_NO, then
+0002e9 6094      	stbr	Flags,NEWPR	;set new press flag
+0002ea e560      	ldi	tempH,ARDelV	;autorepeat delay value
+0002eb e140      	ldi	tempL,ARCnV
+0002ec c013      	rjmp	Stac		;go to store ARCnt
                  	
-0002f3 8379      NewP:	std	Y+Tc,temp	;TempCode <- scancode
-0002f4 e043      	ldi	tempL,DebncV
-0002f5 834b      	std	Y+DebTM,tempL	;debounce timer load
+0002ed 8379      NewP:	std	Y+Tc,temp	;TempCode <- scancode
+0002ee e043      	ldi	tempL,DebncV
+0002ef 834b      	std	Y+DebTM,tempL	;debounce timer load
                  	
-0002f6 7f9b      Hold:	clbr	Flags,NEWPR	;clear new press flag
-0002f7 814c      	ldd	tempL,Y+KeyTM
-0002f8 2344      	tst	tempL		;check key timer
-0002f9 f481      	brne	Proc
-0002fa 8148      	ldd	tempL,Y+Lc
-0002fb 3044      	cpi	tempL,K_UP	;K_UP, autorepeat enable
-0002fc f019      	breq	Ar
-0002fd 3042      	cpi	tempL,K_DN	;K_DN, autorepeat enable
-0002fe f009      	breq	Ar
-0002ff c00a      	rjmp	Proc
-000300 6094      Ar:	stbr	Flags,NEWPR	;set new press flag
-000301 814a      	ldd	tempL,Y+ARCnt
-000302 2344      	tst	tempL
-000303 f021      	breq	Fast		;fast autorepeat if count is over
-000304 954a      	dec	tempL		;dec autorepeat counter
-000305 e162      	ldi	tempH,ARSlwV	;slow autorepeat rate
+0002f0 7f9b      Hold:	clbr	Flags,NEWPR	;clear new press flag
+0002f1 814c      	ldd	tempL,Y+KeyTM
+0002f2 2344      	tst	tempL		;check key timer
+0002f3 f481      	brne	Proc
+0002f4 8148      	ldd	tempL,Y+Lc
+0002f5 3044      	cpi	tempL,K_UP	;K_UP, autorepeat enable
+0002f6 f019      	breq	Ar
+0002f7 3042      	cpi	tempL,K_DN	;K_DN, autorepeat enable
+0002f8 f009      	breq	Ar
+0002f9 c00a      	rjmp	Proc
+0002fa 6094      Ar:	stbr	Flags,NEWPR	;set new press flag
+0002fb 814a      	ldd	tempL,Y+ARCnt
+0002fc 2344      	tst	tempL
+0002fd f021      	breq	Fast		;fast autorepeat if count is over
+0002fe 954a      	dec	tempL		;dec autorepeat counter
+0002ff e162      	ldi	tempH,ARSlwV	;slow autorepeat rate
                  	
-000306 834a      Stac:	std	Y+ARCnt,tempL	;store autorepeat counter ARCnt
-000307 c001      	rjmp	Stkt		;go to store KeyTM
+000300 834a      Stac:	std	Y+ARCnt,tempL	;store autorepeat counter ARCnt
+000301 c001      	rjmp	Stkt		;go to store KeyTM
                  	
-000308 e066      Fast:	ldi	tempH,ARFstV	;fast autorepeat rate
-000309 836c      Stkt:	std	Y+KeyTM,tempH	;store key timer KeyTM
+000302 e066      Fast:	ldi	tempH,ARFstV	;fast autorepeat rate
+000303 836c      Stkt:	std	Y+KeyTM,tempH	;store key timer KeyTM
                  Proc:
                  
                  ;Process timers:
                  
-00030a ff90
-00030b c00a      	bbrc	Flags,UPD,Tmr2
+000304 ff90
+000305 c00a      	bbrc	Flags,UPD,Tmr2
                  	
-00030c 817b      	ldd	temp,Y+DebTM
-00030d 2377      	tst	temp		;check debounce timer		 
-00030e f011      	breq	Tmr1
-00030f 957a      	dec	temp		;advance debounce timer
-000310 837b      	std	Y+DebTM,temp
+000306 817b      	ldd	temp,Y+DebTM
+000307 2377      	tst	temp		;check debounce timer		 
+000308 f011      	breq	Tmr1
+000309 957a      	dec	temp		;advance debounce timer
+00030a 837b      	std	Y+DebTM,temp
                  
-000311 817c      Tmr1:	ldd	temp,Y+KeyTM
-000312 2377      	tst	temp		;check key timer		 
-000313 f011      	breq	Tmr2
-000314 957a      	dec	temp		;advance key timer
-000315 837c      	std	Y+KeyTM,temp
-000316 9508      Tmr2:	ret
+00030b 817c      Tmr1:	ldd	temp,Y+KeyTM
+00030c 2377      	tst	temp		;check key timer		 
+00030d f011      	breq	Tmr2
+00030e 957a      	dec	temp		;advance key timer
+00030f 837c      	std	Y+KeyTM,temp
+000310 9508      Tmr2:	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Scan keyboard:
                  ;Out: temp - scancode
                  
-000317 d001      Scan:	rcall	scyc		;dummy scan (load 0bXXXX1111 in HC164)
-000318 9896      	Port_DATA_0		;DATA <- 0 at first
-000319 e078      scyc:	ldi	temp,0b00001000	;scan 4 buttons by 5 impulses
-00031a 9897      sclk:	Port_CLK_0		;CLK <- 0
-00031b 9488      	clc			;clc inside the loop for longer delay only
-00031c 9b84      	Skip_if_RETL_1		;C <- ~RETL
-00031d 9408      	sec
-00031e 9a97      	Port_CLK_1		;CLK <- 1
-00031f 9a96      	Port_DATA_1		;DATA <- 1 forever
-000320 1f77      	rol	temp		;C <- temp.7..temp.0 <- C
-000321 f7c0      	brcc	sclk
-000322 9508      	ret			;temp = scancode
+000311 d001      Scan:	rcall	scyc		;dummy scan (load 0bXXXX1111 in HC164)
+000312 9896      	Port_DATA_0		;DATA <- 0 at first
+000313 e078      scyc:	ldi	temp,0b00001000	;scan 4 buttons by 5 impulses
+000314 9897      sclk:	Port_CLK_0		;CLK <- 0
+000315 9488      	clc			;clc inside the loop for longer delay only
+000316 9b84      	Skip_if_RETL_1		;C <- ~RETL
+000317 9408      	sec
+000318 9a97      	Port_CLK_1		;CLK <- 1
+000319 9a96      	Port_DATA_1		;DATA <- 1 forever
+00031a 1f77      	rol	temp		;C <- temp.7..temp.0 <- C
+00031b f7c0      	brcc	sclk
+00031c 9508      	ret			;temp = scancode
                  
                  ;----------------------------------------------------------------------------
                  .include "Beeper.asm"		;link beeper support module
@@ -2317,30 +2317,30 @@ main.asm(122): Including file 'EEPROM.asm'
                  
                  ;Error bell:
                  
-000323 e327      ErrB:	ldi	tempE,ERRBP	;period
-000324 d008      	rcall	Tone
-000325 9508      	ret
+00031d e327      ErrB:	ldi	tempE,ERRBP	;period
+00031e d008      	rcall	Tone
+00031f 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Data save melody:
                  
-000326 e322      Melody:	ldi	tempE,MLDP1	;tone 1	
-000327 d005      	rcall	Tone
-000328 e22d      	ldi	tempE,MLDP2	;tone 2
-000329 d003      	rcall	Tone
-00032a e223      	ldi	tempE,MLDP3	;tone 3
-00032b d001      	rcall	Tone
-00032c 9508      	ret
+000320 e322      Melody:	ldi	tempE,MLDP1	;tone 1	
+000321 d005      	rcall	Tone
+000322 e22d      	ldi	tempE,MLDP2	;tone 2
+000323 d003      	rcall	Tone
+000324 e223      	ldi	tempE,MLDP3	;tone 3
+000325 d001      	rcall	Tone
+000326 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Tone generation:
                  ;Input: tempE - period
                  
-00032d e916      Tone:	ldi	tempD,TDUR	;tone duration
-00032e d008      	rcall	Sgen
-00032f 9508      	ret
+000327 e916      Tone:	ldi	tempD,TDUR	;tone duration
+000328 d008      	rcall	Sgen
+000329 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
@@ -2348,13 +2348,13 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;Input: temp - frequency
                  
                  Sound:
-000330 2f27      	mov	tempE,temp	;temp - frequency
-000331 9520      	com	tempE		;temp=~temp
-000332 702f      	andi	tempE,0x0F	;mask unused bits
-000333 5e22      	subi	tempE,-30	;add period offset
-000334 e119      	ldi	tempD,SDUR	;sound duration
-000335 d001      	rcall	Sgen
-000336 9508      	ret
+00032a 2f27      	mov	tempE,temp	;temp - frequency
+00032b 9520      	com	tempE		;temp=~temp
+00032c 702f      	andi	tempE,0x0F	;mask unused bits
+00032d 5e22      	subi	tempE,-30	;add period offset
+00032e e119      	ldi	tempD,SDUR	;sound duration
+00032f d001      	rcall	Sgen
+000330 9508      	ret
                  	
                  ;----------------------------------------------------------------------------
                  
@@ -2362,20 +2362,20 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;Input: tempE - period
                  ;       tempD - duration
                  	
-000337 2f32      Sgen:	mov	tempF,tempE	;3
-000338 e180      sndb:	ldi	Cnt,NSND  	;2 outer loop
-000339 958a      snda:	dec	Cnt		    ;1 inner loop
-00033a f7f1      	brne	snda		    ;1 inner loop
-00033b 953a      	dec	tempF		  ;2 outer loop
-00033c f7d9      	brne	sndb		  ;2 outer loop
-00033d 95a8      	wdr			;3 watchdog restart
-00033e fd10      	sbrc	tempD,0		;3 check tempF.0
-00033f 9a92      	Port_SND_1		;3 set	 SND if tempF.0 = 1
-000340 ff10      	sbrs	tempD,0		;3 check tempF.0
-000341 9892      	Port_SND_0		;3 clear SND if tempF.0 = 0
-000342 951a      	dec	tempD		;3
-000343 f799      	brne	Sgen		;3
-000344 9508      	ret			;tempF=1, SND = 1, beeper power off
+000331 2f32      Sgen:	mov	tempF,tempE	;3
+000332 e180      sndb:	ldi	Cnt,NSND  	;2 outer loop
+000333 958a      snda:	dec	Cnt		    ;1 inner loop
+000334 f7f1      	brne	snda		    ;1 inner loop
+000335 953a      	dec	tempF		  ;2 outer loop
+000336 f7d9      	brne	sndb		  ;2 outer loop
+000337 95a8      	wdr			;3 watchdog restart
+000338 fd10      	sbrc	tempD,0		;3 check tempF.0
+000339 9a92      	Port_SND_1		;3 set	 SND if tempF.0 = 1
+00033a ff10      	sbrs	tempD,0		;3 check tempF.0
+00033b 9892      	Port_SND_0		;3 clear SND if tempF.0 = 0
+00033c 951a      	dec	tempD		;3
+00033d f799      	brne	Sgen		;3
+00033e 9508      	ret			;tempF=1, SND = 1, beeper power off
                  
                  ;----------------------------------------------------------------------------
                  .include "Menu_1602.asm"	;link menu implementation module
@@ -2462,252 +2462,261 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;Init menu subsystem:
                  
                  iMenu:
-000345 e392      	ldi		Flags,(1<<ON) | (1<<ONR) | (1<<UPDD)
-000346 d201      	rcall	ReadF		;read from EEPROM Calib, ValFS, ValF
-000347 e070      	ldi		temp,MnuF	;menu "Frequency"
-000348 9370 0327 	sts		Menu,temp
-00034a d0c1      	rcall	SetMd		;set mode, calculate Freq and enable interrupts
-00034b d17c      	rcall	Update		;update display data
+00033f e392      	ldi		Flags,(1<<ON) | (1<<ONR) | (1<<UPDD)
+000340 d201      	rcall	ReadF		;read from EEPROM Calib, ValFS, ValF
+000341 e070      	ldi		temp,MnuF	;menu "Frequency"
+000342 9370 0327 	sts		Menu,temp
+000344 d0c1      	rcall	SetMd		;set mode, calculate Freq and enable interrupts
+000345 d17c      	rcall	Update		;update display data
                  
-00034c dfca      	rcall	Scan
-00034d 3071      	cpi		temp,K_EX	;EX pressed ?
-00034e f431      	brne	norm
-00034f e075      	ldi		temp,MnuC	;menu "Calibration"
-000350 9370 0327 	sts		Menu,temp
-000352 d0b9      	rcall	SetMd		;set calibration mode
-000353 d174      	rcall	Update		;update display data
-000354 df22      	rcall	Disp		;display
+000346 dfca      	rcall	Scan
+000347 3071      	cpi		temp,K_EX	;EX pressed ?
+000348 f431      	brne	norm
+000349 e075      	ldi		temp,MnuC	;menu "Calibration"
+00034a 9370 0327 	sts		Menu,temp
+00034c d0b9      	rcall	SetMd		;set calibration mode
+00034d d174      	rcall	Update		;update display data
+00034e df28      	rcall	Disp		;display
                  
                  norm:
-000355 e223      	ldi		tempE,35
-000356 dfd6      	rcall	Tone		;initial beep
+00034f e223      	ldi		tempE,35
+000350 dfd6      	rcall	Tone		;initial beep
                  	
                  rels:	
-000357 dfbf      	rcall	Scan
-000358 95a8      	wdr
-000359 3070      	cpi		temp,K_NO
-00035a f7e1      	brne	rels		;wait for keyboard release
-00035b 9508      	ret
+000351 dfbf      	rcall	Scan
+000352 95a8      	wdr
+000353 3070      	cpi		temp,K_NO
+000354 f7e1      	brne	rels		;wait for keyboard release
+000355 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Process key functions:
                  	
-00035c ff92
-00035d c015      mMenu:	bbrc	Flags,NEWPR,NoPr
-00035e e2c2
-00035f e0d3      	ldy	KBD
-000360 8178      	ldd	temp,Y+Lc	;temp <- LastCode
-000361 3070      	cpi	temp,K_NO
-000362 f081      	breq	NoPr		;skip if no press
-000363 dfcc      	rcall	Sound		;key beep
-000364 3074      	cpi	temp,K_UP
-000365 f411      	brne	Pro1
-000366 d00d      	rcall	Do_UP		;key UP processing
-000367 c00b      	rjmp	NoPr
-000368 3072      Pro1:	cpi	temp,K_DN
-000369 f411      	brne	Pro2
-00036a d035      	rcall	Do_DN		;key DN processing
-00036b c007      	rjmp	NoPr
-00036c 3071      Pro2:	cpi	temp,K_EX
-00036d f411      	brne	Pro3
-00036e d063      	rcall	Do_EX		;key EX processing
-00036f c003      	rjmp	NoPr
-000370 3078      Pro3:	cpi	temp,K_EN
-000371 f409      	brne	NoPr
-000372 d076      	rcall	Do_EN		;key EN procesing
-000373 9508      NoPr:	ret
+000356 ff92
+000357 c015      mMenu:	bbrc	Flags,NEWPR,NoPr
+000358 e2c2
+000359 e0d3      	ldy	KBD
+00035a 8178      	ldd	temp,Y+Lc	;temp <- LastCode
+00035b 3070      	cpi	temp,K_NO
+00035c f081      	breq	NoPr		;skip if no press
+00035d dfcc      	rcall	Sound		;key beep
+00035e 3074      	cpi	temp,K_UP
+00035f f411      	brne	Pro1
+000360 d00d      	rcall	Do_UP		;key UP processing
+000361 c00b      	rjmp	NoPr
+000362 3072      Pro1:	cpi	temp,K_DN
+000363 f411      	brne	Pro2
+000364 d035      	rcall	Do_DN		;key DN processing
+000365 c007      	rjmp	NoPr
+000366 3071      Pro2:	cpi	temp,K_EX
+000367 f411      	brne	Pro3
+000368 d063      	rcall	Do_EX		;key EX processing
+000369 c003      	rjmp	NoPr
+00036a 3078      Pro3:	cpi	temp,K_EN
+00036b f409      	brne	NoPr
+00036c d076      	rcall	Do_EN		;key EN procesing
+00036d 9508      NoPr:	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Key "UP" processing:
                  
-000374 9170 0327 Do_UP:	lds	temp,Menu
-000376 3074      	cpi	temp,MnuFS	;---> menu "Frequency Step"?
-000377 f089      	breq	upst
+00036e 9170 0327 Do_UP:	lds	temp,Menu
+000370 3074      	cpi	temp,MnuFS	;---> menu "Frequency Step"?
+000371 f089      	breq	upst
                  	
                  ;Buff + Step, align value to step
                  
-000378 e3c4
-000379 e0d3      	ldy	Buff
-00037a d1ac      	rcall	LdLMH		;tempH:tempM:tempL = Buff
-00037b e3c7
-00037c e0d3      	ldy	Step
-00037d d1b1      	rcall	LdDEF		;tempF:tempE:tempD = Step
-00037e d190      	rcall	div24		;tempC:tempB:tempA = Rem(Buff / Step) 
-00037f e3c4
-000380 e0d3      	ldy	Buff
-000381 d1a5      	rcall	LdLMH		;tempH:tempM:tempL = Buff
-000382 194e      	sub	tempL,tempA	;tempH:tempM:tempL - Rem(Buff / Step)
-000383 095f      	sbc	tempM,tempB
-000384 0b60      	sbc	tempH,tempC
-000385 0f41      	add	tempL,tempD	;tempH:tempM:tempL + Step
-000386 1f52      	adc	tempM,tempE
-000387 1f63      	adc	tempH,tempF
-000388 c012      	rjmp	upv		;validate buffer
+000372 e3c4
+000373 e0d3      	ldy	Buff
+000374 d1ac      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+000375 e3c7
+000376 e0d3      	ldy	Step
+000377 d1b1      	rcall	LdDEF		;tempF:tempE:tempD = Step
+000378 d190      	rcall	div24		;tempC:tempB:tempA = Rem(Buff / Step) 
+000379 e3c4
+00037a e0d3      	ldy	Buff
+00037b d1a5      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+00037c 194e      	sub	tempL,tempA	;tempH:tempM:tempL - Rem(Buff / Step)
+00037d 095f      	sbc	tempM,tempB
+00037e 0b60      	sbc	tempH,tempC
+00037f 0f41      	add	tempL,tempD	;tempH:tempM:tempL + Step
+000380 1f52      	adc	tempM,tempE
+000381 1f63      	adc	tempH,tempF
+000382 c012      	rjmp	upv		;validate buffer
                  
                  ;Step change (1 -> 2 -> 5 -> 10 -> 20..)
                  
-000389 e3c4
-00038a e0d3      upst:	ldy	Buff
-00038b d19b      	rcall	LdLMH		;tempH:tempM:tempL = Buff
-00038c 0f44      	lsl	tempL
-00038d 1f55      	rol	tempM
-00038e 1f66      	rol	tempH		;Buff * 2
-00038f d0ec      	rcall	Search
-000390 3072      	cpi	temp,2
-000391 f449      	brne	upv		;validate buffer
-000392 e3c4
-000393 e0d3      	ldy	Buff
-000394 d196      	rcall	LdABC		;tempC:tempB:tempA = Buff	
-000395 9506      	lsr	tempC
-000396 94f7      	ror	tempB
-000397 94e7      	ror	tempA		;Buff / 2
-000398 0d4e      	add	tempL,tempA
-000399 1d5f      	adc	tempM,tempB
-00039a 1f60      	adc	tempH,tempC	;Buff * 2.5
+000383 e3c4
+000384 e0d3      upst:	ldy	Buff
+000385 d19b      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+000386 0f44      	lsl	tempL
+000387 1f55      	rol	tempM
+000388 1f66      	rol	tempH		;Buff * 2
+000389 d0ec      	rcall	Search
+00038a 3072      	cpi	temp,2
+00038b f449      	brne	upv		;validate buffer
+00038c e3c4
+00038d e0d3      	ldy	Buff
+00038e d196      	rcall	LdABC		;tempC:tempB:tempA = Buff	
+00038f 9506      	lsr	tempC
+000390 94f7      	ror	tempB
+000391 94e7      	ror	tempA		;Buff / 2
+000392 0d4e      	add	tempL,tempA
+000393 1d5f      	adc	tempM,tempB
+000394 1f60      	adc	tempH,tempC	;Buff * 2.5
                  
-00039b d0e8      upv:	rcall	Valid		;validate tempH:tempM:tempL
-00039c d10c      	rcall	Assume		;assume new parameters
-00039d 6098      	stbr	Flags,EDT	;set edited flag
-00039e d129      	rcall	Update		;update display data
-00039f 9508      	ret
+000395 d0e8      upv:	rcall	Valid		;validate tempH:tempM:tempL
+000396 d10c      	rcall	Assume		;assume new parameters
+000397 6098      	stbr	Flags,EDT	;set edited flag
+000398 d129      	rcall	Update		;update display data
+000399 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Key "DN" processing:
                  		
-0003a0 9170 0327 Do_DN:	lds	temp,Menu
-0003a2 3074      	cpi	temp,MnuFS	;---> menu "Frequency Step"?
-0003a3 f0b1      	breq	dnst
+00039a 9170 0327 Do_DN:	lds	temp,Menu
+00039c 3074      	cpi	temp,MnuFS	;---> menu "Frequency Step"?
+00039d f0b1      	breq	dnst
                  	
                  
                  ;Buff - Step, align value to step
                  
-0003a4 e3c4
-0003a5 e0d3      	ldy	Buff
-0003a6 d180      	rcall	LdLMH		;tempH:tempM:tempL = Buff
-0003a7 e3c7
-0003a8 e0d3      	ldy	Step
-0003a9 d185      	rcall	LdDEF		;tempF:tempE:tempD = Step
-0003aa d164      	rcall	div24		;tempC:tempB:tempA = Rem(Buff / Step) 
-0003ab e3c4
-0003ac e0d3      	ldy	Buff
-0003ad d179      	rcall	LdLMH		;tempH:tempM:tempL = Buff
-0003ae 2d7e      	mov	temp,tempA
-0003af 297f      	or	temp,tempB
-0003b0 2b70      	or	temp,tempC
-0003b1 f021      	breq	dn0
-0003b2 194e      	sub	tempL,tempA	;Buff - Rem(Buff/Step)
-0003b3 095f      	sbc	tempM,tempB
-0003b4 0b60      	sbc	tempH,tempC
-0003b5 c017      	rjmp	dnv		;validate buffer	
-0003b6 1b41      dn0:	sub	tempL,tempD	;Buff - Step
-0003b7 0b52      	sbc	tempM,tempE
-0003b8 0b63      	sbc	tempH,tempF
-0003b9 c013      dn1:	rjmp	dnv		;validate buffer	
+00039e e3c4
+00039f e0d3      	ldy	Buff
+0003a0 d180      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+0003a1 e3c7
+0003a2 e0d3      	ldy	Step
+0003a3 d185      	rcall	LdDEF		;tempF:tempE:tempD = Step
+0003a4 d164      	rcall	div24		;tempC:tempB:tempA = Rem(Buff / Step) 
+0003a5 e3c4
+0003a6 e0d3      	ldy	Buff
+0003a7 d179      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+0003a8 2d7e      	mov	temp,tempA
+0003a9 297f      	or	temp,tempB
+0003aa 2b70      	or	temp,tempC
+0003ab f021      	breq	dn0
+0003ac 194e      	sub	tempL,tempA	;Buff - Rem(Buff/Step)
+0003ad 095f      	sbc	tempM,tempB
+0003ae 0b60      	sbc	tempH,tempC
+0003af c017      	rjmp	dnv		;validate buffer	
+0003b0 1b41      dn0:	sub	tempL,tempD	;Buff - Step
+0003b1 0b52      	sbc	tempM,tempE
+0003b2 0b63      	sbc	tempH,tempF
+0003b3 c013      dn1:	rjmp	dnv		;validate buffer	
                  	
                  ;Step change (..20 -> 10 -> 5 -> 2 -> 1)
                  
-0003ba e3c4
-0003bb e0d3      dnst:	ldy	Buff
-0003bc d16a      	rcall	LdLMH		;tempH:tempM:tempL = Buff
-0003bd 9566      	lsr	tempH
-0003be 9557      	ror	tempM
-0003bf 9547      	ror	tempL		;Buff / 2
-0003c0 d0bb      	rcall	Search
-0003c1 3075      	cpi	temp,5
-0003c2 f451      	brne	dnv		;validate buffer
-0003c3 e3c4
-0003c4 e0d3      	ldy	Buff
-0003c5 d161      	rcall	LdLMH		;tempH:tempM:tempL = Buff	
-0003c6 0f44      	lsl	tempL
-0003c7 1f55      	rol	tempM
-0003c8 1f66      	rol	tempH		;Buff * 2
-0003c9 e015      	ldi	tempD,5
-0003ca 2722      	clr	tempE
-0003cb 2733      	clr	tempF
-0003cc d142      	rcall	Div24		;Buff / 2.5
+0003b4 e3c4
+0003b5 e0d3      dnst:	ldy	Buff
+0003b6 d16a      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+0003b7 9566      	lsr	tempH
+0003b8 9557      	ror	tempM
+0003b9 9547      	ror	tempL		;Buff / 2
+0003ba d0bb      	rcall	Search
+0003bb 3075      	cpi	temp,5
+0003bc f451      	brne	dnv		;validate buffer
+0003bd e3c4
+0003be e0d3      	ldy	Buff
+0003bf d161      	rcall	LdLMH		;tempH:tempM:tempL = Buff	
+0003c0 0f44      	lsl	tempL
+0003c1 1f55      	rol	tempM
+0003c2 1f66      	rol	tempH		;Buff * 2
+0003c3 e015      	ldi	tempD,5
+0003c4 2722      	clr	tempE
+0003c5 2733      	clr	tempF
+0003c6 d142      	rcall	Div24		;Buff / 2.5
                  
-0003cd d0b6      dnv:	rcall	Valid		;validate tempH:tempM:tempL
-0003ce d0da      	rcall	Assume		;assume new parameters
-0003cf 6098      	stbr	Flags,EDT	;set edited flag
-0003d0 d0f7      	rcall	Update		;update display data
-0003d1 9508      	ret
+0003c7 d0b6      dnv:	rcall	Valid		;validate tempH:tempM:tempL
+0003c8 d0da      	rcall	Assume		;assume new parameters
+0003c9 6098      	stbr	Flags,EDT	;set edited flag
+0003ca d0f7      	rcall	Update		;update display data
+0003cb 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Key "EX" processing (change menu item):
                  	
-0003d2 9170 0327 Do_EX:	lds	temp,Menu
-0003d4 3074      	cpi	temp,MnuFS	;---> menu "Frequency Step":
-0003d5 f099      	breq	Do_EN		;process enter key
+0003cc 9170 0327 Do_EX:	lds	temp,Menu
+0003ce 3074      	cpi	temp,MnuFS	;---> menu "Frequency Step":
+0003cf f099      	breq	Do_EN		;process enter key
                  
-0003d6 3075      	cpi	temp,MnuC	;---> menu "Calibration":
-0003d7 f411      	brne	ex1
-0003d8 d16f      	rcall	ReadF		;skip calibration, read Calib from EEPROM
-0003d9 c009      	rjmp	exf		;return to the frequency menu
+0003d0 3075      	cpi	temp,MnuC	;---> menu "Calibration":
+0003d1 f411      	brne	ex1
+0003d2 d16f      	rcall	ReadF		;skip calibration, read Calib from EEPROM
+0003d3 c009      	rjmp	exf		;return to the frequency menu
                  
-0003da 3070      ex1:	cpi	temp,MnuF	;---> menu "Frequency":
-0003db f029      	breq	exn
+0003d4 3070      ex1:	cpi	temp,MnuF	;---> menu "Frequency":
+0003d5 f029      	breq	exn
                  
-0003dc ff93
-0003dd c001      	bbrc	Flags,EDT,ex2	;if (EDT == 1) return to the frequency menu
-0003de c004      	rjmp	exf		;else next menu item
+0003d6 ff93
+0003d7 c001      	bbrc	Flags,EDT,ex2	;if (EDT == 1) return to the frequency menu
+0003d8 c004      	rjmp	exf		;else next menu item
                  
-0003df 3073      ex2:	cpi	temp,MnuSH	;---> menu "Shape":
-0003e0 f011      	breq	exf		;return to the frequency menu
+0003d9 3073      ex2:	cpi	temp,MnuSH	;---> menu "Shape":
+0003da f011      	breq	exf		;return to the frequency menu
                  
-0003e1 9573      exn:	inc	temp		;next menu item
-0003e2 c001      	rjmp	ex0
-0003e3 e070      exf:	ldi	temp,MnuF
-0003e4 9370 0327 ex0:	sts	Menu,temp
-0003e6 d025      	rcall	SetMd		;set mode
-0003e7 d0e0      	rcall	Update		;update display data
-0003e8 9508      	ret
+0003db 9573      exn:	inc	temp		;next menu item
+0003dc c001      	rjmp	ex0
+0003dd e070      exf:	ldi	temp,MnuF
+0003de 9370 0327 ex0:	sts	Menu,temp
+0003e0 d025      	rcall	SetMd		;set mode
+0003e1 d0e0      	rcall	Update		;update display data
+0003e2 9508      	ret
                  	
                  ;----------------------------------------------------------------------------
                  
                  ;Key "EN" processing (change menu item):
                  
-0003e9 9170 0327 Do_EN:	lds	temp,Menu
-0003eb 3075      	cpi	temp,MnuC	;---> menu "Calibration":
-0003ec f411      	brne	en1
-0003ed d184      	rcall	SaveC		;save Calib in EEPROM
-0003ee c017      	rjmp	enf		;return to the frequency menu
+                 Do_EN:	
+0003e3 9170 0327 	lds		temp,Menu
+0003e5 3075      	cpi		temp,MnuC	;---> menu "Calibration":
+0003e6 f411      	brne	en1
+0003e7 d184      	rcall	SaveC		;save Calib in EEPROM
+0003e8 c017      	rjmp	enf			;return to the frequency menu
                  	
-0003ef 3070      en1:	cpi	temp,MnuF	;---> menu "Frequency":
-0003f0 f411      	brne	en2
-0003f1 e074      	ldi	temp,MnuFS	;jump to the frequency step menu
-0003f2 c014      	rjmp	en0
+                 en1:	
+0003e9 3070      	cpi		temp,MnuF	;---> menu "Frequency":
+0003ea f411      	brne	en2
+0003eb e074      	ldi		temp,MnuFS	;jump to the frequency step menu
+0003ec c014      	rjmp	en0
                  	
-0003f3 3071      en2:	cpi	temp,MnuP	;---> menu "Read Preset":
-0003f4 f439      	brne	en3
-0003f5 e3c1
-0003f6 e0d3      	ldy	ValP
-0003f7 d12f      	rcall	LdLMH		;tempH:tempM:tempL = ValP
-0003f8 e2ce
-0003f9 e0d3      	ldy	ValF
-0003fa d138      	rcall	StLMH		;ValF = tempH:tempM:tempL
-0003fb c008      	rjmp	ens		;beep and return to the frequency menu	
+                 en2:	
+0003ed 3071      	cpi		temp,MnuP	;---> menu "Read Preset":
+0003ee f439      	brne	en3
+0003ef e3c1
+0003f0 e0d3      	ldy		ValP
+0003f1 d12f      	rcall	LdLMH		;tempH:tempM:tempL = ValP
+0003f2 e2ce
+0003f3 e0d3      	ldy		ValF
+0003f4 d138      	rcall	StLMH		;ValF = tempH:tempM:tempL
+0003f5 c008      	rjmp	ens			;beep and return to the frequency menu	
                  	
-0003fc 3072      en3:	cpi	temp,MnuE	;---> menu "Save Preset":
-0003fd f411      	brne	en4
-0003fe d17a      	rcall	SaveP		;save preset
-0003ff c006      	rjmp	enf		;return to the frequency menu
+                 en3:	
+0003f6 3072      	cpi		temp,MnuE	;---> menu "Save Preset":
+0003f7 f411      	brne	en4
+0003f8 d17a      	rcall	SaveP		;save preset
+0003f9 c006      	rjmp	enf			;return to the frequency menu
                  
-000400 3073      en4:	cpi	temp,MnuSH	;---> menu "Shape":
-000401 f411      	brne	ens		;beep and return to the frequency menu
-000402 df20      	rcall	ErrB		;error beep
-000403 c006      	rjmp	enx
+                 en4:	
+0003fa 3073      	cpi		temp,MnuSH	;---> menu "Shape":
+0003fb f411      	brne	ens			;beep and return to the frequency menu
+0003fc df20      	rcall	ErrB		;error beep
+0003fd c006      	rjmp	enx
                  	
-000404 e070      ens:	ldi	temp,0
-000405 df2a      	rcall	Sound		;return beep
-000406 e070      enf:	ldi	temp,MnuF	;menu "Frequency"
-000407 9370 0327 en0:	sts	Menu,temp
-000409 d002      	rcall	SetMd		;set mode
-00040a d0bd      enx:	rcall	Update		;update display data
-00040b 9508      	ret
+                 ens:	
+0003fe e070      	ldi		temp,0
+0003ff df2a      	rcall	Sound		;return beep
+                 enf:	
+000400 e070      	ldi		temp,MnuF	;menu "Frequency"
+                 en0:	
+000401 9370 0327 	sts		Menu,temp
+000403 d002      	rcall	SetMd		;set mode
+                 enx:	
+000404 d0bd      	rcall	Update		;update display data
+000405 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
@@ -2716,142 +2725,142 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;Out:   Buff, Step, Min, Max
                  
                  SetMd:	
-00040c 9170 0327 	lds		temp,Menu
-00040e 3075      	cpi		temp,MnuC	;---> menu "Calibration":
-00040f f499      	brne	smd1
-000410 e2c8
-000411 e0d3      	ldy		Calib
-000412 d114      	rcall	LdLMH
-000413 e3c4
-000414 e0d3      	ldy		Buff
-000415 d11d      	rcall	StLMH		;Buff = Calib
-000416 e04a
+000406 9170 0327 	lds		temp,Menu
+000408 3075      	cpi		temp,MnuC	;---> menu "Calibration":
+000409 f499      	brne	smd1
+00040a e2c8
+00040b e0d3      	ldy		Calib
+00040c d114      	rcall	LdLMH
+00040d e3c4
+00040e e0d3      	ldy		Buff
+00040f d11d      	rcall	StLMH		;Buff = Calib
+000410 e04a
+000411 e050
+000412 e060      	ldmi	STEP_C
+000413 e3c7
+000414 e0d3      	ldy		Step
+000415 d117      	rcall	StLMH		;Step = StepC
+000416 e040
 000417 e050
-000418 e060      	ldmi	STEP_C
-000419 e3c7
-00041a e0d3      	ldy		Step
-00041b d117      	rcall	StLMH		;Step = StepC
-00041c e040
-00041d e050
-00041e e060      	ldmi	MIN_C		;Min  = MIN_C
-00041f e91f
-000420 e826
-000421 e031      	ldei	MAX_C		;Max  = MAX_C
-000422 c04c      	rjmp	smm
+000418 e060      	ldmi	MIN_C		;Min  = MIN_C
+000419 e91f
+00041a e826
+00041b e031      	ldei	MAX_C		;Max  = MAX_C
+00041c c04c      	rjmp	smm
                  	
                  smd1:	
-000423 3070      	cpi		temp,MnuF	;---> menu "Frequency":
-000424 f499      	brne	smd2
-000425 e2ce
-000426 e0d3      	ldy		ValF
-000427 d0ff      	rcall	LdLMH
-000428 e3c4
-000429 e0d3      	ldy		Buff
-00042a d108      	rcall	StLMH		;Buff = ValF
-00042b e2cb
-00042c e0d3      	ldy		ValFS
-00042d d0f9      	rcall	LdLMH
-00042e e3c7
-00042f e0d3      	ldy		Step
-000430 d102      	rcall	StLMH		;Step = ValFS
-000431 e644
-000432 e050
-000433 e060      	ldmi	MIN_F		;Min  = MIN_F
-000434 e410
-000435 e42b
-000436 e43c      	ldei	MAX_F		;Max  = MAX_F
-000437 c037      	rjmp	smm
+00041d 3070      	cpi		temp,MnuF	;---> menu "Frequency":
+00041e f499      	brne	smd2
+00041f e2ce
+000420 e0d3      	ldy		ValF
+000421 d0ff      	rcall	LdLMH
+000422 e3c4
+000423 e0d3      	ldy		Buff
+000424 d108      	rcall	StLMH		;Buff = ValF
+000425 e2cb
+000426 e0d3      	ldy		ValFS
+000427 d0f9      	rcall	LdLMH
+000428 e3c7
+000429 e0d3      	ldy		Step
+00042a d102      	rcall	StLMH		;Step = ValFS
+00042b e644
+00042c e050
+00042d e060      	ldmi	MIN_F		;Min  = MIN_F
+00042e e410
+00042f e42b
+000430 e43c      	ldei	MAX_F		;Max  = MAX_F
+000431 c037      	rjmp	smm
                  
                  smd2:	
-000438 3074      	cpi		temp,MnuFS	;---> menu "Frequency Step":
-000439 f469      	brne	smd3
-00043a e2cb
-00043b e0d3      	ldy		ValFS
-00043c d0ea      	rcall	LdLMH
-00043d e3c4
-00043e e0d3      	ldy		Buff
-00043f d0f3      	rcall	StLMH		;Buff = ValFS
-000440 e041
-000441 e050
-000442 e060      	ldmi	MIN_FS		;Min  = MIN_FS
-000443 e410
-000444 e422
-000445 e03f      	ldei	MAX_FS		;Max  = MAX_FS
-000446 c028      	rjmp	smm
+000432 3074      	cpi		temp,MnuFS	;---> menu "Frequency Step":
+000433 f469      	brne	smd3
+000434 e2cb
+000435 e0d3      	ldy		ValFS
+000436 d0ea      	rcall	LdLMH
+000437 e3c4
+000438 e0d3      	ldy		Buff
+000439 d0f3      	rcall	StLMH		;Buff = ValFS
+00043a e041
+00043b e050
+00043c e060      	ldmi	MIN_FS		;Min  = MIN_FS
+00043d e410
+00043e e422
+00043f e03f      	ldei	MAX_FS		;Max  = MAX_FS
+000440 c028      	rjmp	smm
                  
                  smd3:	
-000447 3073      	cpi		temp,MnuSH	;---> menu "Shape":
-000448 f4a1      	brne	smd4
-000449 fd94      	sbrc	Flags,ON
+000441 3073      	cpi		temp,MnuSH	;---> menu "Shape":
+000442 f4a1      	brne	smd4
+000443 fd94      	sbrc	Flags,ON
+000444 e041
+000445 e050
+000446 e060      	ldmi	1	
+000447 e3c4
+000448 e0d3      	ldy		Buff
+000449 d0e3      	rcall	StLMH		;Buff = ON
 00044a e041
 00044b e050
-00044c e060      	ldmi	1	
-00044d e3c4
-00044e e0d3      	ldy		Buff
-00044f d0e3      	rcall	StLMH		;Buff = ON
-000450 e041
+00044c e060      	ldmi	1
+00044d e3c7
+00044e e0d3      	ldy		Step
+00044f d0dd      	rcall	StLMH		;Step = 1
+000450 e040
 000451 e050
-000452 e060      	ldmi	1
-000453 e3c7
-000454 e0d3      	ldy		Step
-000455 d0dd      	rcall	StLMH		;Step = 1
-000456 e040
-000457 e050
-000458 e060      	ldmi	MIN_SH		;Min = MIN_SH
-000459 e011
-00045a e020
-00045b e030      	ldei	MAX_SH		;Max = MAX_SH
-00045c c012      	rjmp	smm
+000452 e060      	ldmi	MIN_SH		;Min = MIN_SH
+000453 e011
+000454 e020
+000455 e030      	ldei	MAX_SH		;Max = MAX_SH
+000456 c012      	rjmp	smm
                  	
                  smd4:	
-00045d e040
+000457 e040
+000458 e050
+000459 e060      	ldmi	0		;---> menu "Read/Save Preset":
+00045a e3c4
+00045b e0d3      	ldy		Buff
+00045c d0d0      	rcall	StLMH		;Buff = 0
+00045d e041
 00045e e050
-00045f e060      	ldmi	0		;---> menu "Read/Save Preset":
-000460 e3c4
-000461 e0d3      	ldy		Buff
-000462 d0d0      	rcall	StLMH		;Buff = 0
-000463 e041
+00045f e060      	ldmi	1
+000460 e3c7
+000461 e0d3      	ldy		Step
+000462 d0ca      	rcall	StLMH		;Step = 1
+000463 e040
 000464 e050
-000465 e060      	ldmi	1
-000466 e3c7
-000467 e0d3      	ldy		Step
-000468 d0ca      	rcall	StLMH		;Step = 1
-000469 e040
-00046a e050
-00046b e060      	ldmi	MIN_PE		;Min = MIN_PE
-00046c e019
-00046d e020
-00046e e030      	ldei	MAX_PE		;Max = MAX_PE
+000465 e060      	ldmi	MIN_PE		;Min = MIN_PE
+000466 e019
+000467 e020
+000468 e030      	ldei	MAX_PE		;Max = MAX_PE
                  		
                  smm:	
-00046f e3ca
-000470 e0d3      	ldy		Max
-000471 d0c5      	rcall	StDEF		;save Max
-000472 e3cd
-000473 e0d3      	ldy		Min
-000474 d0be      	rcall	StLMH		;save Min
-000475 e3c4
-000476 e0d3      	ldy		Buff
-000477 d0af      	rcall	LdLMH		;tempH:tempM:tempL = Buff	
-000478 d00b      	rcall	Valid		;validate buffer
-000479 d02f      	rcall	Assume		;assume new values
-00047a 7f97      	clbr	Flags,EDT	;set edited flag
-00047b 9508      	ret
+000469 e3ca
+00046a e0d3      	ldy		Max
+00046b d0c5      	rcall	StDEF		;save Max
+00046c e3cd
+00046d e0d3      	ldy		Min
+00046e d0be      	rcall	StLMH		;save Min
+00046f e3c4
+000470 e0d3      	ldy		Buff
+000471 d0af      	rcall	LdLMH		;tempH:tempM:tempL = Buff	
+000472 d00b      	rcall	Valid		;validate buffer
+000473 d02f      	rcall	Assume		;assume new values
+000474 7f97      	clbr	Flags,EDT	;set edited flag
+000475 9508      	ret
                  	
                  ;----------------------------------------------------------------------------
                  
                  ;Search for first non-zero digit:
                  
                  Search:	
-00047c e0c5
-00047d e0d3      	ldy		Dig+3
+000476 e0c5
+000477 e0d3      	ldy		Dig+3
                  srch:	
-00047e 9179      	ld		temp,Y+
-00047f 777f      	andi	temp,~Pt
-000480 f3e9      	breq	srch
-000481 3170      	cpi		temp,BLANK
-000482 f3d9      	breq	srch
-000483 9508      	ret
+000478 9179      	ld		temp,Y+
+000479 777f      	andi	temp,~Pt
+00047a f3e9      	breq	srch
+00047b 3170      	cpi		temp,BLANK
+00047c f3d9      	breq	srch
+00047d 9508      	ret
                  	
                  ;----------------------------------------------------------------------------
                  
@@ -2861,29 +2870,33 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;       [Max], [Min] - limits
                  ;Out:   tempH:tempM:tempL, [Buff] - validated value
                  
-000484 d013      Valid:	rcall	ChkMin		;check for Min
-000485 f010      	brcs	RstBf
-000486 d01b      	rcall	ChkMax		;check for Max
-000487 f460      	brcc	ValOk	
+                 Valid:	
+00047e d013      	rcall	ChkMin		;check for Min
+00047f f010      	brcs	RstBf
+000480 d01b      	rcall	ChkMax		;check for Max
+000481 f460      	brcc	ValOk	
                  	
-000488 e3c4
-000489 e0d3      RstBf:	ldy	Buff
-00048a d09c      	rcall	LdLMH		;error, restore buffer	
-00048b de97      	rcall	ErrB		;error bell
-00048c d00b      	rcall	ChkMin		;check for Min
-00048d f010      	brcs	LimBf
-00048e d013      	rcall	ChkMax		;check for Max
-00048f f420      	brcc	ValOk	
+                 RstBf:	
+000482 e3c4
+000483 e0d3      	ldy		Buff
+000484 d09c      	rcall	LdLMH		;error, restore buffer	
+000485 de97      	rcall	ErrB		;error bell
+000486 d00b      	rcall	ChkMin		;check for Min
+000487 f010      	brcs	LimBf
+000488 d013      	rcall	ChkMax		;check for Max
+000489 f420      	brcc	ValOk	
                  	
-000490 2d4e      LimBf:	mov	tempL,tempA	;limit buffer
-000491 2d5f      	mov	tempM,tempB
-000492 2f60      	mov	tempH,tempC
-000493 de8f      	rcall	ErrB		;error bell
+                 LimBf:	
+00048a 2d4e      	mov		tempL,tempA	;limit buffer
+00048b 2d5f      	mov		tempM,tempB
+00048c 2f60      	mov		tempH,tempC
+00048d de8f      	rcall	ErrB		;error bell
                  
-000494 e3c4
-000495 e0d3      ValOk:	ldy	Buff
-000496 d09c      	rcall	StLMH		;save value to buffer
-000497 9508      	ret
+                 ValOk:	
+00048e e3c4
+00048f e0d3      	ldy		Buff
+000490 d09c      	rcall	StLMH		;save value to buffer
+000491 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
@@ -2891,17 +2904,17 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;Out: C = 1 if limit exceeded
                  	
                  ChkMin:	
-000498 e3cd
-000499 e0d3      	ldy		Min
-00049a d090      	rcall	LdABC		;tempC:tempB:tempA = Min
-00049b ec70      	ldi		temp,0xC0	;0xC00000 is max negative
-00049c 1776      	cp		temp,tempH
-00049d f018      	brcs	chmr
-00049e 154e      	cp		tempL,tempA
-00049f 055f      	cpc		tempM,tempB
-0004a0 0760      	cpc		tempH,tempC
+000492 e3cd
+000493 e0d3      	ldy		Min
+000494 d090      	rcall	LdABC		;tempC:tempB:tempA = Min
+000495 ec70      	ldi		temp,0xC0	;0xC00000 is max negative
+000496 1776      	cp		temp,tempH
+000497 f018      	brcs	chmr
+000498 154e      	cp		tempL,tempA
+000499 055f      	cpc		tempM,tempB
+00049a 0760      	cpc		tempH,tempC
                  chmr:	
-0004a1 9508      	ret
+00049b 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
@@ -2909,13 +2922,13 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;Out: C = 1 if limit exceeded
                  
                  ChkMax:	
-0004a2 e3ca
-0004a3 e0d3      	ldy		Max
-0004a4 d086      	rcall	LdABC		;tempC:tempB:tempA = Max
-0004a5 16e4      	cp		tempA,tempL
-0004a6 06f5      	cpc		tempB,tempM
-0004a7 0706      	cpc		tempC,tempH
-0004a8 9508      	ret
+00049c e3ca
+00049d e0d3      	ldy		Max
+00049e d086      	rcall	LdABC		;tempC:tempB:tempA = Max
+00049f 16e4      	cp		tempA,tempL
+0004a0 06f5      	cpc		tempB,tempM
+0004a1 0706      	cpc		tempC,tempH
+0004a2 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
@@ -2924,45 +2937,45 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;	[Menu] - index
                  	
                  Assume:	
-0004a9 9170 0327 	lds		temp,Menu
-0004ab 3070      	cpi		temp,MnuF	;---> menu "Frequency":
-0004ac f429      	brne	assm1
-0004ad e2ce
-0004ae e0d3      	ldy		ValF	
-0004af d083      	rcall	StLMH		;save new ValF
-0004b0 dbc8      	rcall	MakeF		;change frequency
-0004b1 c015      	rjmp	assmr
+0004a3 9170 0327 	lds		temp,Menu
+0004a5 3070      	cpi		temp,MnuF	;---> menu "Frequency":
+0004a6 f429      	brne	assm1
+0004a7 e2ce
+0004a8 e0d3      	ldy		ValF	
+0004a9 d083      	rcall	StLMH		;save new ValF
+0004aa dbce      	rcall	MakeF		;change frequency
+0004ab c015      	rjmp	assmr
                  
                  assm1:	
-0004b2 3074      	cpi		temp,MnuFS	;---> menu "Frequency Step":
-0004b3 f421      	brne	assm2
-0004b4 e2cb
-0004b5 e0d3      	ldy		ValFS
-0004b6 d07c      	rcall	StLMH		;save new ValFS
-0004b7 c00f      	rjmp	assmr
+0004ac 3074      	cpi		temp,MnuFS	;---> menu "Frequency Step":
+0004ad f421      	brne	assm2
+0004ae e2cb
+0004af e0d3      	ldy		ValFS
+0004b0 d07c      	rcall	StLMH		;save new ValFS
+0004b1 c00f      	rjmp	assmr
                  
                  assm2:	
-0004b8 3073      	cpi		temp,MnuSH	;---> menu "Shape":
-0004b9 f419      	brne	assm3
-0004ba fb40      	bst		tempL,0
-0004bb f994      	bld		Flags,ON	;change shape
-0004bc c00a      	rjmp	assmr
+0004b2 3073      	cpi		temp,MnuSH	;---> menu "Shape":
+0004b3 f419      	brne	assm3
+0004b4 fb40      	bst		tempL,0
+0004b5 f994      	bld		Flags,ON	;change shape
+0004b6 c00a      	rjmp	assmr
                  
                  assm3:	
-0004bd 3071      	cpi		temp,MnuP	;---> menu "Preset":
-0004be f411      	brne	assm4
-0004bf d0ab      	rcall	ReadP		;read preset fom EEPROM
-0004c0 c006      	rjmp	assmr
+0004b7 3071      	cpi		temp,MnuP	;---> menu "Preset":
+0004b8 f411      	brne	assm4
+0004b9 d0ab      	rcall	ReadP		;read preset fom EEPROM
+0004ba c006      	rjmp	assmr
                  
                  assm4:	
-0004c1 3075      	cpi		temp,MnuC	;---> menu "Calibration":
-0004c2 f421      	brne	assmr
-0004c3 e2c8
-0004c4 e0d3      	ldy		Calib
-0004c5 d06d      	rcall	StLMH		;save new Calib
-0004c6 dbb2      	rcall	MakeF		;change frequency
+0004bb 3075      	cpi		temp,MnuC	;---> menu "Calibration":
+0004bc f421      	brne	assmr
+0004bd e2c8
+0004be e0d3      	ldy		Calib
+0004bf d06d      	rcall	StLMH		;save new Calib
+0004c0 dbb8      	rcall	MakeF		;change frequency
                  assmr:
-0004c7 9508      	ret
+0004c1 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
@@ -2972,83 +2985,83 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;	UPDD = 1
                  
                  Update:	
-0004c8 e170      	ldi		temp,BLANK	;load char
-0004c9 dd70      	rcall	Fill		;clear display data
-0004ca e3c4
-0004cb e0d3      	ldy		Buff
-0004cc d05a      	rcall	LdLMH		;tempH:tempM:tempL = Buff
+0004c2 e170      	ldi		temp,BLANK	;load char
+0004c3 dd76      	rcall	Fill		;clear display data
+0004c4 e3c4
+0004c5 e0d3      	ldy		Buff
+0004c6 d05a      	rcall	LdLMH		;tempH:tempM:tempL = Buff
                  
-0004cd 9170 0327 	lds		temp,Menu
-0004cf 3073      	cpi		temp,MnuSH	;---> menu "Shape":
-0004d0 f489      	brne	upd1
+0004c7 9170 0327 	lds		temp,Menu
+0004c9 3073      	cpi		temp,MnuSH	;---> menu "Shape":
+0004ca f489      	brne	upd1
                  
-0004d1 e8ea
-0004d2 e0fa      	table	ShpT		;string table base
-0004d3 2f74      	mov		temp,tempL
-0004d4 0f74      	add		temp,tempL
-0004d5 0f74      	add		temp,tempL	;temp = Buff[0] * 3
-0004d6 0fe7      	add		ZL,temp
-0004d7 1ff7      	adc		ZH,temp
-0004d8 1bf7      	sub		ZH,temp		;ZH:ZL = ShpT + Buff[0] * 3
-0004d9 e0c6
-0004da e0d3      	ldy		Dig+4		;display data base + 4
-0004db 9175      	lpm		temp,Z+
-0004dc 9379      	st		Y+,temp		;menu char 1
-0004dd 9175      	lpm		temp,Z+
-0004de 9379      	st		Y+,temp		;menu char 2
-0004df 9175      	lpm		temp,Z+
-0004e0 9379      	st		Y+,temp		;menu char 3
-0004e1 c02b      	rjmp	upd31
+0004cb e7ee
+0004cc e0fa      	table	ShpT		;string table base
+0004cd 2f74      	mov		temp,tempL
+0004ce 0f74      	add		temp,tempL
+0004cf 0f74      	add		temp,tempL	;temp = Buff[0] * 3
+0004d0 0fe7      	add		ZL,temp
+0004d1 1ff7      	adc		ZH,temp
+0004d2 1bf7      	sub		ZH,temp		;ZH:ZL = ShpT + Buff[0] * 3
+0004d3 e0c6
+0004d4 e0d3      	ldy		Dig+4		;display data base + 4
+0004d5 9175      	lpm		temp,Z+
+0004d6 9379      	st		Y+,temp		;menu char 1
+0004d7 9175      	lpm		temp,Z+
+0004d8 9379      	st		Y+,temp		;menu char 2
+0004d9 9175      	lpm		temp,Z+
+0004da 9379      	st		Y+,temp		;menu char 3
+0004db c02b      	rjmp	upd31
                  
                  upd1:	
-0004e2 e7e6
-0004e3 e0fa      	table	StrT		;string table base
-0004e4 0f77      	add		temp,temp	;temp = Menu * 2
-0004e5 0fe7      	add		ZL,temp
-0004e6 1ff7      	adc		ZH,temp
-0004e7 1bf7      	sub		ZH,temp		;ZH:ZL = StrT + Menu * 2
-0004e8 e0c2
-0004e9 e0d3      	ldy		Dig			;display data base
+0004dc e9ee
+0004dd e0f5      	table	StrFreq		;string table base
+0004de 0f77      	add		temp,temp	;temp = Menu * 2
+0004df 0fe7      	add		ZL,temp
+0004e0 1ff7      	adc		ZH,temp
+0004e1 1bf7      	sub		ZH,temp		;ZH:ZL = StrT + Menu * 2
+0004e2 e0c2
+0004e3 e0d3      	ldy		Dig			;display data base
+0004e4 9175      	lpm		temp,Z+
+0004e5 9379      	st		Y+,temp		;F
+0004e6 9175      	lpm		temp,Z+
+0004e7 9379      	st		Y+,temp		;r
+0004e8 9175      	lpm		temp,Z+
+0004e9 9379      	st		Y+,temp		;e
 0004ea 9175      	lpm		temp,Z+
-0004eb 9379      	st		Y+,temp		;F
+0004eb 9379      	st		Y+,temp		;q
 0004ec 9175      	lpm		temp,Z+
-0004ed 9379      	st		Y+,temp		;r
+0004ed 9379      	st		Y+,temp		;u
 0004ee 9175      	lpm		temp,Z+
 0004ef 9379      	st		Y+,temp		;e
 0004f0 9175      	lpm		temp,Z+
-0004f1 9379      	st		Y+,temp		;q
+0004f1 9379      	st		Y+,temp		;n
 0004f2 9175      	lpm		temp,Z+
-0004f3 9379      	st		Y+,temp		;u
+0004f3 9379      	st		Y+,temp		;c
 0004f4 9175      	lpm		temp,Z+
-0004f5 9379      	st		Y+,temp		;e
-0004f6 9175      	lpm		temp,Z+
-0004f7 9379      	st		Y+,temp		;n
-0004f8 9175      	lpm		temp,Z+
-0004f9 9379      	st		Y+,temp		;c
-0004fa 9175      	lpm		temp,Z+
-0004fb 9379      	st		Y+,temp		;y
+0004f5 9379      	st		Y+,temp		;y
                  
-0004fc 9170 0327 	lds		temp,Menu
-0004fe 3072      	cpi		temp,MnuE	;---> menu "Save Preset":
-0004ff f429      	brne	upd2
-000500 9340 0303 	sts		Dig+1,tempL	;Dig[1] - preset number
-000502 e2ce
-000503 e0d3      	ldy		ValF
-000504 c006      	rjmp	upd21
+0004f6 9170 0327 	lds		temp,Menu
+0004f8 3072      	cpi		temp,MnuE	;---> menu "Save Preset":
+0004f9 f429      	brne	upd2
+0004fa 9340 0303 	sts		Dig+1,tempL	;Dig[1] - preset number
+0004fc e2ce
+0004fd e0d3      	ldy		ValF
+0004fe c006      	rjmp	upd21
                  
                  upd2:	
-000505 3071      	cpi		temp,MnuP	;---> menu "Read Preset":
-000506 f429      	brne	upd3
-000507 9340 0303 	sts		Dig+1,tempL	;Dig[1] - preset number
-000509 e3c1
-00050a e0d3      	ldy		ValP
+0004ff 3071      	cpi		temp,MnuP	;---> menu "Read Preset":
+000500 f429      	brne	upd3
+000501 9340 0303 	sts		Dig+1,tempL	;Dig[1] - preset number
+000503 e3c1
+000504 e0d3      	ldy		ValP
                  upd21:	
-00050b d01b      	rcall	LdLMH		;tempH:tempM:tempL = ValF or ValP
+000505 d01b      	rcall	LdLMH		;tempH:tempM:tempL = ValF or ValP
                  upd3:	
-00050c dd34      	rcall	DisBCD		;tempH:tempM:tempL convert to BCD Dig[3..9]
+000506 dd3a      	rcall	DisBCD		;tempH:tempM:tempL convert to BCD Dig[3..9]
                  upd31:	
-00050d 6092      	stbr	Flags,UPDD	;display update request
-00050e 9508      	ret
+000507 6092      	stbr	Flags,UPDD	;display update request
+000508 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
@@ -3056,103 +3069,104 @@ main.asm(122): Including file 'EEPROM.asm'
                  ; tempH:tempM:tempL.tempC:tempB:tempA
                  
                  div24:	
-00050f 24ee      	clr		tempA		;clear remainder Low byte
-000510 24ff      	clr		tempB
-000511 1b00      	sub		tempC,tempC	;clear remainder High byte and carry
+000509 24ee      	clr		tempA		;clear remainder Low byte
+00050a 24ff      	clr		tempB
+00050b 1b00      	sub		tempC,tempC	;clear remainder High byte and carry
                  	
-000512 e189      	ldi		Cnt,25		;init loop counter
+00050c e189      	ldi		Cnt,25		;init loop counter
                  	
                  div1:	
-000513 1f44      	rol		tempL		;shift left dividend
-000514 1f55      	rol		tempM
-000515 1f66      	rol		tempH
-000516 958a      	dec		Cnt		;decrement counter
-000517 f059      	breq	divret
-000518 1cee      	rol		tempA		;shift dividend into remainder
-000519 1cff      	rol		tempB
-00051a 1f00      	rol		tempC
-00051b 1ae1      	sub		tempA,tempD	;remainder = remainder - divisor
-00051c 0af2      	sbc		tempB,tempE	
-00051d 0b03      	sbc		tempC,tempF	
-00051e f7a0      	brcc	div1		;if result negative
-00051f 0ee1      	add		tempA,tempD	; restore remainder
-000520 1ef2      	adc		tempB,tempE
-000521 1f03      	adc		tempC,tempF
-000522 cff0      	rjmp	div1
+00050d 1f44      	rol		tempL		;shift left dividend
+00050e 1f55      	rol		tempM
+00050f 1f66      	rol		tempH
+000510 958a      	dec		Cnt		;decrement counter
+000511 f059      	breq	divret
+000512 1cee      	rol		tempA		;shift dividend into remainder
+000513 1cff      	rol		tempB
+000514 1f00      	rol		tempC
+000515 1ae1      	sub		tempA,tempD	;remainder = remainder - divisor
+000516 0af2      	sbc		tempB,tempE	
+000517 0b03      	sbc		tempC,tempF	
+000518 f7a0      	brcc	div1		;if result negative
+000519 0ee1      	add		tempA,tempD	; restore remainder
+00051a 1ef2      	adc		tempB,tempE
+00051b 1f03      	adc		tempC,tempF
+00051c cff0      	rjmp	div1
                  divret:	
-000523 9540      	com		tempL
-000524 9550      	com		tempM
-000525 9560      	com		tempH
-000526 9508      	ret
+00051d 9540      	com		tempL
+00051e 9550      	com		tempM
+00051f 9560      	com		tempH
+000520 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Load tempH,M,L from [Y+2],[Y+1],[Y+0]
                  
                  LdLMH:	
-000527 9149      	ld		tempL,Y+
-000528 9159      	ld		tempM,Y+
-000529 9169      	ld		tempH,Y+
-00052a 9508      	ret
+000521 9149      	ld		tempL,Y+
+000522 9159      	ld		tempM,Y+
+000523 9169      	ld		tempH,Y+
+000524 9508      	ret
                  	
                  ;----------------------------------------------------------------------------
                  
                  ;Load tempC,B,A from [Y+2],[Y+1],[Y+0]
                  
-00052b 90e9      LdABC:	ld	tempA,Y+
-00052c 90f9      	ld	tempB,Y+
-00052d 9109      	ld	tempC,Y+
-00052e 9508      	ret
+000525 90e9      LdABC:	ld	tempA,Y+
+000526 90f9      	ld	tempB,Y+
+000527 9109      	ld	tempC,Y+
+000528 9508      	ret
                  	
                  ;----------------------------------------------------------------------------
                  
                  ;Load tempF,E,D from [Y+2],[Y+1],[Y+0]
                  
-00052f 9119      LdDEF:	ld	tempD,Y+
-000530 9129      	ld	tempE,Y+
-000531 9139      	ld	tempF,Y+
-000532 9508      	ret
+000529 9119      LdDEF:	ld	tempD,Y+
+00052a 9129      	ld	tempE,Y+
+00052b 9139      	ld	tempF,Y+
+00052c 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Store tempH,M,L  to [Y+2],[Y+1],[Y+0]
                  
-000533 9349      StLMH:	st	Y+,tempL
-000534 9359      	st	Y+,tempM
-000535 9369      	st	Y+,tempH
-000536 9508      	ret
+                 StLMH:	
+00052d 9349      	st	Y+,tempL
+00052e 9359      	st	Y+,tempM
+00052f 9369      	st	Y+,tempH
+000530 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Store tempF,E,D  to [Y+2],[Y+1],[Y+0]
                  
-000537 9319      StDEF:	st	Y+,tempD
-000538 9329      	st	Y+,tempE
-000539 9339      	st	Y+,tempF
-00053a 9508      	ret
+000531 9319      StDEF:	st	Y+,tempD
+000532 9329      	st	Y+,tempE
+000533 9339      	st	Y+,tempF
+000534 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;String table:
                  
                  StrT:
-00053b 7246
-00053c 7165
-00053d 6575
-00053e 636e
-00053f 2079
-000540 101d
-000541 100e
-000542 1720      	.DB "Frequency",' ',iP,i_,iE,i_,iS,iH
-000543 200f
-000544 100c      	.DB iF,iS,iC,i_
+000535 7246
+000536 7165
+000537 6575
+000538 636e
+000539 2079
+00053a 101d
+00053b 100e
+00053c 1720      	.DB "Frequency",' ',iP,i_,iE,i_,iS,iH
+00053d 200f
+00053e 100c      	.DB iF,iS,iC,i_
                  
                  ;Shape string table:
                  
                  ShpT:
-000545 0f00
-000546 200f
-000547 1b1a      	.DB iO,iF,iF,iS,iii,iiN
+00053f 0f00
+000540 200f
+000541 1b1a      	.DB iO,iF,iF,iS,iii,iiN
                  
                  ;----------------------------------------------------------------------------
                  .include "EEPROM.asm"		;link EEPROM support module
@@ -3200,92 +3214,92 @@ main.asm(122): Including file 'EEPROM.asm'
                  
                  ;Read Calib, ValFS, ValF from EEPROM:
                  
-000548 e2c5
-000549 e0d0      ReadF:	ldy	ESign
-00054a d04f      	rcall	EE_Rd		;read signature
-00054b 3d7e      	cpi	temp,SIGN	;check signature
-00054c f071      	breq	rdpar
+000542 e2c5
+000543 e0d0      ReadF:	ldy	ESign
+000544 d04f      	rcall	EE_Rd		;read signature
+000545 3d7e      	cpi	temp,SIGN	;check signature
+000546 f071      	breq	rdpar
                  
                  ;Signature fail, EEPROM init:
                  
-00054d ddd5      	rcall	ErrB		;error beep
-00054e e0c1
-00054f e0d0      	ldy	ECalib		;load EEPROM array base address
-000550 e7e8
-000551 e0fb      	table	FCalib		;load FLASH array base address
-000552 d047      eeini:	rcall	EE_Rd		;wait EEPROM ready
-000553 9175      	lpm	temp,Z+		;read byte from FLASH
-000554 d05b      	rcall	EE_Wr		;save byte to EEPROM
-000555 9631      	adiw	ZH:ZL,1		;skip high byte of word
-000556 9621      	adiw	YH:YL,1		;EEPROM address inc
-000557 32c6      	cpi	YL,low(EEnd)
-000558 f7c9      	brne	eeini
-000559 30d0      	cpi	YH,high(EEnd)
-00055a f7b9      	brne	eeini
+000547 ddd5      	rcall	ErrB		;error beep
+000548 e0c1
+000549 e0d0      	ldy	ECalib		;load EEPROM array base address
+00054a e6ec
+00054b e0fb      	table	FCalib		;load FLASH array base address
+00054c d047      eeini:	rcall	EE_Rd		;wait EEPROM ready
+00054d 9175      	lpm	temp,Z+		;read byte from FLASH
+00054e d05b      	rcall	EE_Wr		;save byte to EEPROM
+00054f 9631      	adiw	ZH:ZL,1		;skip high byte of word
+000550 9621      	adiw	YH:YL,1		;EEPROM address inc
+000551 32c6      	cpi	YL,low(EEnd)
+000552 f7c9      	brne	eeini
+000553 30d0      	cpi	YH,high(EEnd)
+000554 f7b9      	brne	eeini
                  
-00055b e0c1
-00055c e0d0      rdpar:	ldy	ECalib
-00055d e2e8
-00055e e0f3      	ldz	Calib
-00055f d033      	rcall	EE_Rd3		;read Calib
-000560 e0c4
-000561 e0d0      	ldy	EValFS
-000562 e2eb
-000563 e0f3      	ldz	ValFS
-000564 d02e      	rcall	EE_Rd3		;read ValFS
-000565 e0c7
-000566 e0d0      	ldy	EPres
-000567 e2ee
-000568 e0f3      	ldz	ValF
-000569 d029      	rcall	EE_Rd3		;read ValF
-00056a 9508      	ret
+000555 e0c1
+000556 e0d0      rdpar:	ldy	ECalib
+000557 e2e8
+000558 e0f3      	ldz	Calib
+000559 d033      	rcall	EE_Rd3		;read Calib
+00055a e0c4
+00055b e0d0      	ldy	EValFS
+00055c e2eb
+00055d e0f3      	ldz	ValFS
+00055e d02e      	rcall	EE_Rd3		;read ValFS
+00055f e0c7
+000560 e0d0      	ldy	EPres
+000561 e2ee
+000562 e0f3      	ldz	ValF
+000563 d029      	rcall	EE_Rd3		;read ValF
+000564 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Read preset from the EEPROM:	
                  ;Input: [Buff+0] - preset number
                  	
-00056b 9170 0334 ReadP:	lds	temp,Buff+0	;temp = preset number
-00056d d01c      	rcall	EE_PrA		;YH:YL = EEPROM address
-00056e e3e1
-00056f e0f3      	ldz	ValP
-000570 d022      	rcall	EE_Rd3		;read preset
-000571 9508      	ret
+000565 9170 0334 ReadP:	lds	temp,Buff+0	;temp = preset number
+000567 d01c      	rcall	EE_PrA		;YH:YL = EEPROM address
+000568 e3e1
+000569 e0f3      	ldz	ValP
+00056a d022      	rcall	EE_Rd3		;read preset
+00056b 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Save calibration to the EEPROM:
                  	
-000572 e0c1
-000573 e0d0      SaveC:	ldy	ECalib
-000574 e2e8
-000575 e0f3      	ldz	Calib	
-000576 d02e      	rcall	EE_Wr3		;save Calib
-000577 ddae      	rcall	Melody		;melody
-000578 9508      	ret
+00056c e0c1
+00056d e0d0      SaveC:	ldy	ECalib
+00056e e2e8
+00056f e0f3      	ldz	Calib	
+000570 d02e      	rcall	EE_Wr3		;save Calib
+000571 ddae      	rcall	Melody		;melody
+000572 9508      	ret
                  	
                  ;----------------------------------------------------------------------------
                  
                  ;Save preset to the EEPROM:
                  
-000579 9170 0334 SaveP:	lds	temp,Buff+0	;temp = preset number
-00057b 2377      	tst	temp
-00057c f439      	brne	svp
+000573 9170 0334 SaveP:	lds	temp,Buff+0	;temp = preset number
+000575 2377      	tst	temp
+000576 f439      	brne	svp
                  	
-00057d 937f      	push	temp
-00057e e0c4
-00057f e0d0      	ldy	EValFS
-000580 e2eb
-000581 e0f3      	ldz	ValFS	
-000582 d022      	rcall	EE_Wr3		;save ValFS
-000583 917f      	pop	temp
+000577 937f      	push	temp
+000578 e0c4
+000579 e0d0      	ldy	EValFS
+00057a e2eb
+00057b e0f3      	ldz	ValFS	
+00057c d022      	rcall	EE_Wr3		;save ValFS
+00057d 917f      	pop	temp
                  
-000584 d005      svp:	rcall	EE_PrA		;YH:YL = EEPROM address
-000585 e2ee
-000586 e0f3      	ldz	ValF
-000587 d01d      	rcall	EE_Wr3		;save preset
-000588 dd9d      	rcall	Melody		;melody
-000589 9508      	ret
+00057e d005      svp:	rcall	EE_PrA		;YH:YL = EEPROM address
+00057f e2ee
+000580 e0f3      	ldz	ValF
+000581 d01d      	rcall	EE_Wr3		;save preset
+000582 dd9d      	rcall	Melody		;melody
+000583 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
@@ -3293,15 +3307,15 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;Input: temp - preset number
                  ;Out:   YH:YL - EEPROM address
                  
-00058a e0c7
-00058b e0d0      EE_PrA:	ldy	EPres
-00058c 2f47      	mov	tempL,temp
-00058d 0f74      	add	temp,tempL
-00058e 0f74      	add	temp,tempL
-00058f 2744      	clr	tempL
-000590 0fc7      	add	YL,temp
-000591 1fd4      	adc	YH,tempL
-000592 9508      	ret
+000584 e0c7
+000585 e0d0      EE_PrA:	ldy	EPres
+000586 2f47      	mov	tempL,temp
+000587 0f74      	add	temp,tempL
+000588 0f74      	add	temp,tempL
+000589 2744      	clr	tempL
+00058a 0fc7      	add	YL,temp
+00058b 1fd4      	adc	YH,tempL
+00058c 9508      	ret
                  	
                  ;----------------------------------------------------------------------------
                  
@@ -3309,13 +3323,13 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;Input: YH:YL = EEPROM address
                  ;	ZH:ZL = RAM address
                  
-000593 e083      EE_Rd3:	ldi	Cnt,3
-000594 d005      rdn:	rcall	EE_Rd		;temp = EEPROM data byte
-000595 9371      	st	Z+,temp		;save data byte
-000596 9621      	adiw	YH:YL,1		;EEPROM address inc
-000597 958a      	dec	Cnt
-000598 f7d9      	brne	rdn
-000599 9508      	ret	
+00058d e083      EE_Rd3:	ldi	Cnt,3
+00058e d005      rdn:	rcall	EE_Rd		;temp = EEPROM data byte
+00058f 9371      	st	Z+,temp		;save data byte
+000590 9621      	adiw	YH:YL,1		;EEPROM address inc
+000591 958a      	dec	Cnt
+000592 f7d9      	brne	rdn
+000593 9508      	ret	
                  
                  ;----------------------------------------------------------------------------
                  
@@ -3323,17 +3337,17 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;Input: YH:YL - address
                  ;Out:   temp - data
                  
-00059a 95a8      EE_Rd:	wdr			;watchdog restart
-00059b 99e1      	sbic	EECR,EEWE
-00059c cffd      	rjmp	EE_Rd		;wait for EEPROM ready
-00059d bbce      	out	EEARL,YL	;EEPROM address low
-00059e bbdf      	out	EEARH,YH	;EEPROM address high
-00059f 9ae0      	sbi	EECR,EERE	;strobe
-0005a0 b37d      	in	temp,EEDR	;read EEPROM
-0005a1 2744      	clr	tempL
-0005a2 bb4e      	out	EEARL,tempL	;EEPROM address = 0
-0005a3 bb4f      	out	EEARH,tempL
-0005a4 9508      	ret
+000594 95a8      EE_Rd:	wdr			;watchdog restart
+000595 99e1      	sbic	EECR,EEWE
+000596 cffd      	rjmp	EE_Rd		;wait for EEPROM ready
+000597 bbce      	out	EEARL,YL	;EEPROM address low
+000598 bbdf      	out	EEARH,YH	;EEPROM address high
+000599 9ae0      	sbi	EECR,EERE	;strobe
+00059a b37d      	in	temp,EEDR	;read EEPROM
+00059b 2744      	clr	tempL
+00059c bb4e      	out	EEARL,tempL	;EEPROM address = 0
+00059d bb4f      	out	EEARH,tempL
+00059e 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
@@ -3341,17 +3355,17 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;Input: YH:YL = EEPROM address
                  ;	ZH:ZL = RAM address
                  
-0005a5 e083      EE_Wr3:	ldi	Cnt,3
-0005a6 dff3      wrn:	rcall	EE_Rd
-0005a7 2f47      	mov	tempL,temp	;tempL = EEPROM data byte
-0005a8 9171      	ld	temp,Z+		;temp = RAM data byte
-0005a9 1774      	cp	temp,tempL
-0005aa f009      	breq	wrs		;skip write if temp == tempL
-0005ab d004      	rcall	EE_Wr		;write data byte to the EEPROM
-0005ac 9621      wrs:	adiw	YH:YL,1		;EEPROM address inc
-0005ad 958a      	dec	Cnt
-0005ae f7b9      	brne	wrn
-0005af 9508      	ret
+00059f e083      EE_Wr3:	ldi	Cnt,3
+0005a0 dff3      wrn:	rcall	EE_Rd
+0005a1 2f47      	mov	tempL,temp	;tempL = EEPROM data byte
+0005a2 9171      	ld	temp,Z+		;temp = RAM data byte
+0005a3 1774      	cp	temp,tempL
+0005a4 f009      	breq	wrs		;skip write if temp == tempL
+0005a5 d004      	rcall	EE_Wr		;write data byte to the EEPROM
+0005a6 9621      wrs:	adiw	YH:YL,1		;EEPROM address inc
+0005a7 958a      	dec	Cnt
+0005a8 f7b9      	brne	wrn
+0005a9 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
@@ -3359,72 +3373,72 @@ main.asm(122): Including file 'EEPROM.asm'
                  ;Input: YH:YL - address
                  ;	temp - data
                  
-0005b0 bbce      EE_Wr:	out	EEARL,YL	;EEPROM address low
-0005b1 bbdf      	out	EEARH,YH	;EEPROM address high
-0005b2 bb7d      	out	EEDR,temp	;load data
-0005b3 b74f      	in	tempL,SREG
-0005b4 94f8      	cli			;interrupts disable
-0005b5 9ae2      	sbi 	EECR,EEMWE	;master write enable
-0005b6 9ae1      	sbi	EECR,EEWE	;strobe
-0005b7 bf4f      	out	SREG,tempL	;interrupts enable
-0005b8 2744      	clr	tempL
-0005b9 bb4e      	out	EEARL,tempL	;EEPROM address = 0
-0005ba bb4f      	out	EEARH,tempL
-0005bb 9508      	ret
+0005aa bbce      EE_Wr:	out	EEARL,YL	;EEPROM address low
+0005ab bbdf      	out	EEARH,YH	;EEPROM address high
+0005ac bb7d      	out	EEDR,temp	;load data
+0005ad b74f      	in	tempL,SREG
+0005ae 94f8      	cli			;interrupts disable
+0005af 9ae2      	sbi 	EECR,EEMWE	;master write enable
+0005b0 9ae1      	sbi	EECR,EEWE	;strobe
+0005b1 bf4f      	out	SREG,tempL	;interrupts enable
+0005b2 2744      	clr	tempL
+0005b3 bb4e      	out	EEARL,tempL	;EEPROM address = 0
+0005b4 bb4f      	out	EEARH,tempL
+0005b5 9508      	ret
                  
                  ;----------------------------------------------------------------------------
                  
                  ;Initial EEPROM values:
                  
-0005bc 0050      FCalib:	.dw byte1(C_0)
-0005bd 00c3      	.dw byte2(C_0)
-0005be 0000      	.dw byte3(C_0)
+0005b6 0050      FCalib:	.dw byte1(C_0)
+0005b7 00c3      	.dw byte2(C_0)
+0005b8 0000      	.dw byte3(C_0)
                  
-0005bf 0010      FValFS:	.dw byte1(STEP_0)
-0005c0 0027      	.dw byte2(STEP_0)
-0005c1 0000      	.dw byte3(STEP_0)
+0005b9 0010      FValFS:	.dw byte1(STEP_0)
+0005ba 0027      	.dw byte2(STEP_0)
+0005bb 0000      	.dw byte3(STEP_0)
                  
-0005c2 00a0      FPres:	.dw byte1(FREQ_0)
-0005c3 0086      	.dw byte2(FREQ_0)
-0005c4 0001      	.dw byte3(FREQ_0)
+0005bc 00a0      FPres:	.dw byte1(FREQ_0)
+0005bd 0086      	.dw byte2(FREQ_0)
+0005be 0001      	.dw byte3(FREQ_0)
                  
-0005c5 0040      	.dw byte1(FREQ_1)
-0005c6 000d      	.dw byte2(FREQ_1)
-0005c7 0003      	.dw byte3(FREQ_1)
+0005bf 0040      	.dw byte1(FREQ_1)
+0005c0 000d      	.dw byte2(FREQ_1)
+0005c1 0003      	.dw byte3(FREQ_1)
                  
-0005c8 00e0      	.dw byte1(FREQ_2)
-0005c9 0093      	.dw byte2(FREQ_2)
-0005ca 0004      	.dw byte3(FREQ_2)
+0005c2 00e0      	.dw byte1(FREQ_2)
+0005c3 0093      	.dw byte2(FREQ_2)
+0005c4 0004      	.dw byte3(FREQ_2)
                  
-0005cb 0080      	.dw byte1(FREQ_3)
-0005cc 001a      	.dw byte2(FREQ_3)
-0005cd 0006      	.dw byte3(FREQ_3)
+0005c5 0080      	.dw byte1(FREQ_3)
+0005c6 001a      	.dw byte2(FREQ_3)
+0005c7 0006      	.dw byte3(FREQ_3)
                  
-0005ce 0020      	.dw byte1(FREQ_4)
-0005cf 00a1      	.dw byte2(FREQ_4)
-0005d0 0007      	.dw byte3(FREQ_4)
+0005c8 0020      	.dw byte1(FREQ_4)
+0005c9 00a1      	.dw byte2(FREQ_4)
+0005ca 0007      	.dw byte3(FREQ_4)
                  
-0005d1 00c0      	.dw byte1(FREQ_5)
-0005d2 0027      	.dw byte2(FREQ_5)
-0005d3 0009      	.dw byte3(FREQ_5)
+0005cb 00c0      	.dw byte1(FREQ_5)
+0005cc 0027      	.dw byte2(FREQ_5)
+0005cd 0009      	.dw byte3(FREQ_5)
                  
-0005d4 0060      	.dw byte1(FREQ_6)
-0005d5 00ae      	.dw byte2(FREQ_6)
-0005d6 000a      	.dw byte3(FREQ_6)
+0005ce 0060      	.dw byte1(FREQ_6)
+0005cf 00ae      	.dw byte2(FREQ_6)
+0005d0 000a      	.dw byte3(FREQ_6)
                  
-0005d7 0040      	.dw byte1(FREQ_7)
-0005d8 0042      	.dw byte2(FREQ_7)
-0005d9 000f      	.dw byte3(FREQ_7)
+0005d1 0040      	.dw byte1(FREQ_7)
+0005d2 0042      	.dw byte2(FREQ_7)
+0005d3 000f      	.dw byte3(FREQ_7)
                  
-0005da 0080      	.dw byte1(FREQ_8)
-0005db 0084      	.dw byte2(FREQ_8)
-0005dc 001e      	.dw byte3(FREQ_8)
+0005d4 0080      	.dw byte1(FREQ_8)
+0005d5 0084      	.dw byte2(FREQ_8)
+0005d6 001e      	.dw byte3(FREQ_8)
                  
-0005dd 0040      	.dw byte1(FREQ_9)
-0005de 004b      	.dw byte2(FREQ_9)
-0005df 004c      	.dw byte3(FREQ_9)
+0005d7 0040      	.dw byte1(FREQ_9)
+0005d8 004b      	.dw byte2(FREQ_9)
+0005d9 004c      	.dw byte3(FREQ_9)
                  
-0005e0 00de      FSign:	.dw SIGN
+0005da 00de      FSign:	.dw SIGN
                  
                  ;----------------------------------------------------------------------------
                  
@@ -3478,8 +3492,8 @@ Instructions used: 65 out of 110 (59.1%)
 ATmega8 memory use summary [bytes]:
 Segment   Begin    End      Code   Data   Used    Size   Use%
 ---------------------------------------------------------------
-[.cseg] 0x000000 0x000bc2   2332    668   3000    8192  36.6%
+[.cseg] 0x000000 0x000bb6   2332    656   2988    8192  36.5%
 [.dseg] 0x000060 0x000340      0    587    587    1024  57.3%
 [.eseg] 0x000000 0x000026      0     38     38     512   7.4%
 
-Assembly complete, 0 errors, 0 warnings
+Assembly complete, 0 errors, 1 warnings
