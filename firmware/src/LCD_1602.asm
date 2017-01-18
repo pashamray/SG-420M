@@ -174,7 +174,7 @@ setpo:
 ;Indicate Dig[0..9] on LCD:
 	
 Disp:	
-		ldi		temp,0x02		;temp home  address
+		ldi		temp,0x80		;temp home  address
 		rcall	LCD_CMD			;write address
 		ldy		Dig				;pointer to Dig
 		ldi		Cnt,Lcd_bytes
@@ -184,14 +184,11 @@ disp_loop:
 		swap	temp
 		rcall	LCD_WN			;write nibble from temp to LCD
 		pop		temp			;restore byte
-		nop
-		nop
-		nop
 		rcall	LCD_WN			;write nibble from temp to LCD
 		dec		Cnt
-		cpi		Cnt,0
+		cpi		Cnt,0			;all bytes is out
 		breq	disp_ret
-		cpi		Cnt,Lcd_cols
+		cpi		Cnt,Lcd_cols	;1 line is full
 		brne	disp_loop
 		ldi		temp,0xC0		;temp 2 line address
 		rcall	LCD_CMD			;write address
