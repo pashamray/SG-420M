@@ -413,7 +413,7 @@ Search:
 	ldy		Dig+Lcd_cols
 srch:	
 	ld		temp,Y+
-	andi	temp,~Pt
+	andi	temp,~'.'
 	breq	srch
 	cpi		temp,BLANK
 	breq	srch
@@ -698,12 +698,12 @@ StDEF:	st	Y+,tempD
 ;String table:
 
 StrT:
-	.DB "Frequency",' ',iP,i_,iE,i_,iS,iH
-	.DB iF,iS,iC,i_
+	.DB "F",' ','P',' ','E',' ','S','H'
+	.DB 'F','S','C',' '
 
 ;Shape string table:
 
 ShpT:
-	.DB iO,iF,iF,iS,iii,iiN
+	.DB 'O','F','F','S','i','n'
 
 ;----------------------------------------------------------------------------

@@ -28,12 +28,12 @@ Init:
 	ldy		RAMEND	
 	out		SPL,YL		;locate stack
 	out		SPH,YH
-	;rcall	iWdog		;start internal watchdog
+	rcall	iWdog		;start internal watchdog
 	rcall	iPorts		;ports init
 	rcall	iVar		;variables init
 	rcall	iTimer		;system timer init
 	rcall	iDisp		;LCD init
-	;rcall	iDDS		;DDS subsystem init
+	rcall	iDDS		;DDS subsystem init
 	sei					;enable interrupts
 	rcall	iMenu		;menu subsystem init
 
