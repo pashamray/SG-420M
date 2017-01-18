@@ -410,7 +410,7 @@ smm:
 ;Search for first non-zero digit:
 
 Search:	
-	ldy		Dig+3
+	ldy		Dig+Lcd_cols
 srch:	
 	ld		temp,Y+
 	andi	temp,~Pt
@@ -562,10 +562,6 @@ Update:
 
 upd1:	
 	table	StrFreq		;string table base
-	add		temp,temp	;temp = Menu * 2
-	add		ZL,temp
-	adc		ZH,temp
-	sub		ZH,temp		;ZH:ZL = StrT + Menu * 2
 	ldy		Dig			;display data base
 	lpm		temp,Z+
 	st		Y+,temp		;F
@@ -585,6 +581,15 @@ upd1:
 	st		Y+,temp		;c
 	lpm		temp,Z+
 	st		Y+,temp		;y
+
+	table	StrkHz		;string table base
+	ldy		Dig+Lcd_bytes-3		;display data base 
+	lpm		temp,Z+
+	st		Y+,temp		;k
+	lpm		temp,Z+
+	st		Y+,temp		;H
+	lpm		temp,Z+
+	st		Y+,temp		;z
 
 	lds		temp,Menu
 	cpi		temp,MnuE	;---> menu "Save Preset":

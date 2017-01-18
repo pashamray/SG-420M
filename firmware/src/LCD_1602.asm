@@ -84,81 +84,90 @@ iDisp:		Port_LOAD_0;        ;E <- 0
 
 ;Update display:
 
-mDisp:		bbrc	Flags,UPDD,NoUpd ;check up update flag
-			clbr	Flags,UPDD	 ;clear update flag
-			rcall	Disp		 ;update display
-NoUpd:		ret
+mDisp:		
+		bbrc	Flags,UPDD,NoUpd ;check up update flag
+		clbr	Flags,UPDD	 ;clear update flag
+		rcall	Disp		 ;update display
+NoUpd:	
+		ret
 
 ;----------------------------------------------------------------------------
 
 ;Fill display with char from temp:
 
-Fill:		ldy		Dig
-			ldi		Cnt,Lcd_bytes
-fill1:		st		Y+,temp
-			dec		Cnt
-			brne	fill1
-			ret
+Fill:		
+		ldy		Dig
+		ldi		Cnt,Lcd_bytes
+fill1:	
+		st		Y+,temp
+		dec		Cnt
+		brne	fill1
+		ret
 
 ;----------------------------------------------------------------------------
 
 ;tempH:tempM:tempL convert to BCD Dig[3..9]
 	
-DisBCD:
-			ldy		Dig+Lcd_cols
-			clr		temp
-			ldi		Cnt,Lcd_cols
-clrout: 	st		Y+,temp		;output array clear
-			dec		Cnt
-			brne	clrout		
-			ret
-			
-			ldi		Cnt,24		;input bits count
-			ldz		Dig
-hloop:		lsl		tempL		;input array shift left
-			rol		tempM
-			rol		tempH		
-			ldy		Dig+Lcd_cols
-sloop:		ld		temp,-Y
-			rol		temp
-			subi	temp,-0x06	;temp+6, C=1
-			sbrs	temp,4
-			subi	temp,0x06	;temp-6, C=0
-			andi	temp,0x0f
-			st		Y,temp
-			cpse	YL,ZL		;ZH:ZL = Dig+3
-			rjmp	sloop
-			cpse	YH,ZH
-			rjmp	sloop
-			dec		Cnt		;YH:YL = Dig+3
-			brne	hloop 
+DisBCD:	ret
+		ldy		Dig+3
+		clr		temp
+		ldi		Cnt,7
+clrout: 
+		st		Y+,temp		;output array clear
+		dec		Cnt
+		brne	clrout		
+
+		ldi		Cnt,24		;input bits count
+		ldz		Dig+3
+hloop:	
+		lsl		tempL		;input array shift left
+		rol		tempM
+		rol		tempH		
+		ldy		Dig+10
+sloop:	
+		ld		temp,-Y
+		rol		temp
+		subi	temp,-0x06	;temp+6, C=1
+		sbrs	temp,4
+		subi	temp,0x06	;temp-6, C=0
+		andi	temp,0x0f
+		st		Y,temp
+		cpse	YL,ZL		;ZH:ZL = Dig+3
+		rjmp	sloop
+		cpse	YH,ZH
+		rjmp	sloop
+		dec		Cnt			;YH:YL = Dig+3
+		brne	hloop
 
 ;Supress zeros:
 
-			ldz		Dig+7
-			ldi		tempL,BLANK
-zsp:		ld		temp,Y
-			tst		temp
-			brne	notz
-			st		Y+,tempL	;suppress zero
-			cp		YL,ZL
-			brne	zsp
-			cp		YH,ZH
-			brne	zsp
-notz:		movw	ZH:ZL,YH:YL	;ZH:ZL points to first non-zero digit
+		ldz		Dig+7
+		ldi		tempL,BLANK
+zsp:	
+		ld		temp,Y
+		tst		temp
+		brne	notz
+		st		Y+,tempL	;suppress zero
+		cp		YL,ZL
+		brne	zsp
+		cp		YH,ZH
+		brne	zsp
+notz:	
+		movw	ZH:ZL,YH:YL	;ZH:ZL points to first non-zero digit
 	
 ;Setup point:
 
-			ldy		Dig+5
-			cp		ZL,YL
-			cpc		ZH,YH
-			ldy		Dig+4
-			brlo	setpo
-			ldy		Dig+7
-setpo:		ld		temp,Y
-			ori		temp,Pt
-			st		Y,temp		;setup point at Dig+4 or Dig+7
-			ret	
+		ldy		Dig+5
+		cp		ZL,YL
+		cpc		ZH,YH
+		ldy		Dig+4
+		brlo	setpo
+		ldy		Dig+7
+setpo:	
+		ld		temp,Y
+		ori		temp,Pt
+		st		Y,temp		;setup point at Dig+4 or Dig+7
+		ret	
 
 ;----------------------------------------------------------------------------
 
@@ -175,13 +184,16 @@ disp_loop:
 		swap	temp
 		rcall	LCD_WN			;write nibble from temp to LCD
 		pop		temp			;restore byte
+		nop
+		nop
+		nop
 		rcall	LCD_WN			;write nibble from temp to LCD
 		dec		Cnt
 		cpi		Cnt,0
 		breq	disp_ret
 		cpi		Cnt,Lcd_cols
 		brne	disp_loop
-		ldi		temp,0x8F		;temp home  address
+		ldi		temp,0xC0		;temp 2 line address
 		rcall	LCD_CMD			;write address
 		rjmp	disp_loop
 disp_ret:
@@ -192,16 +204,46 @@ LCD_CMD:	push	temp
 			rcall	LCD_WA		; first HIGH bits
 			pop		temp
 			swap	temp 		; second LOW bits
-			nop
-			nop
-			nop
-			nop
-			nop
-			nop
-			nop
-			nop
-			nop
-			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
 			rcall	LCD_WA		
 			ret
 
@@ -209,16 +251,46 @@ LCD_DATA:	push	temp
 			swap	temp
 			rcall	LCD_WN		; first HIGH bits
 			pop		temp
-			nop
-			nop
-			nop
-			nop
-			nop
-			nop
-			nop
-			nop
-			nop
-			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
 			rcall	LCD_WN		; second LOW bits
 			ret
 
@@ -230,7 +302,7 @@ LCD_WN:		andi	temp,0x0F	;mask unused bits
 
 ;Write address from temp to LCD:
 
-LCD_WA:		swap	temp 		; first HIGH bits
+LCD_WA:		swap	temp 		;first HIGH bits
 			andi	temp,0x0F	;mask unused bits
 
 w5:			push	Cnt
@@ -255,6 +327,156 @@ w5_0:		rol		temp
   			nop
   			nop
   			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
+  			nop
 			Port_LOAD_0			;E <- 0
 			pop		Cnt
 			ret
@@ -263,15 +485,15 @@ w5_0:		rol		temp
 
 ; Strings table
 StrName:
-	.db "SG-420M",'\0'
+    .db "SG-420M", '\0'
 StrVer:
-	.db "Version: 1.01",'\0'
+    .db "Version: 1.01", '\0'
 StrFreq:
-	.db "Frequency",'\0'
-StrStep:
-	.db "step ",'\0'
+    .db "Frequency", '\0'
 StrkHz:
-	.db "kHz",'\0'
+    .db "kHz", '\0'
+StrStep:
+    .db "step ", '\0'
 
 ;----------------------------------------------------------------------------
 
