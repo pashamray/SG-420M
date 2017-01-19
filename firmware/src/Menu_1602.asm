@@ -410,10 +410,10 @@ smm:
 ;Search for first non-zero digit:
 
 Search:	
-	ldy		Dig+Lcd_cols
+	ldy		Dig+3
 srch:	
 	ld		temp,Y+
-	andi	temp,~'.'
+	andi	temp,~Pt
 	breq	srch
 	cpi		temp,BLANK
 	breq	srch
@@ -544,7 +544,7 @@ Update:
 	cpi		temp,MnuSH	;---> menu "Shape":
 	brne	upd1
 
-	table	ShpT		;string table base
+	table	StrMode		;string table base
 	mov		temp,tempL
 	add		temp,tempL
 	add		temp,tempL	;temp = Buff[0] * 3
@@ -558,6 +558,8 @@ Update:
 	st		Y+,temp		;menu char 2
 	lpm		temp,Z+
 	st		Y+,temp		;menu char 3
+	lpm		temp,Z+
+	st		Y+,temp		;menu char 4
 	rjmp	upd31
 
 upd1:	
@@ -692,18 +694,5 @@ StDEF:	st	Y+,tempD
 	st	Y+,tempE
 	st	Y+,tempF
 	ret
-
-;----------------------------------------------------------------------------
-
-;String table:
-
-StrT:
-	.DB "F",' ','P',' ','E',' ','S','H'
-	.DB 'F','S','C',' '
-
-;Shape string table:
-
-ShpT:
-	.DB 'O','F','F','S','i','n'
 
 ;----------------------------------------------------------------------------
