@@ -145,7 +145,7 @@ Do_UP:	lds	temp,Menu
 	
 ;Buff + Step, align value to step
 
-	ldy	Buff
+	ldy		Buff
 	rcall	LdLMH		;tempH:tempM:tempL = Buff
 	ldy	Step
 	rcall	LdDEF		;tempF:tempE:tempD = Step
@@ -410,7 +410,7 @@ smm:
 ;Search for first non-zero digit:
 
 Search:	
-	ldy		Dig+3
+	ldy		Dig+5 
 srch:	
 	ld		temp,Y+
 	andi	temp,~Pt
@@ -545,21 +545,33 @@ Update:
 	brne	upd1
 
 	table	StrMode		;string table base
+	ldy		Dig 		;display data base
+	lpm		temp,Z+
+	st		Y+,temp		;O
+	lpm		temp,Z+
+	st		Y+,temp		;u
+	lpm		temp,Z+
+	st		Y+,temp		;t
+	lpm		temp,Z+
+	st		Y+,temp		;p
+	lpm		temp,Z+
+	st		Y+,temp		;u
+	lpm		temp,Z+
+	st		Y+,temp		;t
+	table	ShpT
+	ldy		Dig+Lcd_cols 		;display data base
 	mov		temp,tempL
 	add		temp,tempL
 	add		temp,tempL	;temp = Buff[0] * 3
 	add		ZL,temp
 	adc		ZH,temp
 	sub		ZH,temp		;ZH:ZL = ShpT + Buff[0] * 3
-	ldy		Dig+4		;display data base + 4
 	lpm		temp,Z+
 	st		Y+,temp		;menu char 1
 	lpm		temp,Z+
 	st		Y+,temp		;menu char 2
 	lpm		temp,Z+
 	st		Y+,temp		;menu char 3
-	lpm		temp,Z+
-	st		Y+,temp		;menu char 4
 	rjmp	upd31
 
 upd1:	
@@ -584,6 +596,22 @@ upd1:
 	lpm		temp,Z+
 	st		Y+,temp		;y
 
+	lds		temp,Menu
+	cpi		temp,MnuFS	;---> menu "Freq step":
+	brne	skip
+	ldi 	temp,BLANK
+	st		Y+,temp		;blank
+	table	StrStep		;string table base
+	lpm		temp,Z+
+	st		Y+,temp		;s
+	lpm		temp,Z+
+	st		Y+,temp		;t
+	lpm		temp,Z+
+	st		Y+,temp		;e
+	lpm		temp,Z+
+	st		Y+,temp		;p
+
+skip:
 	table	StrkHz		;string table base
 	ldy		Dig+Lcd_bytes-3		;display data base 
 	lpm		temp,Z+
@@ -596,14 +624,70 @@ upd1:
 	lds		temp,Menu
 	cpi		temp,MnuE	;---> menu "Save Preset":
 	brne	upd2
-	sts		Dig+1,tempL	;Dig[1] - preset number
+	ldy		Dig
+	table	StrSave		;save string
+	lpm		temp,Z+
+	st		Y+,temp		;S
+	lpm		temp,Z+
+	st		Y+,temp		;a
+	lpm		temp,Z+
+	st		Y+,temp		;v
+	lpm		temp,Z+
+	st		Y+,temp		;e
+	ldi		temp,BLANK
+	st		Y+,temp		;blank
+	table	StrPre		;preset string
+	lpm		temp,Z+
+	st		Y+,temp		;p
+	lpm		temp,Z+
+	st		Y+,temp		;r
+	lpm		temp,Z+
+	st		Y+,temp		;e
+	lpm		temp,Z+
+	st		Y+,temp		;s
+	lpm		temp,Z+
+	st		Y+,temp		;e
+	lpm		temp,Z+
+	st		Y+,temp		;t
+	ldi		temp,BLANK
+	st		Y+,temp		;blank
+	mov		temp,tempL
+	st		Y+,temp		;number
 	ldy		ValF
 	rjmp	upd21
 
 upd2:	
 	cpi		temp,MnuP	;---> menu "Read Preset":
 	brne	upd3
-	sts		Dig+1,tempL	;Dig[1] - preset number
+	ldy		Dig
+	table	StrRead		;read string
+	lpm		temp,Z+
+	st		Y+,temp		;R
+	lpm		temp,Z+
+	st		Y+,temp		;e
+	lpm		temp,Z+
+	st		Y+,temp		;a
+	lpm		temp,Z+
+	st		Y+,temp		;d
+	ldi		temp,BLANK
+	st		Y+,temp		;blank
+	table	StrPre		;preset string
+	lpm		temp,Z+
+	st		Y+,temp		;p
+	lpm		temp,Z+
+	st		Y+,temp		;r
+	lpm		temp,Z+
+	st		Y+,temp		;e
+	lpm		temp,Z+
+	st		Y+,temp		;s
+	lpm		temp,Z+
+	st		Y+,temp		;e
+	lpm		temp,Z+
+	st		Y+,temp		;t
+	ldi		temp,BLANK
+	st		Y+,temp		;blank
+	mov		temp,tempL
+	st		Y+,temp		;number
 	ldy		ValP
 upd21:	
 	rcall	LdLMH		;tempH:tempM:tempL = ValF or ValP
@@ -694,5 +778,11 @@ StDEF:	st	Y+,tempD
 	st	Y+,tempE
 	st	Y+,tempF
 	ret
+
+;----------------------------------------------------------------------------
+
+;Shape string table:
+
+ShpT:	.DB _iO, _iiF, _iiF, _iO, _iiN, BLANK
 
 ;----------------------------------------------------------------------------

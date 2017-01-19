@@ -109,7 +109,8 @@ fill1:
 
 ;tempH:tempM:tempL convert to BCD Dig[3..9]
 	
-DisBCD:	ldy	Dig+Lcd_cols
+DisBCD:	
+  ldy	Dig+Lcd_cols+5
 	clr	temp
 	ldi	Cnt,7
 clrout: st	Y+,temp		;output array clear
@@ -117,11 +118,11 @@ clrout: st	Y+,temp		;output array clear
 	brne	clrout		
 
 	ldi	Cnt,24		;input bits count
-	ldz	Dig+Lcd_cols
+	ldz	Dig+Lcd_cols+5
 hloop:	lsl	tempL		;input array shift left
 	rol	tempM
 	rol	tempH		
-	ldy	Dig+Lcd_cols+7
+	ldy	Dig+Lcd_cols+12
 sloop:	ld	temp,-Y
 	rol	temp
 	subi	temp,-0x06	;temp+6, C=1
@@ -138,7 +139,7 @@ sloop:	ld	temp,-Y
 
 ;Supress zeros:
 
-	ldz	Dig+Lcd_cols+4
+	ldz	Dig+Lcd_cols+9
 	ldi	tempL,BLANK
 zsp:	ld	temp,Y
 	tst	temp
@@ -152,17 +153,17 @@ notz:	movw	ZH:ZL,YH:YL	;ZH:ZL points to first non-zero digit
 	
 ;Setup point:
 
-	ldy	Dig+Lcd_cols+2
+	ldy	Dig+Lcd_cols+7
 	cp	ZL,YL
 	cpc	ZH,YH
-	ldy	Dig+Lcd_cols+1
+	ldy	Dig+Lcd_cols+6
 	brlo	setpo
-	ldy	Dig+Lcd_cols+4
-setpo:	
-	ld	temp,Y+
-	ldi	temp,DOT
-	st	Y,temp		;setup point at Dig+4 or Dig+7
-	ret	
+	ldy	Dig+Lcd_cols+9
+setpo: 
+  ld  temp,Y
+  ori temp,Pt
+  st  Y,temp    ;setup point at Dig+4 or Dig+7
+  ret 
 
 ;----------------------------------------------------------------------------
 
@@ -175,6 +176,7 @@ Disp:
 		ldi		Cnt,Lcd_bytes
 disp_loop:	
 		ld		temp,Y+			;temp <- digit
+    andi  temp,0x7F ;temp.7 <- 0
 		table	FONT			;pointer to FONT
 		add		ZL,temp			;ZH:ZL = ZH:ZL + temp
 		adc		ZH,temp
@@ -302,8 +304,13 @@ StrkHz:
 StrStep:
     .db _iiS, _iiT, _iiE, _iiP
 StrMode:
-	.db _iM, _iiO, _iiD, _iiE
-
+	.db _iO, _iiU, _iiT, _iiP, _iiU, _iiT
+StrPre:
+  .db _iiP, _iiR, _iiE, _iiS, _iiE, _iiT
+StrRead:
+  .db _iR, _iiE, _iiA, _iiD
+StrSave:
+  .db _iS, _iiA, _iiV, _iiE
 ;----------------------------------------------------------------------------
 
 ;Font table:
