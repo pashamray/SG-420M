@@ -43,26 +43,26 @@ Dig:	.byte Lcd_bytes	;display data (string copy)
 ;			rcall	Disp		;blank display
 ;			ret
 
-iDisp:		
+iDisp:
       Port_LOAD_0;        ;E <- 0
 			ldi		temp, 15
 			rcall	WaitMiliseconds
 			ldi		temp,0x30		; FUNCTION SET (8 bit)
 			rcall	LCD_WA
-			ldi		temp, 15 		;delay >4.1 ms 	
-			rcall	WaitMiliseconds 
+			ldi		temp, 15 		;delay >4.1 ms
+			rcall	WaitMiliseconds
 			ldi		temp,0x30		; FUNCTION SET (8 bit)
 			rcall	LCD_WA
 			ldi		temp, 15
 			rcall	WaitMiliseconds	;delay >100 us
 			ldi		temp,0x30		; FUNCTION SET (8 bit)
 			rcall	LCD_WA
-			ldi		temp, 15 		;delay >4.1 ms 	
-			rcall	WaitMiliseconds 
+			ldi		temp, 15 		;delay >4.1 ms
+			rcall	WaitMiliseconds
 			ldi		temp,0x20		; FUNCTION SET (4 bit)
 			rcall	LCD_WA
-			ldi		temp, 15 		;delay >4.1 ms 	
-			rcall	WaitMiliseconds 
+			ldi		temp, 15 		;delay >4.1 ms
+			rcall	WaitMiliseconds
 			ldi		temp,0x28		;FUNCTION SET (4 bit)
 			rcall	LCD_CMD
 			ldi		temp, 20
@@ -77,7 +77,7 @@ iDisp:
 			rcall	WaitMiliseconds
 			ldi		temp,0x0C		; display on
 			rcall	LCD_CMD
-			ldi		temp, 25 
+			ldi		temp, 25
 			rcall	WaitMiliseconds
 			ret
 
@@ -85,21 +85,21 @@ iDisp:
 
 ;Update display:
 
-mDisp:		
+mDisp:
 		bbrc	Flags,UPDD,NoUpd ;check up update flag
 		clbr	Flags,UPDD	 ;clear update flag
 		rcall	Disp		 ;update display
-NoUpd:	
+NoUpd:
 		ret
 
 ;----------------------------------------------------------------------------
 
 ;Fill display with char from temp:
 
-Fill:		
+Fill:
 		ldy		Dig
 		ldi		Cnt,Lcd_bytes
-fill1:	
+fill1:
 		st		Y+,temp
 		dec		Cnt
 		brne	fill1
@@ -108,20 +108,20 @@ fill1:
 ;----------------------------------------------------------------------------
 
 ;tempH:tempM:tempL convert to BCD Dig[3..9]
-	
-DisBCD:	
+
+DisBCD:
   ldy	Dig+Lcd_cols+5
 	clr	temp
 	ldi	Cnt,7
 clrout: st	Y+,temp		;output array clear
 	dec	Cnt
-	brne	clrout		
+	brne	clrout
 
 	ldi	Cnt,24		;input bits count
 	ldz	Dig+Lcd_cols+5
 hloop:	lsl	tempL		;input array shift left
 	rol	tempM
-	rol	tempH		
+	rol	tempH
 	ldy	Dig+Lcd_cols+12
 sloop:	ld	temp,-Y
 	rol	temp
@@ -150,7 +150,7 @@ zsp:	ld	temp,Y
 	cp	YH,ZH
 	brne	zsp
 notz:	movw	ZH:ZL,YH:YL	;ZH:ZL points to first non-zero digit
-	
+
 ;Setup point:
 
 	ldy	Dig+Lcd_cols+7
@@ -159,22 +159,22 @@ notz:	movw	ZH:ZL,YH:YL	;ZH:ZL points to first non-zero digit
 	ldy	Dig+Lcd_cols+6
 	brlo	setpo
 	ldy	Dig+Lcd_cols+9
-setpo: 
+setpo:
   ld  temp,Y
   ori temp,Pt
   st  Y,temp    ;setup point at Dig+4 or Dig+7
-  ret 
+  ret
 
 ;----------------------------------------------------------------------------
 
 ;Indicate Dig[0..9] on LCD:
-	
-Disp:	
+
+Disp:
 		ldi		temp,0x80		;temp home  address
 		rcall	LCD_CMD			;write address
 		ldy		Dig				;pointer to Dig
 		ldi		Cnt,Lcd_bytes
-disp_loop:	
+disp_loop:
 		ld		temp,Y+			;temp <- digit
     andi  temp,0x7F ;temp.7 <- 0
 		table	FONT			;pointer to FONT
@@ -196,10 +196,10 @@ disp_loop:
 		rcall	LCD_CMD			;write address
 		rjmp	disp_loop
 disp_ret:
-		ret	
+		ret
 
 ;----------------------------------------------------------------------------
-LCD_CMD:	
+LCD_CMD:
       push	temp
 			rcall	LCD_WA		; first HIGH bits
 			pop		temp
@@ -214,7 +214,7 @@ LCD_CMD:
       nop
       nop
       nop
-			rcall	LCD_WA		
+			rcall	LCD_WA
 			ret
 
 LCD_DATA:
@@ -237,17 +237,17 @@ LCD_DATA:
 
 ;Write nibble from temp to LCD:
 
-LCD_WN:		
+LCD_WN:
       andi	temp,0x0F	;mask unused bits
 			ori		temp,0x10	;address = 1
 			rjmp	w5
 
 ;Write address from temp to LCD:
 
-LCD_WA:		
+LCD_WA:
       swap	temp 		  ;first HIGH bits
 			andi	temp,0x0F	;mask unused bits
-w5:			
+w5:
       push   Cnt
 			ldi    Cnt,5		;write 5 bits to LCD
 w5_cyc:
@@ -298,9 +298,9 @@ w5_0:
 ; Strings table
 
 StrFreq:
-    .db _iF, _iiR, _iiE, _iiQ, _iiU, _iiE, _iiN, _iiC, _iiY, '\0'
+    .db _iF, _iiR, _iiE, _iiQ, _iiU, _iiE, _iiN, _iiC, _iiY
 StrkHz:
-    .db _iiK, _iH, _iiZ, '\0'
+    .db _iiK, _iH, _iiZ
 StrStep:
     .db _iiS, _iiT, _iiE, _iiP
 StrMode:
