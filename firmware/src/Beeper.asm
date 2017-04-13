@@ -43,7 +43,7 @@ ErrB:	ldi	tempE,ERRBP	;period
 
 ;Data save melody:
 
-Melody:	ldi	tempE,MLDP1	;tone 1	
+Melody:	ldi	tempE,MLDP1	;tone 1
 	rcall	Tone
 	ldi	tempE,MLDP2	;tone 2
 	rcall	Tone
@@ -73,13 +73,12 @@ Sound:
 	ldi	tempD,SDUR	;sound duration
 	rcall	Sgen
 	ret
-	
+
 ;----------------------------------------------------------------------------
 
 ;Sound generation:
 ;Input: tempE - period
 ;       tempD - duration
-	
 Sgen:	mov	tempF,tempE	;3
 sndb:	ldi	Cnt,NSND  	;2 outer loop
 snda:	dec	Cnt		    ;1 inner loop

@@ -25,8 +25,7 @@
 
 .ESEG	;EEPROM initial values
 
-;----------------------------------------------------------------------------
-
+.DSEG ; Start data segment
 Enone:	.byte 1			;address 0 not used
 ECalib:	.byte 3			;calibration value
 EValFS:	.byte 3			;step
@@ -75,9 +74,9 @@ rdpar:	ldy	ECalib
 
 ;----------------------------------------------------------------------------
 
-;Read preset from the EEPROM:	
+;Read preset from the EEPROM:
 ;Input: [Buff+0] - preset number
-	
+
 ReadP:	lds	temp,Buff+0	;temp = preset number
 	rcall	EE_PrA		;YH:YL = EEPROM address
 	ldz	ValP
@@ -87,13 +86,13 @@ ReadP:	lds	temp,Buff+0	;temp = preset number
 ;----------------------------------------------------------------------------
 
 ;Save calibration to the EEPROM:
-	
+
 SaveC:	ldy	ECalib
-	ldz	Calib	
+	ldz	Calib
 	rcall	EE_Wr3		;save Calib
 	rcall	Melody		;melody
 	ret
-	
+
 ;----------------------------------------------------------------------------
 
 ;Save preset to the EEPROM:
@@ -101,10 +100,10 @@ SaveC:	ldy	ECalib
 SaveP:	lds	temp,Buff+0	;temp = preset number
 	tst	temp
 	brne	svp
-	
+
 	push	temp
 	ldy	EValFS
-	ldz	ValFS	
+	ldz	ValFS
 	rcall	EE_Wr3		;save ValFS
 	pop	temp
 
@@ -128,7 +127,7 @@ EE_PrA:	ldy	EPres
 	add	YL,temp
 	adc	YH,tempL
 	ret
-	
+
 ;----------------------------------------------------------------------------
 
 ;Read 3 bytes from the EEPROM:
@@ -141,7 +140,7 @@ rdn:	rcall	EE_Rd		;temp = EEPROM data byte
 	adiw	YH:YL,1		;EEPROM address inc
 	dec	Cnt
 	brne	rdn
-	ret	
+	ret
 
 ;----------------------------------------------------------------------------
 

@@ -62,18 +62,18 @@ KBD:	.byte 5			;keyboard data structure
 
 mKey:	rcall	Scan		;scan keyboard
 	ldy	KBD		;keyboard data structure base
-	ldd	tempL,Y+Lc	
+	ldd	tempL,Y+Lc
 	cp	tempL,temp	;scancode = LastCode ?
 	breq	Hold		;branch if same key
-	
+
 	ldd	tempL,Y+Tc
 	cp	tempL,temp	;scancode = TempCode ?
 	brne	NewP		;branch if new key
-	
+
 	ldd	tempL,Y+DebTM
 	tst	tempL		;check debounce timer
 	brne	Hold
-	
+
 	ldd	tempL,Y+Lc
 	cpi	tempL,K_NO	;check LastCode
 	std	Y+Lc,temp	;LastCode <- scancode
@@ -82,11 +82,11 @@ mKey:	rcall	Scan		;scan keyboard
 	ldi	tempH,ARDelV	;autorepeat delay value
 	ldi	tempL,ARCnV
 	rjmp	Stac		;go to store ARCnt
-	
+
 NewP:	std	Y+Tc,temp	;TempCode <- scancode
 	ldi	tempL,DebncV
 	std	Y+DebTM,tempL	;debounce timer load
-	
+
 Hold:	clbr	Flags,NEWPR	;clear new press flag
 	ldd	tempL,Y+KeyTM
 	tst	tempL		;check key timer
@@ -103,10 +103,10 @@ Ar:	stbr	Flags,NEWPR	;set new press flag
 	breq	Fast		;fast autorepeat if count is over
 	dec	tempL		;dec autorepeat counter
 	ldi	tempH,ARSlwV	;slow autorepeat rate
-	
+
 Stac:	std	Y+ARCnt,tempL	;store autorepeat counter ARCnt
 	rjmp	Stkt		;go to store KeyTM
-	
+
 Fast:	ldi	tempH,ARFstV	;fast autorepeat rate
 Stkt:	std	Y+KeyTM,tempH	;store key timer KeyTM
 Proc:
@@ -114,15 +114,14 @@ Proc:
 ;Process timers:
 
 	bbrc	Flags,UPD,Tmr2
-	
 	ldd	temp,Y+DebTM
-	tst	temp		;check debounce timer		 
+	tst	temp		;check debounce timer
 	breq	Tmr1
 	dec	temp		;advance debounce timer
 	std	Y+DebTM,temp
 
 Tmr1:	ldd	temp,Y+KeyTM
-	tst	temp		;check key timer		 
+	tst	temp		;check key timer
 	breq	Tmr2
 	dec	temp		;advance key timer
 	std	Y+KeyTM,temp

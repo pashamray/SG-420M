@@ -24,8 +24,8 @@
 
 ;--------------------------- Main program: ----------------------------------
 
-Init:	
-	ldy		RAMEND	
+Init:
+	ldy		RAMEND
 	out		SPL,YL		;locate stack
 	out		SPH,YH
 	rcall	iWdog		;start internal watchdog
@@ -39,7 +39,7 @@ Init:
 
 ;Main loop:
 
-Main:	
+Main:
 	rcall	mTimer		;process system timer
 	rcall	mKey		;scan keyboard
 	rcall	mMenu		;process menu
@@ -52,19 +52,19 @@ Main:
 
 ;Internal watchdog init:
 
-iWdog:	
+iWdog:
 	wdr
 	ldi		temp,(1<<WDCE) | (1<<WDE)
-	out		WDTCR,temp	
-	ldi		temp,(1<<WDE) | (1<<WDP2)	
+	out		WDTCR,temp
+	ldi		temp,(1<<WDE) | (1<<WDP2)
 	out		WDTCR,temp	;watchdog enable, period 260 mS
-	ret	
+	ret
 
 ;----------------------------------------------------------------------------
 
 ;Internal watchdog restart:
 
-mWdog:	
+mWdog:
 	wdr			;internal watchdog restart
 	ret
 
@@ -72,7 +72,7 @@ mWdog:
 
 ;System timer init:
 
-iTimer:	
+iTimer:
 	ldi		temp,(1<<CS02) | (1<<CS00)
 	out		TCCR0,temp	;CK/1024
 	ret
@@ -81,7 +81,7 @@ iTimer:
 
 ;Process system timer:
 
-mTimer:	
+mTimer:
 	clbr	Flags,UPD
 	in		temp,TIFR
 	bbrc	temp,TOV0,no_tm	;check for Timer 0 overflow
@@ -90,19 +90,19 @@ mTimer:
 	ldi		temp,T0Val
 	out		TCNT0,temp	;Timer 0 reload
 	stbr	Flags,UPD	;set update flag
-no_tm:	
+no_tm:
 	ret
 
 ;----------------------------------------------------------------------------
 
 ;Ports init:
-	
-iPorts:	
+
+iPorts:
 	ldi		temp,PUPB
 	out		PORTB,temp	;init PORTB and on/off pullup
-	ldi		temp,DIRB	
+	ldi		temp,DIRB
 	out		DDRB,temp	;set PORTB direction
-	
+
 	ldi		temp,PUPC
 	out		PORTC,temp	;init PORTC and on/off pullup
 	ldi		temp,DIRC
@@ -118,7 +118,7 @@ iPorts:
 
 ;Variables init:
 
-iVar:	
+iVar:
 	clr		Flags		;clear flags
 	ret
 

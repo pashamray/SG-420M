@@ -32,7 +32,7 @@
 
 ;Nominal frequency calibration value:
 
-.equ CAL_0 = (1125899906842624 / FCLK * (FCLK/FUPD) + 50) / 100
+.equ CAL_0 = 0 ;(1125899906842624 / FCLK * (FCLK/FUPD) + 50) / 100
 
 ;----------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ LUT:	.byte 514		;LUT
 ;tsreg - SREG store
 ;r0,r1 - used with mul instruction
 
-DDS:	ldi	XL,(1<<COM1A0)	
+DDS:	ldi	XL,(1<<COM1A0)
 	out	TCCR1A,XL	;OC1A toggle
 	ldi	XL,(1<<COM1A0) | (1<<FOC1A)
 	out	TCCR1A,XL	;set SCK (OC1A force toggle)
@@ -108,13 +108,13 @@ DDS:	ldi	XL,(1<<COM1A0)
 	adc	SinL,r1		;SinH:SinL = sin[x] + round(r1:r0 / 256)
 	adc	SinH,r0		;SinH:SinL = A
 
-	sbrs	PhaseP,1	
+	sbrs	PhaseP,1
 	rjmp	ph_cd		;jump if Phase.33 == 0
 
 ph_ab:	com	SinL		;SIN > 0, data line has NOT gate,
 	com	SinH		;SinH:SinL = !SinH:SinL
 	rjmp	ph_all
-	
+
 ph_cd:	sec
 	sbc	SinL,r0		;SIN < 0, data line has NOT gate,
 	sbc	SinH,r0		;SinH:SinL = SinH:SinL - 1
@@ -128,7 +128,7 @@ ph_all:	ldi	XL,(1<<COM1A0) | (1<<FOC1A)
 
 	out	SREG,tsreg	;restore status register
 	reti
-	
+
 ;----------------------------------------------------------------------------
 
 ;Init DDS subsystem:
@@ -137,25 +137,25 @@ iDDS:
 
 ;Periphery setup:
 
-	ldi	temp,(1<<WGM12) | (1<<CS10)	
+	ldi	temp,(1<<WGM12) | (1<<CS10)
 	out	TCCR1B,temp	;clear on compare match, CK/1
 
 	ldi	temp,(1<<COM1A1)
 	out	TCCR1A,temp	;OC1A clear on compare
 
 	ldi	temp,high(FCLK/FUPD-1)
-	out	OCR1AH,temp	
+	out	OCR1AH,temp
 	ldi	temp, low(FCLK/FUPD-1)
 	out	OCR1AL,temp
 
-	ldi	temp,(1<<OCF1A)	
+	ldi	temp,(1<<OCF1A)
 	out	TIFR,temp	;clear pending timer interrupt
 	out	TIMSK,temp	;enable output compare interrupt
 
 	ldi	temp,(1<<SPE) | (1<<MSTR) | (1<<CPHA)
 	out	SPCR,temp	;SPI enable, MSB first, master
 
-	ldi	temp,(1<<SPI2X)	
+	ldi	temp,(1<<SPI2X)
 	out	SPSR,temp	;double SPI speed
 
 ;Build sin LUT in RAM:
@@ -232,7 +232,7 @@ TCopy:	lpm	temp,Z+
 
 ;Process ON bit:
 
-mOn:	
+mOn:
 	mov		temp,Flags
 	andi	temp,(1<<ON) | (1<<ONR)
 	breq	No_op
@@ -240,22 +240,22 @@ mOn:
 	breq	No_op
 	cpi		temp,(1<<ON)
 	brne	do_off
-	
-do_on:	
+
+do_on:
 	cbr		Flags,(1<<MF)
 	sbr		Flags,(1<<ONR)
 	rcall	MakeF		;restore ValF
-	rjmp	No_op	
+	rjmp	No_op
 
-do_off:	
+do_off:
 	mov		temp,SinH
 	bbrs	temp,7,dd_off	;jump if minus
 	sbr		Flags,(1<<MF)	;set minus flag
 	tst		FreqM
-	brne	do_off		;wait for plus if FreqM > 0	
+	brne	do_off		;wait for plus if FreqM > 0
 	rjmp	No_op
-	
-dd_off:	
+
+dd_off:
 	bbrc	Flags,MF,No_op	;wait for minus flag
 	cbr		Flags,(1<<ONR)
 	rcall	MakeF		;ValF <- 0
@@ -264,7 +264,7 @@ dd_off:
 	clr		PhaseM
 	clr		PhaseN
 	clr		PhaseP
-No_op:	
+No_op:
 	ret
 
 ;----------------------------------------------------------------------------
@@ -282,17 +282,16 @@ No_op:
 ;mp - ValF -> [MulB+0]..[MulB+2]
 ;m  - [MulB+0]..[MulB+6]
 
-MakeF:	
+MakeF:
 	ldi		Cnt,7
 	ldy		MulB+7
 	clr		temp
-clrm:	
+clrm:
 	st	    -Y,temp		;clear m
 	dec		Cnt
 	brne	clrm
 
 	bbrc	Flags,ONR,m0	;if(ONR == 0) Freq = 0
-	
 	ldy		Calib		;init mc
 	rcall	LdLMH
 	clr		tempD
@@ -308,7 +307,7 @@ clrm:
 	ldz		ValF+3		;init mp
 	ld		temp,-Z
 	lsr		temp
-	std		Y+2,temp	
+	std		Y+2,temp
 	ld		temp,-Z
 	ror		temp
 	std		Y+1,temp
@@ -317,7 +316,7 @@ clrm:
 	std		Y+0,temp
 
 	ldi		Cnt,24		;load cycle counter
-m24_32:		
+m24_32:
 	brcc	noadd
 	ldz		CalB
 	ldd		temp,Y+3
@@ -336,10 +335,10 @@ m24_32:
 	ld		tempD,Z+
 	adc		temp,tempD
 	std		Y+6,temp
-	
-noadd:	
+
+noadd:
 	ldz		MulB+7
-rry:	
+rry:
 	ld		temp,-Z
 	ror		temp
 	st		Z,temp
@@ -347,13 +346,13 @@ rry:
 	rjmp	rry
 	cpse	ZH,YH
 	rjmp	rry
-	
+
 	dec		Cnt
 	brne	m24_32
 
 ;FreqK,L,M,N = [MulB+2]..[MulB+5] + 0.5
 
-m0:	
+m0:
 	ld		temp,Y+		;skip [MulB+0]
 	ldi		tempD,0x80
 	ld		temp,Y+		;load [MulB+1]
@@ -370,7 +369,7 @@ m0:
 	adc		FreqN,Cnt
 	out		SREG,tempL	;interrupts enable
 	ret
-	
+
 ;----------------------------------------------------------------------------
 
 SinTab:
