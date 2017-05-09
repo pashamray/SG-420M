@@ -325,7 +325,7 @@ StrSave:
 ;----------------------------------------------------------------------------
 
 ;Characters codes table:
-.equ  COM       = ','
+;.equ  COM       = ','
 .equ	DOT	  	  = '.'	;character "." code
 .equ	BLANK 	  = ' '	;character "blank" code
 

@@ -25,7 +25,6 @@
 
 .ESEG	;EEPROM initial values
 
-.DSEG ; Start data segment
 Enone:	.byte 1			;address 0 not used
 ECalib:	.byte 3			;calibration value
 EValFS:	.byte 3			;step
