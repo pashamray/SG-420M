@@ -410,14 +410,17 @@ smm:
 ;Search for first non-zero digit:
 
 Search:
-	ldy		Dig+5
+	ldy	Dig+Lcd_cols+0
 srch:
-	ld		temp,Y+
+  ld	temp,Y+
 	andi	temp,~Pt
 	breq	srch
-	cpi		temp,BLANK
+	andi	temp,~Coma
+	breq	srch
+	cpi	temp,BLANK
 	breq	srch
 	ret
+
 
 ;----------------------------------------------------------------------------
 
@@ -614,8 +617,6 @@ skip:
 	table	StrkHz		;string table base
 	ldy		Dig+Lcd_bytes-3		;display data base
 	lpm		temp,Z+
-	st		Y+,temp		;k
-	lpm		temp,Z+
 	st		Y+,temp		;H
 	lpm		temp,Z+
 	st		Y+,temp		;z
@@ -651,6 +652,7 @@ skip:
 	ldi		temp,BLANK
 	st		Y+,temp		;blank
 	mov		temp,tempL
+	subi	temp,-0x30 ; shift 0x30 for hd44780
 	st		Y+,temp		;number
 	ldy		ValF
 	rjmp	upd21
@@ -686,6 +688,7 @@ upd2:
 	ldi		temp,BLANK
 	st		Y+,temp		;blank
 	mov		temp,tempL
+	subi	temp,-0x30 ; shift 0x30 for hd44780
 	st		Y+,temp		;number
 	ldy		ValP
 upd21:
@@ -782,6 +785,6 @@ StDEF:	st	Y+,tempD
 
 ;Shape string table:
 
-ShpT:	.DB _iO, _iiF, _iiF, _iO, _iiN, BLANK
+ShpT:	.DB "OffOn "
 
 ;----------------------------------------------------------------------------
