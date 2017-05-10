@@ -8,7 +8,7 @@
 ;----------------------------------------------------------------------------
 
 .include "m8def.inc"
-.include "macros.asm"
+.include "macros.inc"
 .include "header.asm"
 
 ;------------------------- Interrupt Vectors: -------------------------------
