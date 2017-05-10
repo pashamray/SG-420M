@@ -8,8 +8,8 @@
 ;----------------------------------------------------------------------------
 
 .include "m8def.inc"
-.include "macros.mac"
-.include "Header.asm"
+.include "macros.asm"
+.include "header.asm"
 
 ;------------------------- Interrupt Vectors: -------------------------------
 
@@ -18,7 +18,7 @@
 	rjmp	Init		;reset vector
 
 .org	OC1Aaddr
-.include "DDS.asm"			;link DDS implementation module
+.include "dds.asm"			;link DDS implementation module
 							;DDS implementation is located direct at the OC1A vector address
 							;Only one interrupt is used in this project
 
@@ -124,10 +124,10 @@ iVar:
 
 ;----------------------------------------------------------------------------
 
-.include "LCD_1602.asm"		;link LCD support module
-.include "Keyboard.asm"		;link keyboard support module
-.include "Beeper.asm"		;link beeper support module
-.include "Menu_1602.asm"	;link menu implementation module
-.include "EEPROM.asm"		;link EEPROM support module
+.include "lcd_1602.asm"		;link LCD support module
+.include "keyboard.asm"		;link keyboard support module
+.include "beeper.asm"		;link beeper support module
+.include "menu_1602.asm"	;link menu implementation module
+.include "eeprom.asm"		;link EEPROM support module
 
 ;----------------------------------------------------------------------------
