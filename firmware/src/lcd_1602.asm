@@ -107,7 +107,7 @@ fill1:
 ;tempH:tempM:tempL convert to BCD Dig[5..12]
 
 DisBCD:
-  ldy	  Dig+Lcd_cols+0
+  ldy	  Dig+Lcd_cols+4
 	clr	  temp
 	ldi	  Cnt,7
 clrout:
@@ -116,12 +116,12 @@ clrout:
 	brne	clrout
 
 	ldi	  Cnt,24		;input bits count
-	ldz	  Dig+Lcd_cols+0
+	ldz	  Dig+Lcd_cols+4
 hloop:
   lsl   tempL		;input array shift left
 	rol	  tempM
 	rol	  tempH
-	ldy	  Dig+Lcd_cols+7
+	ldy	  Dig+Lcd_cols+11
 sloop:
   ld	  temp,-Y
 	rol	  temp
@@ -136,10 +136,9 @@ sloop:
 	rjmp	sloop
 	dec	  Cnt		     ;YH:YL = Dig+3
 	brne	hloop
-  ;ret
 
 ;Supress zeros:
-	ldz	  Dig+Lcd_cols+4
+	ldz	  Dig+Lcd_cols+8
 	ldi	  tempL,BLANK
 zsp:
   ld    temp,Y
@@ -154,17 +153,42 @@ notz:
   movw	ZH:ZL,YH:YL	;ZH:ZL points to first non-zero digit
 
 ;Setup point:
-	ldy	Dig+Lcd_cols+2
+	ldy	Dig+Lcd_cols+6
 	cp	ZL,YL
 	cpc	ZH,YH
-	ldy	Dig+Lcd_cols+1
-	brlo	setpo
-	ldy	Dig+Lcd_cols+4
-setpo:
+  ldy	Dig+Lcd_cols+5
+	brlo set_khz
+  ldy	Dig+Lcd_cols+8
+  rjmp set_hz
+  ret
+
+set_khz:
+  rcall set_po
+  table	StrkHz		;string table base
+  ldy		Dig+Lcd_bytes-4		;display data base
+  lpm		temp,Z+
+  st		Y+,temp		;k
+  lpm		temp,Z+
+  st		Y+,temp		;H
+  lpm		temp,Z+
+  st		Y+,temp		;z
+  ret
+
+set_hz:
+  rcall set_po
+  table	StrHz		;string table base
+  ldy		Dig+Lcd_bytes-3		;display data base
+  lpm		temp,Z+
+  st		Y+,temp		;H
+  lpm		temp,Z+
+  st		Y+,temp		;z
+  ret
+
+set_po:
   ld	temp,Y
 	ori	temp,Pt
 	st	Y,temp		;setup point at Dig+4 or Dig+7
-	ret
+  ret
 
 ;----------------------------------------------------------------------------
 
@@ -306,8 +330,10 @@ md1:	ldi	Cnt,200		;inner loop, 200uS
 
 StrFreq:
     .db "Frequency", 0
-StrkHz:
+StrHz:
     .db "Hz"
+StrkHz:
+    .db "kHz",0
 StrStep:
     .db "step"
 StrMode:

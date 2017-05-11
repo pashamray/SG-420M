@@ -415,8 +415,6 @@ srch:
   ld	temp,Y+
 	andi	temp,~Pt
 	breq	srch
-	andi	temp,~Coma
-	breq	srch
 	cpi	temp,BLANK
 	breq	srch
 	ret
@@ -614,12 +612,14 @@ upd1:
 	st		Y+,temp		;p
 
 skip:
-	table	StrkHz		;string table base
-	ldy		Dig+Lcd_bytes-3		;display data base
-	lpm		temp,Z+
-	st		Y+,temp		;H
-	lpm		temp,Z+
-	st		Y+,temp		;z
+;	table	StrkHz		;string table base
+;	ldy		Dig+Lcd_bytes-3		;display data base
+;	lpm		temp,Z+
+;	st		Y+,temp		;k
+;	lpm		temp,Z+
+;	st		Y+,temp		;H
+;	lpm		temp,Z+
+;	st		Y+,temp		;z
 
 	lds		temp,Menu
 	cpi		temp,MnuE	;---> menu "Save Preset":
