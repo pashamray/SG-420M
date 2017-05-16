@@ -1,3 +1,3 @@
 # SG-420M
-![alt face](https://github.com/pashamray/SG-420M/blob/master/doc/sg-420m.jpg)
-![alt inside](https://github.com/pashamray/SG-420M/blob/master/doc/sg-420m_in.jpg)
+![alt melt7](https://github.com/pashamray/SG-420M/blob/master/doc/sg-420m_melt7.png)
+![alt wh1602s](https://github.com/pashamray/SG-420M/blob/master/doc/sg-420m_wh1602s.png)
