@@ -10,7 +10,7 @@
 
 ![alt sch_wh1602s](https://github.com/pashamray/SG-420M/blob/master/doc/SG-420M_sch_wh160x.png)
 
-#### Автор конструкций генератора и базовай прошивки
+#### Автор конструкций генератора и базовой прошивки
 
 Ридико Леонид Иванович
 * http://www.leoniv.diod.club
