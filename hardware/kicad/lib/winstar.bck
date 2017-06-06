@@ -1,0 +1,9 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP WH1602S
+D WH1602S display
+K wh1602, HD44780
+F http://www.winstar.com.tw/uploads/files/7356deed0091650012909c20472ba483.pdf
+$ENDCMP
+#
+#End Doc Library
